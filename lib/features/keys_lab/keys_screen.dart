@@ -105,7 +105,9 @@ class _KeysScreenState extends State<KeysScreen> {
                       backgroundColor: const Color(0xFF3B82F6),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: 12.circularRadius),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: 12.circularRadius,
+                      ),
                     ),
                     icon: const Icon(Icons.swap_vert_rounded),
                     label: const Text('تبديل أول عنصرين'),
@@ -119,7 +121,9 @@ class _KeysScreenState extends State<KeysScreen> {
                       backgroundColor: const Color(0xFF475569),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: 12.circularRadius),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: 12.circularRadius,
+                      ),
                     ),
                     icon: const Icon(Icons.restart_alt_rounded),
                     label: const Text('إعادة تعيين'),
@@ -132,7 +136,11 @@ class _KeysScreenState extends State<KeysScreen> {
             // 4. عناصر القائمة التفاعلية
             const Text(
               '📝 قائمة المهام التفاعلية (اكتب ملاحظات بداخل كل حقل ثم احذف العنصر الأول لترى النتيجة):',
-              style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             12.heightBox,
             ...List.generate(_items.length, (index) {
@@ -176,7 +184,11 @@ class _KeysScreenState extends State<KeysScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.account_tree_rounded, color: Colors.indigoAccent, size: 24),
+              const Icon(
+                Icons.account_tree_rounded,
+                color: Colors.indigoAccent,
+                size: 24,
+              ),
               8.widthBox,
               const Text(
                 'سر الأشجار الثلاث (Widget - Element - RenderObject)',
@@ -256,6 +268,12 @@ class _KeysScreenState extends State<KeysScreen> {
   }
 
   Widget _buildThreeTreesArchitectureCard() {
+    const code =
+        'static bool canUpdate(Widget oldWidget, Widget newWidget) {\n'
+        '  return oldWidget.runtimeType == newWidget.runtimeType\n'
+        '      && oldWidget.key == newWidget.key;\n'
+        '}';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -268,32 +286,17 @@ class _KeysScreenState extends State<KeysScreen> {
         children: [
           const Text(
             '🔍 معادلة المطابقة في Flutter (Widget.canUpdate):',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
           ),
           10.heightBox,
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F172A),
-                borderRadius: 8.circularRadius,
-                border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.3)),
-              ),
-              child: const Text(
-                'static bool canUpdate(Widget oldWidget, Widget newWidget) {\n'
-                '  return oldWidget.runtimeType == newWidget.runtimeType\n'
-                '      && oldWidget.key == newWidget.key;\n'
-                '}',
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  color: Colors.cyanAccent,
-                  fontSize: 12,
-                  height: 1.4,
-                ),
-              ),
-            ),
+          const CopyableCodeBlock(
+            code: code,
+            copiedMessage: 'تم نسخ الكود',
+            copyTooltip: 'نسخ الكود',
           ),
           12.heightBox,
           const Text(
@@ -338,7 +341,9 @@ class _StatefulColorTileState extends State<StatefulColorTile> {
       random.nextInt(150) + 40,
       random.nextInt(150) + 40,
     );
-    _notesController = TextEditingController(text: 'ملاحظة خاصة بالبند ${widget.item.id}');
+    _notesController = TextEditingController(
+      text: 'ملاحظة خاصة بالبند ${widget.item.id}',
+    );
   }
 
   @override
@@ -376,7 +381,11 @@ class _StatefulColorTileState extends State<StatefulColorTile> {
                 ),
                 child: Text(
                   'ID: ${widget.item.id}',
-                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               10.widthBox,
@@ -391,7 +400,10 @@ class _StatefulColorTileState extends State<StatefulColorTile> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: widget.onDelete,
                 tooltip: 'حذف هذا العنصر',
               ),

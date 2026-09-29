@@ -55,7 +55,11 @@ class _ErrorHandlingView extends StatelessWidget {
             // 2. أزرار محاكاة السيناريوهات المختلفة
             const Text(
               '🎮 اختر سيناريو الاستجابة لمحاكاته:',
-              style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             12.heightBox,
             _buildScenarioButtons(context),
@@ -64,7 +68,11 @@ class _ErrorHandlingView extends StatelessWidget {
             // 3. مساحة عرض الحالة الحالية (BlocBuilder State Area)
             const Text(
               '📱 استجابة الـ Cubit والواجهة (Live UI State):',
-              style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             12.heightBox,
             _buildStateCard(),
@@ -84,14 +92,20 @@ class _ErrorHandlingView extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: 16.circularRadius,
-        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFF10B981).withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.security_rounded, color: Color(0xFF10B981), size: 24),
+              const Icon(
+                Icons.security_rounded,
+                color: Color(0xFF10B981),
+                size: 24,
+              ),
               8.widthBox,
               const Text(
                 'لماذا نستخدم إستراتيجية Either<Failure, T>؟',
@@ -171,7 +185,10 @@ class _ErrorHandlingView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         shape: RoundedRectangleBorder(borderRadius: 10.circularRadius),
       ),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+      child: Text(
+        label,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+      ),
     );
   }
 
@@ -181,7 +198,10 @@ class _ErrorHandlingView extends StatelessWidget {
         if (state is UserLoaded) {
           context.showSuccessSnackBar('تم جلب بيانات المستخدم بنجاح!');
         } else if (state is UserError) {
-          context.showErrorSnackBar(state.failure.message, title: 'فشل العملية');
+          context.showErrorSnackBar(
+            state.failure.message,
+            title: 'فشل العملية',
+          );
         }
       },
       builder: (context, state) {
@@ -199,7 +219,10 @@ class _ErrorHandlingView extends StatelessWidget {
               children: [
                 CircularProgressIndicator(color: Colors.blueAccent),
                 SizedBox(height: 12),
-                Text('جاري محاكاة الاتصال بالسيرفر...', style: TextStyle(color: Colors.white70)),
+                Text(
+                  'جاري محاكاة الاتصال بالسيرفر...',
+                  style: TextStyle(color: Colors.white70),
+                ),
               ],
             ),
           );
@@ -212,14 +235,21 @@ class _ErrorHandlingView extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF1E293B),
               borderRadius: 16.circularRadius,
-              border: Border.all(color: Colors.greenAccent.withValues(alpha: 0.5), width: 1.5),
+              border: Border.all(
+                color: Colors.greenAccent.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
             ),
             child: Row(
               children: [
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.greenAccent.withValues(alpha: 0.2),
-                  child: const Icon(Icons.person_rounded, color: Colors.greenAccent, size: 36),
+                  child: const Icon(
+                    Icons.person_rounded,
+                    color: Colors.greenAccent,
+                    size: 36,
+                  ),
                 ),
                 16.widthBox,
                 Expanded(
@@ -238,21 +268,39 @@ class _ErrorHandlingView extends StatelessWidget {
                           ),
                           8.widthBox,
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.greenAccent.withValues(alpha: 0.2),
                               borderRadius: 4.circularRadius,
                             ),
-                            child: const Text('200 OK', style: TextStyle(color: Colors.greenAccent, fontSize: 10)),
+                            child: const Text(
+                              '200 OK',
+                              style: TextStyle(
+                                color: Colors.greenAccent,
+                                fontSize: 10,
+                              ),
+                            ),
                           ),
                         ],
                       ),
                       4.heightBox,
-                      Text(user.email, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+                      Text(
+                        user.email,
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 12,
+                        ),
+                      ),
                       4.heightBox,
                       Text(
                         'الدور: ${user.role} | المعرف: ${user.id}',
-                        style: const TextStyle(color: Colors.cyanAccent, fontSize: 11),
+                        style: const TextStyle(
+                          color: Colors.cyanAccent,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -269,7 +317,10 @@ class _ErrorHandlingView extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF1E293B),
               borderRadius: 16.circularRadius,
-              border: Border.all(color: Colors.redAccent.withValues(alpha: 0.6), width: 1.5),
+              border: Border.all(
+                color: Colors.redAccent.withValues(alpha: 0.6),
+                width: 1.5,
+              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,7 +331,11 @@ class _ErrorHandlingView extends StatelessWidget {
                     color: Colors.redAccent.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 28),
+                  child: const Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.redAccent,
+                    size: 28,
+                  ),
                 ),
                 12.widthBox,
                 Expanded(
@@ -300,14 +355,20 @@ class _ErrorHandlingView extends StatelessWidget {
                           if (failure.statusCode != null) ...[
                             8.widthBox,
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.redAccent.withValues(alpha: 0.2),
                                 borderRadius: 4.circularRadius,
                               ),
                               child: Text(
                                 '${failure.statusCode}',
-                                style: const TextStyle(color: Colors.redAccent, fontSize: 10),
+                                style: const TextStyle(
+                                  color: Colors.redAccent,
+                                  fontSize: 10,
+                                ),
                               ),
                             ),
                           ],
@@ -316,7 +377,11 @@ class _ErrorHandlingView extends StatelessWidget {
                       6.heightBox,
                       Text(
                         failure.message,
-                        style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
                       ),
                     ],
                   ),
@@ -351,6 +416,13 @@ class _ErrorHandlingView extends StatelessWidget {
   }
 
   Widget _buildCodeSnippetCard() {
+    const code =
+        'final result = await repository.getUserProfile(scenario);\n\n'
+        'result.fold(\n'
+        '  (failure) => emit(UserError(failure)), // Left  <- Failure\n'
+        '  (user)    => emit(UserLoaded(user)),   // Right <- Success\n'
+        ');';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -363,33 +435,17 @@ class _ErrorHandlingView extends StatelessWidget {
         children: [
           const Text(
             '💻 كيف يتم فك النتيجة في الـ Cubit عبر fold():',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
           ),
           10.heightBox,
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F172A),
-                borderRadius: 8.circularRadius,
-                border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.2)),
-              ),
-              child: const Text(
-                'final result = await repository.getUserProfile(scenario);\n\n'
-                'result.fold(\n'
-                '  (failure) => emit(UserError(failure)), // Left  <- فشل\n'
-                '  (user)    => emit(UserLoaded(user)),   // Right <- نجاح\n'
-                ');',
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  color: Colors.cyanAccent,
-                  fontSize: 12,
-                  height: 1.4,
-                ),
-              ),
-            ),
+          const CopyableCodeBlock(
+            code: code,
+            copiedMessage: 'تم نسخ الكود',
+            copyTooltip: 'نسخ الكود',
           ),
         ],
       ),

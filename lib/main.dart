@@ -57,17 +57,20 @@ class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
     final scheme = ColorScheme.fromSeed(
       seedColor: const Color(0xFF14B8A6),
       brightness: brightness,
+    ).copyWith(
+      surface: isDark ? const Color(0xFF101828) : const Color(0xFFF8FAFC),
+      primary: const Color(0xFF14B8A6),
+      secondary: const Color(0xFFF59E0B),
+      tertiary: const Color(0xFF60A5FA),
     );
 
-    return ThemeData(
+    final baseTheme = ThemeData(
       useMaterial3: true,
       brightness: brightness,
-      colorScheme: scheme.copyWith(
-        surface: isDark ? const Color(0xFF101828) : const Color(0xFFF8FAFC),
-        primary: const Color(0xFF14B8A6),
-        secondary: const Color(0xFFF59E0B),
-        tertiary: const Color(0xFF60A5FA),
-      ),
+      colorScheme: scheme,
+    );
+
+    return baseTheme.copyWith(
       scaffoldBackgroundColor: isDark
           ? const Color(0xFF0B1220)
           : const Color(0xFFF8FAFC),
@@ -75,18 +78,48 @@ class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xFF0A0F1D),
         foregroundColor: Colors.white,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: const Color(0xFF14B8A6),
+          foregroundColor: const Color(0xFF04111C),
+          minimumSize: const Size.fromHeight(48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: const Color(0xFF5EEAD4),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF101828),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF24324A)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF24324A)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF14B8A6), width: 1.4),
+        ),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
         color: isDark ? const Color(0xFF172033) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      textTheme: const TextTheme(
-        titleLarge: TextStyle(fontWeight: FontWeight.w800),
-        titleMedium: TextStyle(fontWeight: FontWeight.w700),
-        bodyMedium: TextStyle(height: 1.45),
+      textTheme: baseTheme.textTheme.copyWith(
+        titleLarge: baseTheme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        titleMedium: baseTheme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+        bodyMedium: baseTheme.textTheme.bodyMedium?.copyWith(height: 1.45),
       ),
     );
   }
