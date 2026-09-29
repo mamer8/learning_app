@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,10 +23,14 @@ class AiAssistantService {
     _cachedApiKey = prefs.getString(_apiKeyStorageKey);
   }
 
-  /// المفتاح الفعلي المستخدم (المفتاح المحفوظ في التطبيق أو المفتاح الافتراضي)
+  /// المفتاح الفعلي المستخدم (المفتاح المحفوظ في التطبيق أو ملف .env أو المفتاح الافتراضي)
   String? get currentApiKey {
     if (_cachedApiKey != null && _cachedApiKey!.trim().isNotEmpty) {
       return _cachedApiKey!.trim();
+    }
+    final envKey = dotenv.maybeGet('GEMINI_API_KEY');
+    if (envKey != null && envKey.trim().isNotEmpty) {
+      return envKey.trim();
     }
     if (_defaultApiKey.trim().isNotEmpty) {
       return _defaultApiKey.trim();

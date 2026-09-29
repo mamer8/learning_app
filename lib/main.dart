@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/localization/app_localizations.dart';
+import 'core/services/ai_assistant_service.dart';
 import 'features/home/home_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load .env file safely
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (_) {
+    // .env might not exist in production or during test environments
+  }
+
+  // Initialize AI assistant preferences
+  await AiAssistantService.instance.init();
+
   runApp(const FlutterLearningLabApp());
 }
 
