@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
 import '../../../core/services/ai_assistant_service.dart';
+import 'ai_markdown_view.dart';
+import 'ai_typing_indicator.dart';
 
 /// نافذة المساعد الذكي التفاعلية المنبثقة من أسفل الشاشة (Contextual AI Sheet)
 class ContextualAiSheet extends StatefulWidget {
@@ -27,9 +28,10 @@ class ContextualAiSheet extends StatefulWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFF070B14),
+      barrierColor: Colors.black.withValues(alpha: 0.7),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (_) => ContextualAiSheet(
         topicTitle: topicTitle,
@@ -46,6 +48,7 @@ class ContextualAiSheet extends StatefulWidget {
 
 class _ContextualAiSheetState extends State<ContextualAiSheet> {
   final TextEditingController _promptController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   final AiAssistantService _aiService = AiAssistantService.instance;
 
   bool _isLoading = false;
@@ -61,13 +64,13 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
   @override
   void initState() {
     super.initState();
-    // إرسال طلب الشرح الافتراضي عند فتح النافذة
-    _askAssistant('اشرح لي أهمية وتطبيق هذا المفهوم في بيئة الإنتاج');
+    _askAssistant('اشرح لي أهمية وتطبيق هذا المفهوم في بيئة الإنتاج الحقيقية');
   }
 
   @override
   void dispose() {
     _promptController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -101,13 +104,16 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: const Color(0xFF0F172A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: const BorderSide(color: Color(0xFF1E293B)),
+          ),
           title: const Row(
             children: [
-              Icon(Icons.vpn_key_rounded, color: Color(0xFF14B8A6)),
+              Icon(Icons.vpn_key_rounded, color: Color(0xFF5EEAD4), size: 20),
               SizedBox(width: 8),
-              Text('إعدادات مفتاح الذكاء الاصطناعي', style: TextStyle(color: Colors.white, fontSize: 15)),
+              Text('إعدادات مفتاح المساعد (API Key)', style: TextStyle(color: Colors.white, fontSize: 15)),
             ],
           ),
           content: SingleChildScrollView(
@@ -129,30 +135,30 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'المفتاح مفعّل ومحمي بأمان 🔒 (Gemini Live)',
+                            'المفتاح مفعّل ومحمي بأمان 🔒',
                             style: TextStyle(color: Color(0xFFD1FAE5), fontSize: 11.5, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  12.heightBox,
+                  const SizedBox(height: 12),
                 ],
                 Text(
                   _aiService.hasApiKey
                       ? 'لتغيير المفتاح الحالي، الصق المفتاح الجديد هنا:'
-                      : 'أدخل مفتاح Gemini API الخاص بك للحصول على ردود حية ومباشرة:',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      : 'أدخل مفتاح الـ API الخاص بك للحصول على ردود حية فائقة السرعة:',
+                  style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 12),
                 ),
-                10.heightBox,
+                const SizedBox(height: 10),
                 TextField(
                   controller: keyController,
                   obscureText: isObscured,
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF0F172A),
-                    hintText: _aiService.hasApiKey ? '••••••••••••••••••••••••' : 'الصق المفتاح هنا...',
+                    fillColor: const Color(0xFF1E293B),
+                    hintText: _aiService.hasApiKey ? '••••••••••••••••••••••••' : 'AIzaSy...',
                     hintStyle: const TextStyle(color: Colors.white38),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -170,10 +176,10 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
                     ),
                   ),
                 ),
-                8.heightBox,
+                const SizedBox(height: 10),
                 const Text(
-                  '💡 يمكنك الحصول عليه مجاناً من: aistudio.google.com',
-                  style: TextStyle(color: Colors.cyanAccent, fontSize: 11),
+                  '💡 يمكنك الحصول على مفتاح مجاني من: aistudio.google.com',
+                  style: TextStyle(color: Color(0xFF5EEAD4), fontSize: 11),
                 ),
               ],
             ),
@@ -181,7 +187,7 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('إلغاء'),
+              child: const Text('إلغاء', style: TextStyle(color: Colors.white70)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -189,6 +195,7 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
                   await _aiService.saveApiKey(keyController.text.trim());
                 }
                 if (ctx.mounted) Navigator.pop(ctx);
+                setState(() {});
                 _askAssistant('مرحباً، تم ضبط وتفعيل المفتاح بنجاح!');
               },
               style: ElevatedButton.styleFrom(
@@ -207,146 +214,196 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.75,
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.82,
+        decoration: const BoxDecoration(
+          color: Color(0xFF070B14),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // شريط السحب والإغلاق
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF14B8A6).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6), size: 22),
+            // مقبض السحب العلوي (Drag Handle)
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF334155),
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                10.widthBox,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'مساعد Flutter الذكي (AI Copilot)',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                      Text(
-                        'سياق الموضوع: ${widget.topicTitle}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11.5),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'إعدادات API Key',
-                  icon: Icon(
-                    _aiService.hasApiKey ? Icons.key_rounded : Icons.key_off_rounded,
-                    color: _aiService.hasApiKey ? Colors.greenAccent : Colors.amberAccent,
-                    size: 20,
-                  ),
-                  onPressed: _showApiKeyDialog,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Colors.white60),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            12.heightBox,
-
-            // أزرار الاقتراحات السريعة
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _quickPrompts.map((prompt) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ActionChip(
-                      label: Text(prompt),
-                      backgroundColor: const Color(0xFF1E293B),
-                      side: const BorderSide(color: Color(0xFF24324A)),
-                      labelStyle: const TextStyle(color: Color(0xFF5EEAD4), fontSize: 11),
-                      onPressed: () => _askAssistant(prompt),
-                    ),
-                  );
-                }).toList(),
               ),
             ),
-            12.heightBox,
+
+            // شريط العنوان والسياق
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF14B8A6), Color(0xFF0284C7)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.psychology_rounded, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Flutter AI Copilot (Contextual)',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5),
+                        ),
+                        Text(
+                          widget.topicTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Color(0xFF5EEAD4), fontSize: 11.5, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'إعدادات API Key',
+                    icon: Icon(
+                      _aiService.hasApiKey ? Icons.vpn_key_rounded : Icons.vpn_key_outlined,
+                      color: _aiService.hasApiKey ? const Color(0xFF34D399) : const Color(0xFFF59E0B),
+                      size: 19,
+                    ),
+                    onPressed: _showApiKeyDialog,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8)),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(color: Color(0xFF1E293B), height: 1),
+
+            // أزرار الاقتراحات السريعة
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              color: const Color(0xFF0B1220),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Row(
+                  children: _quickPrompts.map((prompt) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: InkWell(
+                        onTap: () => _askAssistant(prompt),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF101828),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.3)),
+                          ),
+                          child: Text(
+                            prompt,
+                            style: const TextStyle(
+                              color: Color(0xFF5EEAD4),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
 
             // مساحة عرض إجابة المساعد الذكي
             Expanded(
               child: Container(
+                margin: const EdgeInsets.all(14),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF101828),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF24324A)),
+                  color: const Color(0xFF0D1527),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFF1E293B)),
                 ),
                 child: _isLoading
                     ? const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(color: Color(0xFF14B8A6)),
-                            SizedBox(height: 12),
-                            Text('المساعد الذكي يحلل الكود والموضوع...', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                          ],
+                        child: AiTypingIndicator(
+                          statusText: 'المساعد الذكي يحلل الكود والموضوع في بيئة الإنتاج...',
                         ),
                       )
                     : SingleChildScrollView(
-                        child: Text(
-                          _aiResponse,
-                          style: const TextStyle(color: Color(0xFFE2E8F0), height: 1.55, fontSize: 12.5),
-                        ),
+                        controller: _scrollController,
+                        child: AiMarkdownView(data: _aiResponse),
                       ),
               ),
             ),
-            12.heightBox,
 
             // حقل كتابة سؤال مخصص
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _promptController,
-                    style: const TextStyle(color: Colors.white, fontSize: 12.5),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: const Color(0xFF1E293B),
-                      hintText: 'اسأل عن أي شيء يخص هذا الموضوع...',
-                      hintStyle: const TextStyle(color: Colors.white38, fontSize: 12),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF101828),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: const Color(0xFF24324A)),
+                      ),
+                      child: TextField(
+                        controller: _promptController,
+                        style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                        decoration: const InputDecoration(
+                          hintText: 'اسأل عن أي تفصيل في هذا الموضوع...',
+                          hintStyle: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        ),
+                        onSubmitted: (val) {
+                          if (val.trim().isNotEmpty) {
+                            _askAssistant(val.trim());
+                            _promptController.clear();
+                          }
+                        },
+                      ),
                     ),
-                    onSubmitted: (val) {
-                      if (val.trim().isNotEmpty) {
-                        _askAssistant(val.trim());
-                        _promptController.clear();
-                      }
-                    },
                   ),
-                ),
-                8.widthBox,
-                IconButton(
-                  icon: const Icon(Icons.send_rounded, color: Color(0xFF14B8A6)),
-                  onPressed: () {
-                    final text = _promptController.text.trim();
-                    if (text.isNotEmpty) {
-                      _askAssistant(text);
-                      _promptController.clear();
-                    }
-                  },
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.send_rounded, color: Color(0xFF04111C), size: 17),
+                      onPressed: () {
+                        final text = _promptController.text.trim();
+                        if (text.isNotEmpty) {
+                          _askAssistant(text);
+                          _promptController.clear();
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'core/localization/app_localizations.dart';
 import 'core/services/ai_assistant_service.dart';
@@ -83,6 +84,8 @@ class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
       colorScheme: scheme,
     );
 
+    final cairoTheme = GoogleFonts.cairoTextTheme(baseTheme.textTheme);
+
     return baseTheme.copyWith(
       scaffoldBackgroundColor: isDark
           ? const Color(0xFF0B1220)
@@ -129,37 +132,37 @@ class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
         color: isDark ? const Color(0xFF172033) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      textTheme: baseTheme.textTheme.copyWith(
-        headlineSmall: baseTheme.textTheme.headlineSmall?.copyWith(
+      textTheme: cairoTheme.copyWith(
+        headlineSmall: cairoTheme.headlineSmall?.copyWith(
           fontSize: 18,
           fontWeight: FontWeight.w800,
-          height: 1.25,
+          height: 1.3,
         ),
-        titleLarge: baseTheme.textTheme.titleLarge?.copyWith(
+        titleLarge: cairoTheme.titleLarge?.copyWith(
           fontSize: 15,
           fontWeight: FontWeight.w800,
         ),
-        titleMedium: baseTheme.textTheme.titleMedium?.copyWith(
+        titleMedium: cairoTheme.titleMedium?.copyWith(
           fontSize: 13.5,
           fontWeight: FontWeight.w700,
         ),
-        titleSmall: baseTheme.textTheme.titleSmall?.copyWith(
+        titleSmall: cairoTheme.titleSmall?.copyWith(
           fontSize: 12.5,
           fontWeight: FontWeight.w600,
         ),
-        bodyLarge: baseTheme.textTheme.bodyLarge?.copyWith(
+        bodyLarge: cairoTheme.bodyLarge?.copyWith(
           fontSize: 13,
+          height: 1.5,
+        ),
+        bodyMedium: cairoTheme.bodyMedium?.copyWith(
+          fontSize: 12,
           height: 1.45,
         ),
-        bodyMedium: baseTheme.textTheme.bodyMedium?.copyWith(
-          fontSize: 12,
+        bodySmall: cairoTheme.bodySmall?.copyWith(
+          fontSize: 11,
           height: 1.4,
         ),
-        bodySmall: baseTheme.textTheme.bodySmall?.copyWith(
-          fontSize: 11,
-          height: 1.35,
-        ),
-        labelLarge: baseTheme.textTheme.labelLarge?.copyWith(
+        labelLarge: cairoTheme.labelLarge?.copyWith(
           fontSize: 12,
           fontWeight: FontWeight.w700,
         ),

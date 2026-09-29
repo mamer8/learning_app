@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/core.dart';
+import 'package:intl/intl.dart';
 import '../../core/services/ai_assistant_service.dart';
+import 'widgets/ai_markdown_view.dart';
+import 'widgets/ai_typing_indicator.dart';
 
-/// نموذج رسالة المحادثة
+/// نموذج رسالة المحادثة المطورة
 class ChatMessage {
   final String text;
   final bool isUser;
@@ -16,7 +18,7 @@ class ChatMessage {
   }) : timestamp = timestamp ?? DateTime.now();
 }
 
-/// شاشة المساعد الذكي الكاملة لـ Flutter (Dedicated AI Copilot Screen)
+/// شاشة المساعد الذكي الاحترافية لـ Flutter (Pro AI Copilot Screen)
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
 
@@ -32,12 +34,43 @@ class _AiChatScreenState extends State<AiChatScreen> {
   final List<ChatMessage> _messages = [];
   bool _isLoading = false;
 
-  final List<String> _suggestedTopics = [
-    'كيف أصمم بنية Clean Architecture مع BLoC في مشروع حقيقي؟',
-    'ما الفرق بين Isolates و compute() ومتى أستخدم كل منهما؟',
-    'كيف أمنع الـ Memory Leaks وأحسن معدل الإطارات (60/120 FPS)؟',
-    'اشرح لي آلية عمل QueuedInterceptor لتحديث JWT Token تلقائياً',
-    'كيف أقوم بإعداد CI/CD مع GitHub Actions لرفع التطبيق للـ Stores؟',
+  final List<({String title, String prompt, IconData icon, Color color})> _suggestedTopics = [
+    (
+      title: 'بنية Clean Architecture',
+      prompt: 'كيف أصمم بنية Clean Architecture مع BLoC وإدارة الحالات في مشروع إنتاجي كبير؟',
+      icon: Icons.account_tree_rounded,
+      color: const Color(0xFF0284C7),
+    ),
+    (
+      title: 'الأداء ومعدل 120 FPS',
+      prompt: 'كيف أكتشف الـ Memory Leaks وأمنع الـ Jank في Flutter للوصول إلى 60/120 FPS ثابتة؟',
+      icon: Icons.speed_rounded,
+      color: const Color(0xFF10B981),
+    ),
+    (
+      title: 'الـ Isolates والعمليات الثقيلة',
+      prompt: 'ما الفرق بين Isolates و compute() ومتى أستخدم كل منهما لمعالجة JSON الضخم؟',
+      icon: Icons.bolt_rounded,
+      color: const Color(0xFFF59E0B),
+    ),
+    (
+      title: 'أمان JWT و Interceptors',
+      prompt: 'اشرح لي آلية عمل QueuedInterceptor لتحديث JWT Token تلقائياً في Dio.',
+      icon: Icons.lock_person_rounded,
+      color: const Color(0xFFEC4899),
+    ),
+    (
+      title: 'كتابة الـ Unit & Bloc Tests',
+      prompt: 'كيف أكتب Unit Tests و BlocTest احترافية مع Mocktail للـ UseCases والـ Repositories؟',
+      icon: Icons.science_rounded,
+      color: const Color(0xFF8B5CF6),
+    ),
+    (
+      title: 'أتمتة CI/CD والنشر',
+      prompt: 'ما هي أفضل خطوات إعداد GitHub Actions لعمل Build ورفع تلقائي لـ Google Play و App Store؟',
+      icon: Icons.rocket_launch_rounded,
+      color: const Color(0xFF14B8A6),
+    ),
   ];
 
   @override
@@ -46,9 +79,14 @@ class _AiChatScreenState extends State<AiChatScreen> {
     _messages.add(
       ChatMessage(
         isUser: false,
-        text: 'أهلاً بك يا بطل! 👋\n'
-            'أنا مساعد Flutter الذكي (AI Architect Copilot).\n'
-            'يمكنك سؤالي عن أي استفسار في بنية المشاريع، إدارة الحالة، الأداء والذاكرة، كتابة الـ Tests، أو حل الأخطاء المعقدة.',
+        text: '### أهلاً بك يا بطل! 👋\n'
+            'أنا **مساعدك الذكي لمعمارية وهندسة Flutter** (*Senior AI Copilot*).\n\n'
+            'جاهز للإجابة على استفساراتك المتقدمة في:\n'
+            '- 🏗️ **Clean Architecture & Design Patterns**\n'
+            '- ⚡ **High Performance, Isolates & Memory Profiling**\n'
+            '- 🔒 **Security, JWT Interceptors & Cryptography**\n'
+            '- 🧪 **Unit, Widget & Integration Testing**\n\n'
+            'جرّب اختيار أحد المواضيع المقترحة في الأعلى أو اكتب سؤالك بالأسفل مباشرة.',
       ),
     );
   }
@@ -65,8 +103,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeOutCubic,
         );
       }
     });
@@ -101,7 +139,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
       setState(() {
         _messages.add(
           ChatMessage(
-            text: '⚠️ حدث خطأ أثناء معالجة الرد: $e',
+            text: '⚠️ **حدث خطأ أثناء معالجة الرد:**\n`$e`\n\nتأكد من اتصال الإنترنت أو صحة مفتاح الـ API.',
             isUser: false,
           ),
         );
@@ -109,6 +147,55 @@ class _AiChatScreenState extends State<AiChatScreen> {
       });
       _scrollToBottom();
     }
+  }
+
+  void _showClearConfirmDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF0F172A),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFF1E293B)),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.delete_sweep_rounded, color: Color(0xFFEF4444), size: 22),
+            SizedBox(width: 8),
+            Text('مسح المحادثة', style: TextStyle(color: Colors.white, fontSize: 15)),
+          ],
+        ),
+        content: const Text(
+          'هل أنت متأكد من رغبتك في مسح سجل المحادثة بالكامل؟',
+          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white70)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              setState(() {
+                _messages.clear();
+                _messages.add(
+                  ChatMessage(
+                    isUser: false,
+                    text: '✨ تمت إعادة تهيئة جلسة المحادثة بنجاح. تفضل بسؤالك الجديد!',
+                  ),
+                );
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('مسح الآن'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showApiKeyDialog() {
@@ -119,13 +206,26 @@ class _AiChatScreenState extends State<AiChatScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Row(
+          backgroundColor: const Color(0xFF0F172A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+            side: const BorderSide(color: Color(0xFF1E293B)),
+          ),
+          title: Row(
             children: [
-              Icon(Icons.vpn_key_rounded, color: Color(0xFF14B8A6), size: 22),
-              SizedBox(width: 8),
-              Text('إعدادات مفتاح الذكاء الاصطناعي', style: TextStyle(color: Colors.white, fontSize: 15)),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF14B8A6).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.vpn_key_rounded, color: Color(0xFF5EEAD4), size: 20),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'إعدادات مفتاح المساعد (API Key)',
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           content: SingleChildScrollView(
@@ -135,49 +235,62 @@ class _AiChatScreenState extends State<AiChatScreen> {
               children: [
                 if (_aiService.hasApiKey) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF064E3B),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF064E3B), Color(0xFF065F46)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.5)),
                     ),
                     child: const Row(
                       children: [
-                        Icon(Icons.verified_user_rounded, color: Color(0xFF34D399), size: 18),
-                        SizedBox(width: 8),
+                        Icon(Icons.verified_user_rounded, color: Color(0xFF34D399), size: 20),
+                        SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'المفتاح مفعّل ومحمي بأمان 🔒 (Gemini Live)',
-                            style: TextStyle(color: Color(0xFFD1FAE5), fontSize: 11.5, fontWeight: FontWeight.bold),
+                            'المفتاح مفعّل ومحمي بأمان 🔒',
+                            style: TextStyle(
+                              color: Color(0xFFD1FAE5),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  12.heightBox,
+                  const SizedBox(height: 14),
                 ],
                 Text(
                   _aiService.hasApiKey
-                      ? 'لتغيير المفتاح الحالي، الصق المفتاح الجديد هنا:'
-                      : 'أدخل مفتاح Gemini API الخاص بك لتفعيل الاتصال الحي:',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      ? 'لتحديث المفتاح الحالي، الصق المفتاح الجديد:'
+                      : 'أدخل مفتاح الـ API الخاص بك لتفعيل الاتصال المباشر الفوري:',
+                  style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 12, height: 1.4),
                 ),
-                10.heightBox,
+                const SizedBox(height: 12),
                 TextField(
                   controller: keyController,
                   obscureText: isObscured,
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF0F172A),
-                    hintText: _aiService.hasApiKey ? '••••••••••••••••••••••••' : 'الصق المفتاح هنا...',
+                    fillColor: const Color(0xFF1E293B),
+                    hintText: _aiService.hasApiKey ? '••••••••••••••••••••••••••••••••' : 'AIzaSy...',
                     hintStyle: const TextStyle(color: Colors.white38),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFF334155)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFF14B8A6), width: 1.4),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     suffixIcon: IconButton(
                       icon: Icon(
                         isObscured ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                        color: Colors.white38,
+                        color: Colors.white54,
                         size: 18,
                       ),
                       onPressed: () {
@@ -188,20 +301,35 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     ),
                   ),
                 ),
-                12.heightBox,
+                const SizedBox(height: 14),
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F172A),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.3)),
+                    color: const Color(0xFF172033),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFF24324A)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('📌 خطوات الحصول على المفتاح المجاني:', style: TextStyle(color: Color(0xFF5EEAD4), fontSize: 11.5, fontWeight: FontWeight.bold)),
-                      4.heightBox,
-                      const Text('1. ادخل على موقع: aistudio.google.com\n2. سجل بحساب Google الخاص بك\n3. اضغط زر "Get API key" ثم "Create API key"\n4. انسخ الكود والصقه هنا', style: TextStyle(color: Colors.white70, fontSize: 10.5, height: 1.4)),
+                      const Row(
+                        children: [
+                          Icon(Icons.help_outline_rounded, color: Color(0xFF38BDF8), size: 16),
+                          SizedBox(width: 6),
+                          Text(
+                            'كيف أحصل على المفتاح مجاناً؟',
+                            style: TextStyle(color: Color(0xFF38BDF8), fontSize: 11.5, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        '1. توجه إلى: aistudio.google.com\n'
+                        '2. سجل الدخول بحساب Google\n'
+                        '3. اضغط زر "Get API key" ثم "Create API key"\n'
+                        '4. انسخ المفتاح والصقه في هذا الصندوق',
+                        style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, height: 1.5),
+                      ),
                     ],
                   ),
                 ),
@@ -217,14 +345,17 @@ class _AiChatScreenState extends State<AiChatScreen> {
                   if (ctx.mounted) Navigator.pop(ctx);
                   setState(() {});
                   messenger.showSnackBar(
-                    const SnackBar(content: Text('تم حذف المفتاح والعودة للوضع التجريبي الذكي')),
+                    const SnackBar(
+                      content: Text('تم حذف المفتاح والعودة للنمط المدمج'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
                   );
                 },
-                child: const Text('حذف المفتاح', style: TextStyle(color: Colors.redAccent)),
+                child: const Text('حذف المفتاح', style: TextStyle(color: Color(0xFFEF4444))),
               ),
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('إلغاء'),
+              child: const Text('إلغاء', style: TextStyle(color: Colors.white70)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -235,14 +366,19 @@ class _AiChatScreenState extends State<AiChatScreen> {
                 if (ctx.mounted) Navigator.pop(ctx);
                 setState(() {});
                 messenger.showSnackBar(
-                  const SnackBar(content: Text('✅ تم حفظ مفتاح API بنجاح ومزامنة Gemini AI!')),
+                  const SnackBar(
+                    content: Text('✅ تم حفظ وتفعيل مفتاح API بنجاح!'),
+                    backgroundColor: Color(0xFF0F172A),
+                    behavior: SnackBarBehavior.floating,
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF14B8A6),
                 foregroundColor: const Color(0xFF04111C),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text('حفظ وتفعيل'),
+              child: const Text('حفظ وتفعيل', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -253,39 +389,64 @@ class _AiChatScreenState extends State<AiChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1120),
+      backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF0B1220),
+        elevation: 0,
+        titleSpacing: 0,
         title: Row(
           children: [
+            // أيقونة المساعد بتدرج لوني أنيق
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
-                color: const Color(0xFF14B8A6).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF14B8A6), Color(0xFF0284C7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x3314B8A6), blurRadius: 8, offset: Offset(0, 2)),
+                ],
               ),
-              child: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6), size: 20),
+              child: const Icon(Icons.psychology_rounded, color: Colors.white, size: 20),
             ),
-            10.widthBox,
+            const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Flutter AI Copilot', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Flutter AI Architect Copilot',
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white),
+                ),
+                const SizedBox(height: 2),
                 Row(
                   children: [
                     Container(
-                      width: 6,
-                      height: 6,
+                      width: 7,
+                      height: 7,
                       decoration: BoxDecoration(
-                        color: _aiService.hasApiKey ? Colors.greenAccent : Colors.amberAccent,
+                        color: _aiService.hasApiKey ? const Color(0xFF34D399) : const Color(0xFFF59E0B),
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: _aiService.hasApiKey
+                                ? const Color(0x6634D399)
+                                : const Color(0x66F59E0B),
+                            blurRadius: 4,
+                            spreadRadius: 1,
+                          ),
+                        ],
                       ),
                     ),
-                    4.widthBox,
+                    const SizedBox(width: 5),
                     Text(
-                      _aiService.hasApiKey ? 'Gemini 1.5 Live' : 'Smart Offline Mode',
+                      _aiService.hasApiKey ? 'متصل ومفعّل' : 'النمط التجريبي',
                       style: TextStyle(
                         fontSize: 10,
-                        color: _aiService.hasApiKey ? Colors.greenAccent : Colors.amberAccent,
+                        fontWeight: FontWeight.w600,
+                        color: _aiService.hasApiKey ? const Color(0xFF34D399) : const Color(0xFFF59E0B),
                       ),
                     ),
                   ],
@@ -296,73 +457,45 @@ class _AiChatScreenState extends State<AiChatScreen> {
         ),
         actions: [
           IconButton(
-            tooltip: 'إعدادات API Key',
-            icon: Icon(
-              _aiService.hasApiKey ? Icons.vpn_key_rounded : Icons.vpn_key_outlined,
-              color: _aiService.hasApiKey ? const Color(0xFF14B8A6) : Colors.amberAccent,
-              size: 21,
+            tooltip: 'إعدادات المفتاح',
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: _aiService.hasApiKey
+                    ? const Color(0xFF064E3B)
+                    : const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _aiService.hasApiKey ? const Color(0xFF10B981) : const Color(0xFF334155),
+                  width: 0.8,
+                ),
+              ),
+              child: Icon(
+                _aiService.hasApiKey ? Icons.vpn_key_rounded : Icons.vpn_key_outlined,
+                color: _aiService.hasApiKey ? const Color(0xFF34D399) : const Color(0xFFF59E0B),
+                size: 16,
+              ),
             ),
             onPressed: _showApiKeyDialog,
           ),
           IconButton(
-            tooltip: 'مسح المحادثة',
-            icon: const Icon(Icons.refresh_rounded, size: 20),
-            onPressed: () {
-              setState(() {
-                _messages.clear();
-                _messages.add(
-                  ChatMessage(
-                    isUser: false,
-                    text: 'تمت إعادة تهيئة المحادثة. تفضل بسؤالك الجديد!',
-                  ),
-                );
-              });
-            },
+            tooltip: 'مسح الجلسة',
+            icon: const Icon(Icons.refresh_rounded, size: 20, color: Color(0xFF94A3B8)),
+            onPressed: _showClearConfirmDialog,
           ),
+          const SizedBox(width: 6),
         ],
       ),
       body: Column(
         children: [
-          // شريط الاقتراحات السريعة
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            decoration: const BoxDecoration(
-              color: Color(0xFF0F172A),
-              border: Border(bottom: BorderSide(color: Color(0xFF1E293B))),
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _suggestedTopics.map((topic) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: InkWell(
-                      onTap: () => _sendMessage(topic),
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFF334155)),
-                        ),
-                        child: Text(
-                          topic,
-                          style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
+          // شريط الاقتراحات التفاعلي السريع
+          _buildQuickTopicsCarousel(),
 
           // قائمة الرسائل
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final msg = _messages[index];
@@ -371,102 +504,232 @@ class _AiChatScreenState extends State<AiChatScreen> {
             ),
           ),
 
-          // مؤشر التحميل والتفكير
-          if (_isLoading)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              alignment: Alignment.centerRight,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF14B8A6)),
-                    ),
-                    SizedBox(width: 8),
-                    Text('الذكاء الاصطناعي يقوم بالتحليل والصياغة...', style: TextStyle(color: Colors.white70, fontSize: 11.5)),
-                  ],
-                ),
-              ),
-            ),
+          // مؤشر التحميل والتحليل
+          if (_isLoading) const AiTypingIndicator(),
 
-          // صندوق الإدخال
-          _buildInputArea(),
+          // صندوق الإدخال الحديث
+          _buildModernInputArea(),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
-    return Align(
-      alignment: message.isUser ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.88),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: message.isUser ? const Color(0xFF0284C7) : const Color(0xFF1E293B),
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(12),
-            topRight: const Radius.circular(12),
-            bottomLeft: Radius.circular(message.isUser ? 0 : 12),
-            bottomRight: Radius.circular(message.isUser ? 12 : 0),
-          ),
-          border: Border.all(
-            color: message.isUser ? const Color(0xFF38BDF8) : const Color(0xFF334155),
-            width: 0.8,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  message.isUser ? Icons.person_rounded : Icons.psychology_rounded,
-                  size: 14,
-                  color: message.isUser ? Colors.white70 : const Color(0xFF14B8A6),
-                ),
-                4.widthBox,
-                Text(
-                  message.isUser ? 'أنت' : 'Flutter Architect Copilot',
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.bold,
-                    color: message.isUser ? Colors.white70 : const Color(0xFF5EEAD4),
+  Widget _buildQuickTopicsCarousel() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: const BoxDecoration(
+        color: Color(0xFF0B1220),
+        border: Border(bottom: BorderSide(color: Color(0xFF172236))),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: _suggestedTopics.map((topic) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: InkWell(
+                onTap: () => _sendMessage(topic.prompt),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF101828),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: topic.color.withValues(alpha: 0.35)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(topic.icon, color: topic.color, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        topic.title,
+                        style: const TextStyle(
+                          color: Color(0xFFE2E8F0),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const Spacer(),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(Icons.copy_rounded, size: 14, color: Colors.white38),
-                  tooltip: 'نسخ الإجابة',
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: message.text));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم نسخ النص إلى الحافظة!'), duration: Duration(seconds: 1)),
-                    );
-                  },
-                ),
-              ],
-            ),
-            6.heightBox,
-            SelectableText(
-              message.text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12.5,
-                height: 1.5,
               ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessageBubble(ChatMessage message) {
+    final timeStr = DateFormat('hh:mm a').format(message.timestamp);
+
+    if (message.isUser) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 14, right: 32),
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF0284C7), Color(0xFF0369A1)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+              bottomLeft: Radius.circular(4),
+              bottomRight: Radius.circular(16),
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x330284C7),
+                blurRadius: 8,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.person_rounded, size: 13, color: Colors.white70),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'أنت',
+                    style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    timeStr,
+                    style: const TextStyle(color: Colors.white60, fontSize: 9.5),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              SelectableText(
+                message.text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.5,
+                  height: 1.45,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // فقاعة المساعد الذكي
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16, left: 16),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.94),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0D1527),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+            bottomLeft: Radius.circular(16),
+            bottomRight: Radius.circular(4),
+          ),
+          border: Border.all(color: const Color(0xFF1E293B)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x22000000),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // رأس رسالة المساعد
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: const BoxDecoration(
+                color: Color(0xFF111C33),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                border: Border(bottom: BorderSide(color: Color(0xFF1E293B), width: 0.8)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF14B8A6).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(Icons.psychology_rounded, color: Color(0xFF5EEAD4), size: 14),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Flutter Architect Copilot',
+                    style: TextStyle(
+                      color: Color(0xFF5EEAD4),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    timeStr,
+                    style: const TextStyle(color: Color(0xFF64748B), fontSize: 9.5),
+                  ),
+                  const Spacer(),
+                  // زر نسخ الإجابة بالكامل
+                  InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: message.text));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Row(
+                            children: [
+                              Icon(Icons.check_circle_rounded, color: Color(0xFF34D399), size: 16),
+                              SizedBox(width: 8),
+                              Text('تم نسخ الإجابة بالكامل إلى الحافظة!'),
+                            ],
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: const Color(0xFF0F172A),
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E293B),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.copy_rounded, size: 12, color: Color(0xFF94A3B8)),
+                          SizedBox(width: 4),
+                          Text('نسخ الرد', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9.5)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // محتوى الرسالة بصيغة Markdown الغنية
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: AiMarkdownView(data: message.text),
             ),
           ],
         ),
@@ -474,46 +737,67 @@ class _AiChatScreenState extends State<AiChatScreen> {
     );
   }
 
-  Widget _buildInputArea() {
+  Widget _buildModernInputArea() {
     return Container(
       padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 8,
-        bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 8 : 16,
+        left: 14,
+        right: 14,
+        top: 10,
+        bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 10 : 18,
       ),
       decoration: const BoxDecoration(
-        color: Color(0xFF0F172A),
+        color: Color(0xFF0B1220),
         border: Border(top: BorderSide(color: Color(0xFF1E293B))),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
-            child: TextField(
-              controller: _textController,
-              style: const TextStyle(color: Colors.white, fontSize: 12.5),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFF1E293B),
-                hintText: 'اكتب سؤالك لمهندس Flutter...',
-                hintStyle: const TextStyle(color: Colors.white38, fontSize: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF101828),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFF24324A)),
               ),
-              onSubmitted: _sendMessage,
+              child: TextField(
+                controller: _textController,
+                maxLines: 4,
+                minLines: 1,
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+                decoration: const InputDecoration(
+                  filled: false,
+                  hintText: 'اسأل عن بنية الأكواد، الأداء، الأمان، أو حل المشاكل...',
+                  hintStyle: TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                onSubmitted: _sendMessage,
+              ),
             ),
           ),
-          8.widthBox,
+          const SizedBox(width: 10),
           Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF14B8A6),
-              shape: BoxShape.circle,
+            height: 44,
+            width: 44,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(22),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x4414B8A6),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.send_rounded, color: Color(0xFF04111C), size: 18),
+              icon: const Icon(Icons.send_rounded, color: Color(0xFF04111C), size: 19),
               onPressed: () => _sendMessage(_textController.text),
             ),
           ),

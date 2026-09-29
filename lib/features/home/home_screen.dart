@@ -36,19 +36,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return Directionality(
       textDirection: locale.textDirection,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AiChatScreen()),
-            );
-          },
-          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
-          label: Text(
-            isArabic ? 'مساعد Flutter الذكي' : 'Flutter AI Copilot',
-            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold, fontSize: 12.5),
+        floatingActionButton: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF14B8A6), Color(0xFF0284C7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x5514B8A6),
+                blurRadius: 16,
+                offset: Offset(0, 6),
+              ),
+            ],
           ),
-          backgroundColor: const Color(0xFF14B8A6),
+          child: FloatingActionButton.extended(
+            elevation: 0,
+            highlightElevation: 0,
+            backgroundColor: Colors.transparent,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AiChatScreen()),
+              );
+            },
+            icon: const Icon(Icons.psychology_rounded, color: Colors.white, size: 22),
+            label: Text(
+              isArabic ? 'مساعد Flutter الذكي' : 'Flutter AI Copilot',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13),
+            ),
+          ),
         ),
         body: Container(
           decoration: const BoxDecoration(
@@ -164,6 +183,39 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? 'تجارب تفاعلية حية لشرح الأداء، التوازي، المعمارية النظيفة، وأمان التطبيقات والنشر على المتاجر.'
                 : 'Live interactive labs for performance, concurrency, clean architecture, security, and store releases.',
             style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 12, height: 1.45),
+          ),
+          12.heightBox,
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AiChatScreen()),
+              );
+            },
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F172A).withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.5)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.auto_awesome_rounded, color: Color(0xFF5EEAD4), size: 16),
+                  8.widthBox,
+                  Expanded(
+                    child: Text(
+                      isArabic
+                          ? 'استشر المساعد الذكي (AI Copilot) في أي موضوع أو معمارية...'
+                          : 'Ask AI Copilot for architecture advice & code review...',
+                      style: const TextStyle(color: Color(0xFF5EEAD4), fontSize: 11.5, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_rounded, color: Color(0xFF5EEAD4), size: 16),
+                ],
+              ),
+            ),
           ),
         ],
       ),
