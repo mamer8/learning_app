@@ -2,19 +2,26 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/ai_chat_screen.dart';
+import '../animations_lab/animations_screen.dart';
+import '../clean_arch_lab/clean_arch_screen.dart';
 import '../curriculum/curriculum_data.dart';
 import '../curriculum/level_detail_screen.dart';
+import '../dart3_lab/dart3_screen.dart';
 import '../debouncer_lab/debouncer_screen.dart';
 import '../deployment_lab/deployment_screen.dart';
 import '../error_handling_lab/presentation/screens/error_handling_screen.dart';
 import '../extensions_lab/extensions_screen.dart';
 import '../isolates_lab/isolates_screen.dart';
 import '../keys_lab/keys_screen.dart';
+import '../memory_perf_lab/memory_perf_screen.dart';
 import '../offline_sync_lab/offline_sync_screen.dart';
 import '../physics_lab/physics_painter_screen.dart';
+import '../platform_channels_lab/platform_channels_screen.dart';
 import '../repaint_boundary_lab/repaint_boundary_screen.dart';
 import '../security_lab/security_screen.dart';
 import '../slivers_lab/slivers_screen.dart';
+import '../state_inherited_lab/state_inherited_screen.dart';
+import '../streams_rx_lab/streams_rx_screen.dart';
 
 /// الشاشة الرئيسية المطورة لأكاديمية ومختبرات Flutter
 class HomeScreen extends StatefulWidget {
@@ -236,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: _buildSegmentButton(
               index: 0,
               icon: Icons.biotech_rounded,
-              label: isArabic ? 'المعامل التفاعلية (11 معمل)' : 'Interactive Labs (11 Labs)',
+              label: isArabic ? 'المعامل التفاعلية (18 معمل)' : 'Interactive Labs (18 Labs)',
             ),
           ),
           Expanded(
@@ -284,10 +291,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLabCategoryChips(bool isArabic) {
     final categories = [
-      (id: 'all', label: isArabic ? 'الكل' : 'All'),
-      (id: 'performance', label: isArabic ? '⚡ الأداء والرسوميات' : '⚡ Performance'),
-      (id: 'network', label: isArabic ? '🌐 الشبكات والتزامن' : '🌐 Network & Sync'),
-      (id: 'architecture', label: isArabic ? '🔒 الأمان والمعمارية' : '🔒 Architecture & Security'),
+      (id: 'all', label: isArabic ? 'الكل (18)' : 'All (18)'),
+      (id: 'performance', label: isArabic ? '⚡ الأداء والأنيميشن' : '⚡ Performance & Motion'),
+      (id: 'network', label: isArabic ? '🌐 الشبكات والتزامن' : '🌐 Network & Streams'),
+      (id: 'architecture', label: isArabic ? '🔒 المعمارية و Dart 3' : '🔒 Architecture & Dart 3'),
     ];
 
     return SingleChildScrollView(
@@ -320,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLabsGrid(bool isArabic) {
     final allLabs = [
-      // 1. Performance Category
+      // 1. Performance & Motion Category
       (
         category: 'performance',
         title: isArabic ? '1. Isolates & Concurrency' : '1. Isolates & Concurrency',
@@ -339,7 +346,23 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       (
         category: 'performance',
-        title: isArabic ? '3. Slivers & Scroll Geometry' : '3. Slivers & Scroll Geometry',
+        title: isArabic ? '3. Staggered & Physics Animations' : '3. Staggered & Physics Animations',
+        subtitle: isArabic ? 'حركات متسلسلة بـ Intervals ومحاكاة النوابض الطبيعية بـ SpringSimulation.' : 'Chained Interval timelines and physics spring simulation.',
+        icon: Icons.animation_rounded,
+        color: const Color(0xFF8B5CF6),
+        page: const AnimationsScreen(),
+      ),
+      (
+        category: 'performance',
+        title: isArabic ? '4. Memory Profiling & Image Resize' : '4. Memory Profiling & Image Resize',
+        subtitle: isArabic ? 'كشف تسريبات RAM للـ Streams وتقليل حجم صور GPU بـ ResizeImage.' : 'Memory leaks detector and GPU bitmap downsampling.',
+        icon: Icons.memory_rounded,
+        color: const Color(0xFFEF4444),
+        page: const MemoryPerfScreen(),
+      ),
+      (
+        category: 'performance',
+        title: isArabic ? '5. Slivers & Scroll Geometry' : '5. Slivers & Scroll Geometry',
         subtitle: isArabic ? 'مفتش فلاتر الحي لأبعاد ومسافات التمرير والـ Sticky Headers.' : 'Live scroll offset & viewport geometry inspector.',
         icon: Icons.view_quilt_rounded,
         color: const Color(0xFF06B6D4),
@@ -347,43 +370,83 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       (
         category: 'performance',
-        title: isArabic ? '4. CustomPainter & Physics' : '4. CustomPainter & Physics',
+        title: isArabic ? '6. CustomPainter & Physics' : '6. CustomPainter & Physics',
         subtitle: isArabic ? 'محاكي الجسيمات الفيزيائية والرسم المباشر بـ Canvas.' : 'Particle physics engine and direct GPU canvas draw.',
         icon: Icons.auto_awesome_motion_rounded,
         color: const Color(0xFF14B8A6),
         page: const PhysicsPainterScreen(),
       ),
 
-      // 2. Network Category
+      // 2. Network & Async Category
       (
         category: 'network',
-        title: isArabic ? '5. Debouncer & Throttler' : '5. Debouncer & Throttler',
+        title: isArabic ? '7. Debouncer & Throttler' : '7. Debouncer & Throttler',
         subtitle: isArabic ? 'ترشيد استدعاءات API البحث وحماية الأزرار من السبام.' : 'Search keystrokes optimizer and anti-spam protection.',
         icon: Icons.filter_alt_rounded,
-        color: const Color(0xFF8B5CF6),
+        color: const Color(0xFF6366F1),
         page: const DebouncerScreen(),
       ),
       (
         category: 'network',
-        title: isArabic ? '6. Functional Error Handling' : '6. Functional Error Handling',
+        title: isArabic ? '8. Reactive Streams & Pipelines' : '8. Reactive Streams & Pipelines',
+        subtitle: isArabic ? 'بناء خطوط معالجة الأحداث الحية بـ StreamTransformers و distinct.' : 'Reactive streams event emitter and pipeline operators.',
+        icon: Icons.water_drop_rounded,
+        color: const Color(0xFF10B981),
+        page: const StreamsRxScreen(),
+      ),
+      (
+        category: 'network',
+        title: isArabic ? '9. Functional Error Handling' : '9. Functional Error Handling',
         subtitle: isArabic ? 'معالجة الأخطاء بأمان بـ Either<Failure, T> و Cubit.fold().' : 'Safe functional error handling with Either and Cubit.',
         icon: Icons.shield_rounded,
-        color: const Color(0xFF10B981),
+        color: const Color(0xFF34D399),
         page: const ErrorHandlingScreen(),
       ),
       (
         category: 'network',
-        title: isArabic ? '7. Offline-First & Sync Engine' : '7. Offline-First & Sync Engine',
+        title: isArabic ? '10. Offline-First & Sync Engine' : '10. Offline-First & Sync Engine',
         subtitle: isArabic ? 'تحديث الواجهة تفاؤلياً (Optimistic UI) وإدارة طابور المزامنة.' : 'Optimistic UI updates and offline cache sync queue.',
         icon: Icons.cloud_sync_rounded,
         color: const Color(0xFF38BDF8),
         page: const OfflineSyncScreen(),
       ),
 
-      // 3. Architecture & Security Category
+      // 3. Architecture, Language & Native Category
       (
         category: 'architecture',
-        title: isArabic ? '8. 3 Trees & Widget Keys' : '8. 3 Trees & Widget Keys',
+        title: isArabic ? '11. Dart 3: Sealed Classes & Records' : '11. Dart 3: Sealed Classes & Records',
+        subtitle: isArabic ? 'تفكيك السجلات ومطابقة الأنماط وحراسة الشروط الشاملة.' : 'Records, exhaustive switch patterns and guard clauses.',
+        icon: Icons.code_rounded,
+        color: const Color(0xFF0284C7),
+        page: const Dart3Screen(),
+      ),
+      (
+        category: 'architecture',
+        title: isArabic ? '12. InheritedModel & O(1) Rebuilds' : '12. InheritedModel & O(1) Rebuilds',
+        subtitle: isArabic ? 'سر معمارية الوصول السريع والاشتراك الحبيبي بمظاهر Aspect.' : 'O(1) tree lookup and granular aspect-filtered rebuilds.',
+        icon: Icons.hub_rounded,
+        color: const Color(0xFF14B8A6),
+        page: const StateInheritedScreen(),
+      ),
+      (
+        category: 'architecture',
+        title: isArabic ? '13. Clean Architecture & SOLID' : '13. Clean Architecture & SOLID',
+        subtitle: isArabic ? 'فصل الطبقات ومبدأ عكس التبعية (DIP) مع تبديل مصادر البيانات.' : 'Layer separation and live Dependency Inversion switcher.',
+        icon: Icons.architecture_rounded,
+        color: const Color(0xFFF59E0B),
+        page: const CleanArchScreen(),
+      ),
+      (
+        category: 'architecture',
+        title: isArabic ? '14. Platform Channels & Native Bridge' : '14. Platform Channels & Native Bridge',
+        subtitle: isArabic ? 'تواصل Dart مع Kotlin/Swift عبر MethodChannel و EventChannel.' : 'BinaryMessenger bridge, method calls and sensor streams.',
+        icon: Icons.settings_input_component_rounded,
+        color: const Color(0xFF06B6D4),
+        page: const PlatformChannelsScreen(),
+      ),
+      (
+        category: 'architecture',
+        title: isArabic ? '15. 3 Trees & Widget Keys' : '15. 3 Trees & Widget Keys',
         subtitle: isArabic ? 'سر خلط الـ State في القوائم وكيف يطابق Element Tree بالـ Key.' : 'Widget vs Element matching and state identity.',
         icon: Icons.account_tree_rounded,
         color: const Color(0xFFD97706),
@@ -391,7 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       (
         category: 'architecture',
-        title: isArabic ? '9. Security & Token Interceptors' : '9. Security & Token Interceptors',
+        title: isArabic ? '16. Security & Token Interceptors' : '16. Security & Token Interceptors',
         subtitle: isArabic ? 'تشفير AES-256 وتجديد JWT Token التلقائي بـ QueuedInterceptor.' : 'AES-256 encryption and auto JWT refresh queue.',
         icon: Icons.lock_person_rounded,
         color: const Color(0xFFEC4899),
@@ -399,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       (
         category: 'architecture',
-        title: isArabic ? '10. App Stores & CI/CD Release' : '10. App Stores & CI/CD Release',
+        title: isArabic ? '17. App Stores & CI/CD Release' : '17. App Stores & CI/CD Release',
         subtitle: isArabic ? 'توليد Keystores، فحص جاهزية المتجر، ومحاكي GitHub Actions.' : 'Keystore generator, store checklist & CI/CD pipeline.',
         icon: Icons.rocket_launch_rounded,
         color: const Color(0xFFF59E0B),
@@ -407,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       (
         category: 'architecture',
-        title: isArabic ? '11. Core Extensions Playground' : '11. Core Extensions Playground',
+        title: isArabic ? '18. Core Extensions Playground' : '18. Core Extensions Playground',
         subtitle: isArabic ? 'فحص خصائص BuildContext، رسائل SnackBar، والتحقق من النصوص.' : 'Live context dimensions, floating snackbars and validators.',
         icon: Icons.auto_awesome_rounded,
         color: const Color(0xFFE11D48),
