@@ -117,9 +117,39 @@ class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       textTheme: baseTheme.textTheme.copyWith(
-        titleLarge: baseTheme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-        titleMedium: baseTheme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-        bodyMedium: baseTheme.textTheme.bodyMedium?.copyWith(height: 1.45),
+        headlineSmall: baseTheme.textTheme.headlineSmall?.copyWith(
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
+          height: 1.25,
+        ),
+        titleLarge: baseTheme.textTheme.titleLarge?.copyWith(
+          fontSize: 15,
+          fontWeight: FontWeight.w800,
+        ),
+        titleMedium: baseTheme.textTheme.titleMedium?.copyWith(
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+        ),
+        titleSmall: baseTheme.textTheme.titleSmall?.copyWith(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+        ),
+        bodyLarge: baseTheme.textTheme.bodyLarge?.copyWith(
+          fontSize: 13,
+          height: 1.45,
+        ),
+        bodyMedium: baseTheme.textTheme.bodyMedium?.copyWith(
+          fontSize: 12,
+          height: 1.4,
+        ),
+        bodySmall: baseTheme.textTheme.bodySmall?.copyWith(
+          fontSize: 11,
+          height: 1.35,
+        ),
+        labelLarge: baseTheme.textTheme.labelLarge?.copyWith(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

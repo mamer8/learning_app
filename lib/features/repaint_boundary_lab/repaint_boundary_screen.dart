@@ -388,6 +388,21 @@ class _RepaintBoundaryScreenState extends State<RepaintBoundaryScreen>
             '  • يكون الويدجت بسيطاً جداً (مثل أيقونة أو نص عادي)؛ لأن إنشاء طبقة مستقلة في الـ GPU يستهلك ذاكرة إضافية (Overhead) أكبر من تكلفة إعادة رسمها!',
             style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.5),
           ),
+          14.heightBox,
+          const Text(
+            '💻 كود الاستخدام الصحيح لعزل الرسم:',
+            style: TextStyle(color: Colors.tealAccent, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          8.heightBox,
+          const CopyableCodeBlock(
+            code:
+                '// تغليف العنصر سريع الحركة بـ RepaintBoundary لعزل طبقة الرسم\n'
+                'RepaintBoundary(\n'
+                '  child: HighFrequencyAnimatedWidget(),\n'
+                ');',
+            copiedMessage: 'تم نسخ كود RepaintBoundary',
+            copyTooltip: 'نسخ الكود',
+          ),
         ],
       ),
     );

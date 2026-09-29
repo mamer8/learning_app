@@ -204,6 +204,10 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
 
             // 6. سجل الأحداث التفاعلي (Timeline Logs)
             _buildTimelineSection(),
+            16.heightBox,
+
+            // 7. الأكواد القابلة للنسخ
+            _buildCodeSnippetsSection(),
           ],
         ),
       ),
@@ -576,6 +580,66 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
                 },
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeSnippetsSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: 16.circularRadius,
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '💻 الأكواد التطبيقية الجاهزة للنسخ:',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          12.heightBox,
+          const Text(
+            '1. كود استخدام الـ Debouncer في البحث الفوري:',
+            style: TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          8.heightBox,
+          const CopyableCodeBlock(
+            code:
+                'final debouncer = Debouncer(delay: const Duration(milliseconds: 500));\n\n'
+                'void onSearchChanged(String query) {\n'
+                '  debouncer.run(() {\n'
+                '    // يُستدعى فقط بعد توقف المستخدم عن الكتابة لـ 500ms\n'
+                '    fetchSearchResults(query);\n'
+                '  });\n'
+                '}',
+            copiedMessage: 'تم نسخ كود Debouncer',
+            copyTooltip: 'نسخ الكود',
+          ),
+          16.heightBox,
+          const Text(
+            '2. كود استخدام الـ Throttler لحماية أزرار الدفع والتفاعل:',
+            style: TextStyle(color: Colors.purpleAccent, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          8.heightBox,
+          const CopyableCodeBlock(
+            code:
+                'final throttler = Throttler(interval: const Duration(seconds: 1));\n\n'
+                'void onPayButtonClicked() {\n'
+                '  throttler.run(() {\n'
+                '    // يُنفذ فوراً ثم يتجاهل أي نقرات إضافية لمدة 1 ثانية\n'
+                '    processPayment();\n'
+                '  });\n'
+                '}',
+            copiedMessage: 'تم نسخ كود Throttler',
+            copyTooltip: 'نسخ الكود',
+          ),
         ],
       ),
     );

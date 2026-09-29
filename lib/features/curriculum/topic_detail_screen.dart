@@ -123,18 +123,20 @@ class _TopicHeader extends StatelessWidget {
               ),
             ],
           ),
-          14.heightBox,
+          12.heightBox,
           Text(
             topic.title.value(isArabic),
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: const TextStyle(
               color: Colors.white,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              height: 1.25,
             ),
           ),
-          8.heightBox,
+          6.heightBox,
           Text(
             topic.summary.value(isArabic),
-            style: const TextStyle(color: Color(0xFFCBD5E1), height: 1.5),
+            style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 12, height: 1.45),
           ),
         ],
       ),
@@ -156,7 +158,7 @@ class _ExplainCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFF172033),
         borderRadius: BorderRadius.circular(8),
@@ -167,21 +169,21 @@ class _ExplainCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: const Color(0xFF14B8A6), size: 21),
-              10.widthBox,
+              Icon(icon, color: const Color(0xFF14B8A6), size: 19),
+              8.widthBox,
               Expanded(
                 child: Text(
                   title,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13.5,
                   ),
                 ),
               ),
             ],
           ),
-          12.heightBox,
+          10.heightBox,
           child,
         ],
       ),

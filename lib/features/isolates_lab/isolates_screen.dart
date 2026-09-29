@@ -330,7 +330,39 @@ class _IsolatesScreenState extends State<IsolatesScreen>
                   ],
                 ),
               ),
+              16.heightBox,
             ],
+
+            // كود الـ Isolate القابل للنسخ
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B),
+                borderRadius: 16.circularRadius,
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '💻 كود التنفيذ في Isolate منفصل:',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  10.heightBox,
+                  const CopyableCodeBlock(
+                    code:
+                        '// تشغيل الحسابات الثقيلة في Worker Isolate مستقل دون تجميد الـ UI\n'
+                        'final result = await Isolate.run(() => heavyTask(250000));',
+                    copiedMessage: 'تم نسخ كود Isolate',
+                    copyTooltip: 'نسخ الكود',
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
