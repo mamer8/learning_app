@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 import 'curriculum_data.dart';
 
 class TopicDetailScreen extends StatelessWidget {
@@ -25,6 +26,19 @@ class TopicDetailScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text(topic.title.value(isArabic)),
           actions: [
+            IconButton(
+              tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
+              icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+              onPressed: () {
+                ContextualAiSheet.show(
+                  context,
+                  topicTitle: topic.title.value(isArabic),
+                  topicCode: topic.code,
+                  levelTitle: level.title.value(isArabic),
+                  isArabic: isArabic,
+                );
+              },
+            ),
             TextButton.icon(
               onPressed: locale.onToggleLanguage,
               icon: const Icon(Icons.language_rounded),
@@ -33,8 +47,25 @@ class TopicDetailScreen extends StatelessWidget {
             8.widthBox,
           ],
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            ContextualAiSheet.show(
+              context,
+              topicTitle: topic.title.value(isArabic),
+              topicCode: topic.code,
+              levelTitle: level.title.value(isArabic),
+              isArabic: isArabic,
+            );
+          },
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: Text(
+            isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
+            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
+        ),
         body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
           children: [
             _TopicHeader(level: level, topic: topic),
             14.heightBox,

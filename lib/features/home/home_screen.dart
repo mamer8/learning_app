@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/ai_chat_screen.dart';
 import '../curriculum/curriculum_data.dart';
 import '../curriculum/level_detail_screen.dart';
 import '../debouncer_lab/debouncer_screen.dart';
@@ -35,6 +36,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return Directionality(
       textDirection: locale.textDirection,
       child: Scaffold(
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AiChatScreen()),
+            );
+          },
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: Text(
+            isArabic ? 'مساعد Flutter الذكي' : 'Flutter AI Copilot',
+            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold, fontSize: 12.5),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
+        ),
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -51,6 +66,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   pinned: true,
                   title: Text(isArabic ? 'أكاديمية ومختبرات Flutter' : 'Flutter Master Academy'),
                   actions: [
+                    IconButton(
+                      tooltip: isArabic ? 'مساعد Flutter الذكي' : 'Flutter AI Copilot',
+                      icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const AiChatScreen()),
+                        );
+                      },
+                    ),
                     TextButton.icon(
                       onPressed: locale.onToggleLanguage,
                       icon: const Icon(Icons.language_rounded, size: 18),
