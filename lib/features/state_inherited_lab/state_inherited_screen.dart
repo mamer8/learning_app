@@ -113,39 +113,42 @@ class _StateInheritedScreenState extends State<StateInheritedScreen> {
           counter: _counter,
           activeColor: _color,
           themeName: _themeName,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-            children: [
-              _buildIntroCard(isArabic),
-              16.heightBox,
+          child: ResponsiveContentWrapper(
+            maxWidth: 1200,
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+              children: [
+                _buildIntroCard(isArabic),
+                16.heightBox,
 
-              // أزرار التحكم في الـ State الأعلى
-              _buildControlPanel(isArabic),
-              16.heightBox,
+                // أزرار التحكم في الـ State الأعلى
+                _buildControlPanel(isArabic),
+                16.heightBox,
 
-              // فحص الـ Rebuilds للأبناء
-              Text(
-                isArabic ? '📊 اختبار إعادة البناء الحبيبي (Granular Rebuilds):' : '📊 Granular Rebuild Test Watcher:',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
-              ),
-              8.heightBox,
+                // فحص الـ Rebuilds للأبناء
+                Text(
+                  isArabic ? '📊 اختبار إعادة البناء الحبيبي (Granular Rebuilds):' : '📊 Granular Rebuild Test Watcher:',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                ),
+                8.heightBox,
 
-              // ويدجت مهتمة فقط بالعداد
-              const CounterConsumerCard(),
-              10.heightBox,
+                // ويدجت مهتمة فقط بالعداد
+                const CounterConsumerCard(),
+                10.heightBox,
 
-              // ويدجت مهتمة فقط باللون
-              const ColorConsumerCard(),
-              10.heightBox,
+                // ويدجت مهتمة فقط باللون
+                const ColorConsumerCard(),
+                10.heightBox,
 
-              // ويدجت مهتمة بجميع التغييرات (InheritedWidget تقليدي)
-              const AllChangesConsumerCard(),
-              16.heightBox,
+                // ويدجت مهتمة بجميع التغييرات (InheritedWidget تقليدي)
+                const AllChangesConsumerCard(),
+                16.heightBox,
 
-              // كود الـ InheritedModel الحي
-              _buildCodeSection(isArabic),
-              24.heightBox,
-            ],
+                // كود الـ InheritedModel الحي
+                _buildCodeSection(isArabic),
+                24.heightBox,
+              ],
+            ),
           ),
         ),
       ),

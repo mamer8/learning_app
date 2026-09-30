@@ -152,30 +152,33 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
         ),
         onPressed: () => _openAiAssistant(pendingCount),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // بطاقة الشرح
-            _buildExplanationCard(),
-            16.heightBox,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // بطاقة الشرح
+              _buildExplanationCard(),
+              16.heightBox,
 
-            // مفتاح محاكاة الاتصال بالإنترنت
-            _buildNetworkToggleCard(pendingCount),
-            16.heightBox,
+              // مفتاح محاكاة الاتصال بالإنترنت
+              _buildNetworkToggleCard(pendingCount),
+              16.heightBox,
 
-            // إضافة مهمة جديدة
-            _buildAddTaskInput(),
-            16.heightBox,
+              // إضافة مهمة جديدة
+              _buildAddTaskInput(),
+              16.heightBox,
 
-            // قائمة المهام وحالة تزامنها
-            _buildTaskList(),
-            20.heightBox,
+              // قائمة المهام وحالة تزامنها
+              _buildTaskList(),
+              20.heightBox,
 
-            // الكود الجاهز للنسخ
-            _buildCodeSnippetCard(pendingCount),
-          ],
+              // الكود الجاهز للنسخ
+              _buildCodeSnippetCard(pendingCount),
+            ],
+          ),
         ),
       ),
     );

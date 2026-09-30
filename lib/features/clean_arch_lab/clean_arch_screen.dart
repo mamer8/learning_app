@@ -160,28 +160,31 @@ class _CleanArchScreenState extends State<CleanArchScreen> {
           ),
           backgroundColor: const Color(0xFF14B8A6),
         ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-          children: [
-            _buildIntroCard(isArabic),
-            16.heightBox,
+        body: ResponsiveContentWrapper(
+          maxWidth: 1200,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            children: [
+              _buildIntroCard(isArabic),
+              16.heightBox,
 
-            // 1. المخطط التفاعلي للطبقات (Interactive Layer Map)
-            _buildLayersMap(isArabic),
-            16.heightBox,
+              // 1. المخطط التفاعلي للطبقات (Interactive Layer Map)
+              _buildLayersMap(isArabic),
+              16.heightBox,
 
-            // 2. مبدأ عكس التبعية (Dependency Inversion Demonstration)
-            _buildDependencyInversionControl(isArabic),
-            16.heightBox,
+              // 2. مبدأ عكس التبعية (Dependency Inversion Demonstration)
+              _buildDependencyInversionControl(isArabic),
+              16.heightBox,
 
-            // 3. المخرجات في طبقة Presentation
-            _buildPresentationList(isArabic),
-            16.heightBox,
+              // 3. المخرجات في طبقة Presentation
+              _buildPresentationList(isArabic),
+              16.heightBox,
 
-            // 4. كود الـ Clean Architecture المحدث ديناميكياً
-            _buildCodeSection(isArabic),
-            24.heightBox,
-          ],
+              // 4. كود الـ Clean Architecture المحدث ديناميكياً
+              _buildCodeSection(isArabic),
+              24.heightBox,
+            ],
+          ),
         ),
       ),
     );

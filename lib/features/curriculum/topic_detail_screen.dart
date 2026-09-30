@@ -65,54 +65,72 @@ class TopicDetailScreen extends StatelessWidget {
           ),
           backgroundColor: const Color(0xFF14B8A6),
         ),
-        body: ListView(
+        body: ResponsiveContentWrapper(
+          maxWidth: 1280,
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
-          children: [
-            _TopicHeader(level: level, topic: topic),
-            14.heightBox,
-            _ExplainCard(
-              icon: Icons.lightbulb_rounded,
-              title: isArabic ? 'الفكرة ببساطة' : 'Simple idea',
-              child: Text(
-                topic.explain.value(isArabic),
-                style: const TextStyle(color: Color(0xFFCBD5E1), height: 1.6),
+          child: ListView(
+            children: [
+              _TopicHeader(level: level, topic: topic),
+              14.heightBox,
+              AdaptiveSplitView(
+                breakpoint: 940,
+                primaryFlex: 5,
+                secondaryFlex: 5,
+                spacing: 16,
+                primary: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _ExplainCard(
+                      icon: Icons.lightbulb_rounded,
+                      title: isArabic ? 'الفكرة ببساطة' : 'Simple idea',
+                      child: Text(
+                        topic.explain.value(isArabic),
+                        style: const TextStyle(color: Color(0xFFCBD5E1), height: 1.6),
+                      ),
+                    ),
+                    12.heightBox,
+                    _ExplainCard(
+                      icon: Icons.rule_rounded,
+                      title: isArabic ? 'تستخدمه إمتى؟' : 'When to use it',
+                      child: _BulletList(items: topic.whenToUse),
+                    ),
+                    12.heightBox,
+                    _ExplainCard(
+                      icon: Icons.format_list_numbered_rounded,
+                      title: isArabic ? 'خطوات التطبيق' : 'Implementation steps',
+                      child: _NumberedList(items: topic.steps),
+                    ),
+                    12.heightBox,
+                    _ExplainCard(
+                      icon: Icons.warning_amber_rounded,
+                      title: isArabic ? 'أخطاء شائعة' : 'Common mistakes',
+                      child: _BulletList(items: topic.commonMistakes),
+                    ),
+                  ],
+                ),
+                secondary: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _ExplainCard(
+                      icon: Icons.play_circle_filled_rounded,
+                      title: isArabic ? 'المعاينة الحية والنتيجة التفاعلية' : 'Live Output & Interactive Sandbox',
+                      child: TopicLivePreview(
+                        level: level,
+                        topic: topic,
+                        isArabic: isArabic,
+                      ),
+                    ),
+                    12.heightBox,
+                    _ExplainCard(
+                      icon: Icons.code_rounded,
+                      title: isArabic ? 'مثال كود واضح' : 'Clear code example',
+                      child: _CodeBlock(code: topic.code),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            12.heightBox,
-            _ExplainCard(
-              icon: Icons.play_circle_filled_rounded,
-              title: isArabic ? 'المعاينة الحية والنتيجة التفاعلية' : 'Live Output & Interactive Sandbox',
-              child: TopicLivePreview(
-                level: level,
-                topic: topic,
-                isArabic: isArabic,
-              ),
-            ),
-            12.heightBox,
-            _ExplainCard(
-              icon: Icons.rule_rounded,
-              title: isArabic ? 'تستخدمه إمتى؟' : 'When to use it',
-              child: _BulletList(items: topic.whenToUse),
-            ),
-            12.heightBox,
-            _ExplainCard(
-              icon: Icons.format_list_numbered_rounded,
-              title: isArabic ? 'خطوات التطبيق' : 'Implementation steps',
-              child: _NumberedList(items: topic.steps),
-            ),
-            12.heightBox,
-            _ExplainCard(
-              icon: Icons.code_rounded,
-              title: isArabic ? 'مثال كود واضح' : 'Clear code example',
-              child: _CodeBlock(code: topic.code),
-            ),
-            12.heightBox,
-            _ExplainCard(
-              icon: Icons.warning_amber_rounded,
-              title: isArabic ? 'أخطاء شائعة' : 'Common mistakes',
-              child: _BulletList(items: topic.commonMistakes),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

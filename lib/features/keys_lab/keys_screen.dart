@@ -127,10 +127,12 @@ class _KeysScreenState extends State<KeysScreen> {
         ),
         backgroundColor: const Color(0xFF14B8A6),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 1. بطاقة الشرح النظري
             _buildExplanationCard(),
@@ -213,7 +215,8 @@ class _KeysScreenState extends State<KeysScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildExplanationCard() {

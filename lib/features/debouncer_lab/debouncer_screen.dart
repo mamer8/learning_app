@@ -224,12 +224,14 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
         ),
         backgroundColor: const Color(0xFF14B8A6),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // 1. بطاقة الشرح المفصل (Educational Explanations Card)
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. بطاقة الشرح المفصل (Educational Explanations Card)
             _buildEducationalCard(),
             16.heightBox,
 
@@ -258,7 +260,8 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildEducationalCard() {

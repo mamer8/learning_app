@@ -180,26 +180,29 @@ class _SecurityScreenState extends State<SecurityScreen> {
         label: const Text('اسأل الـ AI عن الأمان', style: TextStyle(fontWeight: FontWeight.bold)),
         onPressed: _openAiAssistant,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // بطاقة الشرح
-            _buildConceptCard(),
-            16.heightBox,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // بطاقة الشرح
+              _buildConceptCard(),
+              16.heightBox,
 
-            // محاكي دورة حياة التوكن
-            _buildTokenSimulatorCard(isTokenValid),
-            16.heightBox,
+              // محاكي دورة حياة التوكن
+              _buildTokenSimulatorCard(isTokenValid),
+              16.heightBox,
 
-            // محاكي تشفير وفك تشفير البيانات
-            _buildEncryptionPlayground(),
-            16.heightBox,
+              // محاكي تشفير وفك تشفير البيانات
+              _buildEncryptionPlayground(),
+              16.heightBox,
 
-            // الكود الجاهز للنسخ
-            _buildCodeSnippetCard(isTokenValid),
-          ],
+              // الكود الجاهز للنسخ
+              _buildCodeSnippetCard(isTokenValid),
+            ],
+          ),
         ),
       ),
     );

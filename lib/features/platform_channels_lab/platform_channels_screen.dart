@@ -116,28 +116,31 @@ class _PlatformChannelsScreenState extends State<PlatformChannelsScreen> {
           ),
           onPressed: () => _openAiAssistant(isArabic),
         ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-          children: [
-            _buildIntroCard(isArabic),
-            16.heightBox,
+        body: ResponsiveContentWrapper(
+          maxWidth: 1200,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            children: [
+              _buildIntroCard(isArabic),
+              16.heightBox,
 
-            // 1. MethodChannel Section
-            _buildMethodChannelSection(isArabic),
-            16.heightBox,
+              // 1. MethodChannel Section
+              _buildMethodChannelSection(isArabic),
+              16.heightBox,
 
-            // 2. EventChannel Section
-            _buildEventChannelSection(isArabic),
-            16.heightBox,
+              // 2. EventChannel Section
+              _buildEventChannelSection(isArabic),
+              16.heightBox,
 
-            // 3. سجلات الباكيتات عبر الجسر (Bridge Packet Logs)
-            _buildPacketLogs(isArabic),
-            16.heightBox,
+              // 3. سجلات الباكيتات عبر الجسر (Bridge Packet Logs)
+              _buildPacketLogs(isArabic),
+              16.heightBox,
 
-            // 4. Dynamic Code Snippet Card
-            _buildCodeSnippetCard(isArabic),
-            24.heightBox,
-          ],
+              // 4. Dynamic Code Snippet Card
+              _buildCodeSnippetCard(isArabic),
+              24.heightBox,
+            ],
+          ),
         ),
       ),
     );

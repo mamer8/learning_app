@@ -177,63 +177,66 @@ class _PhysicsPainterScreenState extends State<PhysicsPainterScreen>
         ),
         backgroundColor: const Color(0xFF14B8A6),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // بطاقة الشرح
-            _buildExplanationCard(),
-            16.heightBox,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // بطاقة الشرح
+              _buildExplanationCard(),
+              16.heightBox,
 
-            // مساحة الكانفاس التفاعلية (Canvas Sandbox)
-            Center(
-              child: GestureDetector(
-                onPanUpdate: (details) => setState(() => _touchPosition = details.localPosition),
-                onPanEnd: (_) => setState(() => _touchPosition = null),
-                child: Container(
-                  width: 350,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF020617),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.4)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF14B8A6).withValues(alpha: 0.15),
-                        blurRadius: 20,
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: CustomPaint(
-                      painter: _ParticleCanvasPainter(
-                        particles: _particles,
-                        enableConnections: _enableConnections,
-                        touchPosition: _touchPosition,
+              // مساحة الكانفاس التفاعلية (Canvas Sandbox)
+              Center(
+                child: GestureDetector(
+                  onPanUpdate: (details) => setState(() => _touchPosition = details.localPosition),
+                  onPanEnd: (_) => setState(() => _touchPosition = null),
+                  child: Container(
+                    width: 350,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF020617),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.4)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF14B8A6).withValues(alpha: 0.15),
+                          blurRadius: 20,
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: CustomPaint(
+                        painter: _ParticleCanvasPainter(
+                          particles: _particles,
+                          enableConnections: _enableConnections,
+                          touchPosition: _touchPosition,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-            12.heightBox,
-            const Center(
-              child: Text(
-                '👆 المس واسحب إصبعك داخل المربع للتفاعل مع الجسيمات وإبعادها!',
-                style: TextStyle(color: Colors.white70, fontSize: 11.5),
+              12.heightBox,
+              const Center(
+                child: Text(
+                  '👆 المس واسحب إصبعك داخل المربع للتفاعل مع الجسيمات وإبعادها!',
+                  style: TextStyle(color: Colors.white70, fontSize: 11.5),
+                ),
               ),
-            ),
-            16.heightBox,
+              16.heightBox,
 
-            // لوحة التحكم التفاعلية
-            _buildControlPanel(),
-            16.heightBox,
+              // لوحة التحكم التفاعلية
+              _buildControlPanel(),
+              16.heightBox,
 
-            // الكود الجاهز للنسخ
-            _buildCodeCard(),
-          ],
+              // الكود الجاهز للنسخ
+              _buildCodeCard(),
+            ],
+          ),
         ),
       ),
     );

@@ -37,40 +37,43 @@ class _CurriculumScreenState extends State<CurriculumScreen> {
             8.widthBox,
           ],
         ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          children: [
-            _Header(isArabic: isArabic),
-            12.heightBox,
-            TextField(
-              onChanged: (value) => setState(() => _query = value.trim()),
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFF172033),
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                  color: Color(0xFF14B8A6),
-                ),
-                hintText: isArabic
-                    ? 'ابحث عن auth، api، payment، testing...'
-                    : 'Search auth, api, payment, testing...',
-                hintStyle: const TextStyle(color: Color(0xFF64748B)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
+        body: ResponsiveContentWrapper(
+          maxWidth: 1200,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            children: [
+              _Header(isArabic: isArabic),
+              12.heightBox,
+              TextField(
+                onChanged: (value) => setState(() => _query = value.trim()),
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFF172033),
+                  prefixIcon: const Icon(
+                    Icons.search_rounded,
+                    color: Color(0xFF14B8A6),
+                  ),
+                  hintText: isArabic
+                      ? 'ابحث عن auth، api، payment، testing...'
+                      : 'Search auth, api, payment, testing...',
+                  hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
-            ),
-            16.heightBox,
-            if (visibleLevels.isEmpty)
-              _EmptySearch(isArabic: isArabic)
-            else
-              for (final entry in visibleLevels) ...[
-                _LevelCard(level: entry.level, topics: entry.topics),
-                12.heightBox,
-              ],
-          ],
+              16.heightBox,
+              if (visibleLevels.isEmpty)
+                _EmptySearch(isArabic: isArabic)
+              else
+                for (final entry in visibleLevels) ...[
+                  _LevelCard(level: entry.level, topics: entry.topics),
+                  12.heightBox,
+                ],
+            ],
+          ),
         ),
       ),
     );

@@ -164,20 +164,23 @@ class _AnimationsScreenState extends State<AnimationsScreen> with TickerProvider
           ),
           backgroundColor: const Color(0xFF14B8A6),
         ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-          children: [
-            _buildIntroCard(isArabic),
-            16.heightBox,
+        body: ResponsiveContentWrapper(
+          maxWidth: 1200,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            children: [
+              _buildIntroCard(isArabic),
+              16.heightBox,
 
-            // 1. Staggered Animations Section
-            _buildStaggeredSection(isArabic),
-            16.heightBox,
+              // 1. Staggered Animations Section
+              _buildStaggeredSection(isArabic),
+              16.heightBox,
 
-            // 2. Spring Physics Simulation Section
-            _buildSpringSection(isArabic),
-            24.heightBox,
-          ],
+              // 2. Spring Physics Simulation Section
+              _buildSpringSection(isArabic),
+              24.heightBox,
+            ],
+          ),
         ),
       ),
     );

@@ -112,27 +112,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 // 2. المحتوى الرئيسي
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
-                  sliver: SliverList.list(
-                    children: [
-                      // بنر الترحيب المصغر الأنيق
-                      _buildHeaderBanner(isArabic),
-                      14.heightBox,
-
-                      // أزرار التبديل الرئيسية (Segmented Tab Bar)
-                      _buildMainSegmentedSwitch(isArabic),
-                      16.heightBox,
-
-                      // عرض المحتوى بحسب التبويب المختار
-                      if (_selectedTabIndex == 0) ...[
-                        _buildLabCategoryChips(isArabic),
+                SliverToBoxAdapter(
+                  child: ResponsiveContentWrapper(
+                    maxWidth: 1240,
+                    padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // بنر الترحيب المصغر الأنيق
+                        _buildHeaderBanner(isArabic),
                         14.heightBox,
-                        _buildLabsGrid(isArabic),
-                      ] else ...[
-                        _buildRoadmapSection(isArabic),
+
+                        // أزرار التبديل الرئيسية (Segmented Tab Bar)
+                        _buildMainSegmentedSwitch(isArabic),
+                        16.heightBox,
+
+                        // عرض المحتوى بحسب التبويب المختار
+                        if (_selectedTabIndex == 0) ...[
+                          _buildLabCategoryChips(isArabic),
+                          14.heightBox,
+                          _buildLabsGrid(isArabic),
+                        ] else ...[
+                          _buildRoadmapSection(isArabic),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -483,12 +487,84 @@ class _HomeScreenState extends State<HomeScreen> {
       return lab.category == _labCategoryFilter;
     }).toList();
 
-    return Column(
+    return AdaptiveGrid(
+      mobileColumns: 1,
+      tabletColumns: 2,
+      desktopColumns: 3,
+      spacing: 12,
+      runSpacing: 12,
       children: filteredLabs.map((lab) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: InkWell(
-            onTap: () => context.push(lab.page),
+        return InkWell(
+          onTap: () => context.push(lab.page),
+          borderRadius: BorderRadius.circular(10),
+          child: Ink(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF101828),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFF24324A)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: lab.color.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: lab.color.withValues(alpha: 0.35)),
+                  ),
+                  child: Icon(lab.icon, color: lab.color, size: 22),
+                ),
+                12.widthBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        lab.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                      3.heightBox,
+                      Text(
+                        lab.subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11.5,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                8.widthBox,
+                const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF64748B), size: 14),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildRoadmapSection(bool isArabic) {
+    return AdaptiveGrid(
+      mobileColumns: 1,
+      tabletColumns: 2,
+      desktopColumns: 2,
+      spacing: 12,
+      runSpacing: 12,
+      children: [
+        for (final level in curriculumLevels)
+          InkWell(
+            onTap: () => context.push(LevelDetailScreen(level: level)),
             borderRadius: BorderRadius.circular(10),
             child: Ink(
               padding: const EdgeInsets.all(14),
@@ -503,19 +579,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: lab.color.withValues(alpha: 0.14),
+                      color: level.color.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: lab.color.withValues(alpha: 0.35)),
+                      border: Border.all(color: level.color.withValues(alpha: 0.35)),
                     ),
-                    child: Icon(lab.icon, color: lab.color, size: 22),
+                    child: Center(
+                      child: Text(
+                        '${level.number}',
+                        style: TextStyle(
+                          color: level.color,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
                   ),
                   12.widthBox,
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          lab.title,
+                          level.title.value(isArabic),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
@@ -524,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         3.heightBox,
                         Text(
-                          lab.subtitle,
+                          '${level.topics.length} ${isArabic ? 'مواضيع كود وشروحات' : 'topics with code'} | ${level.subtitle.value(isArabic)}',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -542,83 +628,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildRoadmapSection(bool isArabic) {
-    return Column(
-      children: [
-        for (final level in curriculumLevels) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: InkWell(
-              onTap: () => context.push(LevelDetailScreen(level: level)),
-              borderRadius: BorderRadius.circular(10),
-              child: Ink(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF101828),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFF24324A)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: level.color.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: level.color.withValues(alpha: 0.35)),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${level.number}',
-                          style: TextStyle(
-                            color: level.color,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ),
-                    12.widthBox,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            level.title.value(isArabic),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 13.5,
-                            ),
-                          ),
-                          3.heightBox,
-                          Text(
-                            '${level.topics.length} ${isArabic ? 'مواضيع كود وشروحات' : 'topics with code'} | ${level.subtitle.value(isArabic)}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 11.5,
-                              height: 1.35,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    8.widthBox,
-                    const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF64748B), size: 14),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }

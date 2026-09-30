@@ -69,30 +69,33 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         ),
         backgroundColor: const Color(0xFF14B8A6),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // 1. بطاقة الشرح
-            _buildExplanationCard(),
-            16.heightBox,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. بطاقة الشرح
+              _buildExplanationCard(),
+              16.heightBox,
 
-            // 2. فحص أبعاد الشاشة ومميزات context_extensions.dart
-            _buildContextDimensionsCard(context),
-            16.heightBox,
+              // 2. فحص أبعاد الشاشة ومميزات context_extensions.dart
+              _buildContextDimensionsCard(context),
+              16.heightBox,
 
-            // 3. تجربة رسائل الـ Snackbars العصرية
-            _buildSnackBarsCard(context),
-            16.heightBox,
+              // 3. تجربة رسائل الـ Snackbars العصرية
+              _buildSnackBarsCard(context),
+              16.heightBox,
 
-            // 4. مختبر التحقق من النصوص (String Validation Extensions)
-            _buildStringValidatorsCard(),
-            16.heightBox,
+              // 4. مختبر التحقق من النصوص (String Validation Extensions)
+              _buildStringValidatorsCard(),
+              16.heightBox,
 
-            // 5. كود الـ Extensions الحي
-            _buildCodeCard(),
-          ],
+              // 5. كود الـ Extensions الحي
+              _buildCodeCard(),
+            ],
+          ),
         ),
       ),
     );

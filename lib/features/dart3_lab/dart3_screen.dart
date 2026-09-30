@@ -156,25 +156,28 @@ class _Dart3ScreenState extends State<Dart3Screen> {
           ),
           backgroundColor: const Color(0xFF14B8A6),
         ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-          children: [
-            // بطاقة التقديم
-            _buildIntroCard(isArabic),
-            16.heightBox,
+        body: ResponsiveContentWrapper(
+          maxWidth: 1200,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            children: [
+              // بطاقة التقديم
+              _buildIntroCard(isArabic),
+              16.heightBox,
 
-            // 1. Sealed Classes & Exhaustive Switch
-            _buildSealedClassesSection(isArabic),
-            16.heightBox,
+              // 1. Sealed Classes & Exhaustive Switch
+              _buildSealedClassesSection(isArabic),
+              16.heightBox,
 
-            // 2. Records & Destructuring
-            _buildRecordsSection(isArabic),
-            16.heightBox,
+              // 2. Records & Destructuring
+              _buildRecordsSection(isArabic),
+              16.heightBox,
 
-            // 3. Pattern Matching & Guard Clauses
-            _buildPatternMatchingSection(isArabic),
-            24.heightBox,
-          ],
+              // 3. Pattern Matching & Guard Clauses
+              _buildPatternMatchingSection(isArabic),
+              24.heightBox,
+            ],
+          ),
         ),
       ),
     );

@@ -137,34 +137,37 @@ class _DeploymentScreenState extends State<DeploymentScreen> {
         label: const Text('اسأل الـ AI عن النشر', style: TextStyle(fontWeight: FontWeight.bold)),
         onPressed: _openAiAssistant,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // بطاقة الشرح
-            _buildExplanationCard(),
-            16.heightBox,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // بطاقة الشرح
+              _buildExplanationCard(),
+              16.heightBox,
 
-            // مقياس الجاهزية للإنتاج
-            _buildReadinessCard(completedCount, progress),
-            16.heightBox,
+              // مقياس الجاهزية للإنتاج
+              _buildReadinessCard(completedCount, progress),
+              16.heightBox,
 
-            // قائمة الفحص التفاعلية (Checklist)
-            _buildChecklistCard(),
-            16.heightBox,
+              // قائمة الفحص التفاعلية (Checklist)
+              _buildChecklistCard(),
+              16.heightBox,
 
-            // مولد أوامر البناء
-            _buildCommandGeneratorCard(),
-            16.heightBox,
+              // مولد أوامر البناء
+              _buildCommandGeneratorCard(),
+              16.heightBox,
 
-            // محاكي CI/CD Pipeline
-            _buildPipelineSimulatorCard(),
-            16.heightBox,
+              // محاكي CI/CD Pipeline
+              _buildPipelineSimulatorCard(),
+              16.heightBox,
 
-            // كود GitHub Actions التفاعلي الحي
-            _buildCiCdYamlCard(),
-          ],
+              // كود GitHub Actions التفاعلي الحي
+              _buildCiCdYamlCard(),
+            ],
+          ),
         ),
       ),
     );

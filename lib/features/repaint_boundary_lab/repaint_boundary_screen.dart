@@ -102,30 +102,33 @@ class _RepaintBoundaryScreenState extends State<RepaintBoundaryScreen>
         ),
         backgroundColor: const Color(0xFF14B8A6),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // 1. بطاقة الشرح النظري المتقدم
-            _buildConceptExplanationCard(),
-            16.heightBox,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 1. بطاقة الشرح النظري المتقدم
+              _buildConceptExplanationCard(),
+              16.heightBox,
 
-            // 2. مفتاح التحكم التفاعلي (Toggle Switch)
-            _buildToggleControlCard(),
-            16.heightBox,
+              // 2. مفتاح التحكم التفاعلي (Toggle Switch)
+              _buildToggleControlCard(),
+              16.heightBox,
 
-            // 3. مساحة المقارنة البصرية الحية (Live Visual Benchmark)
-            _buildInteractiveBenchmarkingArea(),
-            16.heightBox,
+              // 3. مساحة المقارنة البصرية الحية (Live Visual Benchmark)
+              _buildInteractiveBenchmarkingArea(),
+              16.heightBox,
 
-            // 4. بطاقة شرح طبقات المعالجة في Flutter (Pipeline Stages)
-            _buildPipelineExplanationCard(),
-            16.heightBox,
+              // 4. بطاقة شرح طبقات المعالجة في Flutter (Pipeline Stages)
+              _buildPipelineExplanationCard(),
+              16.heightBox,
 
-            // 5. نصائح وتوصيات متقدمة (Best Practices)
-            _buildBestPracticesCard(),
-          ],
+              // 5. نصائح وتوصيات متقدمة (Best Practices)
+              _buildBestPracticesCard(),
+            ],
+          ),
         ),
       ),
     );

@@ -122,28 +122,31 @@ class _MemoryPerfScreenState extends State<MemoryPerfScreen> {
           ),
           onPressed: () => _openAiAssistant(isArabic),
         ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-          children: [
-            _buildIntroCard(isArabic),
-            16.heightBox,
+        body: ResponsiveContentWrapper(
+          maxWidth: 1200,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            children: [
+              _buildIntroCard(isArabic),
+              16.heightBox,
 
-            // مقياس الذاكرة الحي (RAM Gauge)
-            _buildRamGauge(isArabic, isHighMemory),
-            16.heightBox,
+              // مقياس الذاكرة الحي (RAM Gauge)
+              _buildRamGauge(isArabic, isHighMemory),
+              16.heightBox,
 
-            // محاكي التسريب والتحكم
-            _buildLeakSimulator(isArabic),
-            16.heightBox,
+              // محاكي التسريب والتحكم
+              _buildLeakSimulator(isArabic),
+              16.heightBox,
 
-            // فحص الصور وتحجيم الذاكرة (Image Downsampling)
-            _buildImageOptimizationSection(isArabic),
-            16.heightBox,
+              // فحص الصور وتحجيم الذاكرة (Image Downsampling)
+              _buildImageOptimizationSection(isArabic),
+              16.heightBox,
 
-            // الكود الجاهز للنسخ والتفاعل
-            _buildCodeSnippetCard(isArabic),
-            24.heightBox,
-          ],
+              // الكود الجاهز للنسخ والتفاعل
+              _buildCodeSnippetCard(isArabic),
+              24.heightBox,
+            ],
+          ),
         ),
       ),
     );

@@ -73,108 +73,111 @@ class _SliversScreenState extends State<SliversScreen> {
           backgroundColor: const Color(0xFF14B8A6),
         ),
       ),
-      body: Stack(
-        children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // 1. SliverAppBar تفاعلي
-              SliverAppBar(
-                expandedHeight: 180,
-                pinned: _isPinned,
-                floating: _isFloating,
-                backgroundColor: const Color(0xFF1E293B),
-                actions: [
-                  IconButton(
-                    tooltip: 'اسأل المساعد الذكي',
-                    icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
-                    onPressed: () => _openAiCopilot(context),
-                  ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  title: const Text('مختبر Slivers المتقدم', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  background: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color(0xFF0D9488), Color(0xFF1E293B)],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: Stack(
+          children: [
+            CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                // 1. SliverAppBar تفاعلي
+                SliverAppBar(
+                  expandedHeight: 180,
+                  pinned: _isPinned,
+                  floating: _isFloating,
+                  backgroundColor: const Color(0xFF1E293B),
+                  actions: [
+                    IconButton(
+                      tooltip: 'اسأل المساعد الذكي',
+                      icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+                      onPressed: () => _openAiCopilot(context),
+                    ),
+                  ],
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: const Text('مختبر Slivers المتقدم', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    background: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF0D9488), Color(0xFF1E293B)],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.view_quilt_rounded, color: Colors.white24, size: 70),
                       ),
                     ),
-                    child: const Center(
-                      child: Icon(Icons.view_quilt_rounded, color: Colors.white24, size: 70),
+                  ),
+                ),
+
+                // 2. بطاقة الشرح والتحكم
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildExplanationCard(),
+                        14.heightBox,
+                        _buildControlCard(),
+                        14.heightBox,
+                        _buildCodeCard(),
+                        14.heightBox,
+                        const Text(
+                          '📜 محتوى القائمة القابل للتمرير (مرر لترى تغير مؤشرات الـ HUD في الأسفل):',
+                          style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
 
-              // 2. بطاقة الشرح والتحكم
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildExplanationCard(),
-                      14.heightBox,
-                      _buildControlCard(),
-                      14.heightBox,
-                      _buildCodeCard(),
-                      14.heightBox,
-                      const Text(
-                        '📜 محتوى القائمة القابل للتمرير (مرر لترى تغير مؤشرات الـ HUD في الأسفل):',
-                        style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+                // 3. SliverPersistentHeader لاصق (Sticky Header)
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _StickyCategoryHeaderDelegate(title: '⚡ المنتجات المختارة (Sticky Category)'),
+                ),
+
+                // 4. القائمة أو الشبكة التفاعلية
+                if (_isGrid)
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                        childAspectRatio: 1.3,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // 3. SliverPersistentHeader لاصق (Sticky Header)
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _StickyCategoryHeaderDelegate(title: '⚡ المنتجات المختارة (Sticky Category)'),
-              ),
-
-              // 4. القائمة أو الشبكة التفاعلية
-              if (_isGrid)
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 10,
-                      childAspectRatio: 1.3,
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => _buildItemTile(index),
+                        childCount: 16,
+                      ),
                     ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => _buildItemTile(index),
-                      childCount: 16,
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverList.builder(
+                      itemCount: 16,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _buildItemTile(index),
+                      ),
                     ),
                   ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverList.builder(
-                    itemCount: 16,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: _buildItemTile(index),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+              ],
+            ),
 
-          // 5. لوحة المفتش البصري الحية (Live Scroll & Geometry HUD)
-          Positioned(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            child: _buildGeometryHud(),
-          ),
-        ],
+            // 5. لوحة المفتش البصري الحية (Live Scroll & Geometry HUD)
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: _buildGeometryHud(),
+            ),
+          ],
+        ),
       ),
     );
   }

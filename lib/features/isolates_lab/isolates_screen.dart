@@ -170,12 +170,14 @@ class _IsolatesScreenState extends State<IsolatesScreen>
         ),
         backgroundColor: const Color(0xFF14B8A6),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // بطاقة الشرح النظري المباشر
+      body: ResponsiveContentWrapper(
+        maxWidth: 1200,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // بطاقة الشرح النظري المباشر
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -405,7 +407,8 @@ class _IsolatesScreenState extends State<IsolatesScreen>
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildMetricRow(String label, String value, Color valueColor) {

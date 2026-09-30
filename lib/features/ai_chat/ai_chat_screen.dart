@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../../core/core.dart';
 import '../../core/services/ai_assistant_service.dart';
 import 'widgets/ai_markdown_view.dart';
 import 'widgets/ai_typing_indicator.dart';
@@ -486,30 +487,33 @@ class _AiChatScreenState extends State<AiChatScreen> {
           const SizedBox(width: 6),
         ],
       ),
-      body: Column(
-        children: [
-          // شريط الاقتراحات التفاعلي السريع
-          _buildQuickTopicsCarousel(),
+      body: ResponsiveContentWrapper(
+        maxWidth: 1000,
+        child: Column(
+          children: [
+            // شريط الاقتراحات التفاعلي السريع
+            _buildQuickTopicsCarousel(),
 
-          // قائمة الرسائل
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final msg = _messages[index];
-                return _buildMessageBubble(msg);
-              },
+            // قائمة الرسائل
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  final msg = _messages[index];
+                  return _buildMessageBubble(msg);
+                },
+              ),
             ),
-          ),
 
-          // مؤشر التحميل والتحليل
-          if (_isLoading) const AiTypingIndicator(),
+            // مؤشر التحميل والتحليل
+            if (_isLoading) const AiTypingIndicator(),
 
-          // صندوق الإدخال الحديث
-          _buildModernInputArea(),
-        ],
+            // صندوق الإدخال الحديث
+            _buildModernInputArea(),
+          ],
+        ),
       ),
     );
   }

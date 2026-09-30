@@ -151,28 +151,31 @@ class _StreamsRxScreenState extends State<StreamsRxScreen> {
           ),
           backgroundColor: const Color(0xFF14B8A6),
         ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-          children: [
-            _buildIntroCard(isArabic),
-            16.heightBox,
+        body: ResponsiveContentWrapper(
+          maxWidth: 1200,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            children: [
+              _buildIntroCard(isArabic),
+              16.heightBox,
 
-            // لوحة إرسال الأحداث
-            _buildEmitterControls(isArabic),
-            16.heightBox,
+              // لوحة إرسال الأحداث
+              _buildEmitterControls(isArabic),
+              16.heightBox,
 
-            // خط أنابيب المعالجة (Pipeline Operators)
-            _buildPipelineSettings(isArabic),
-            16.heightBox,
+              // خط أنابيب المعالجة (Pipeline Operators)
+              _buildPipelineSettings(isArabic),
+              16.heightBox,
 
-            // مساحة العرض البصري الحية
-            _buildStreamsVisualizer(isArabic),
-            16.heightBox,
+              // مساحة العرض البصري الحية
+              _buildStreamsVisualizer(isArabic),
+              16.heightBox,
 
-            // كود الـ Stream الحي
-            _buildCodeSection(isArabic),
-            24.heightBox,
-          ],
+              // كود الـ Stream الحي
+              _buildCodeSection(isArabic),
+              24.heightBox,
+            ],
+          ),
         ),
       ),
     );
