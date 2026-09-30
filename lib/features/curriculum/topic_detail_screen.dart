@@ -4,6 +4,7 @@ import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
 import 'curriculum_data.dart';
+import 'widgets/topic_live_preview.dart';
 
 class TopicDetailScreen extends StatelessWidget {
   const TopicDetailScreen({
@@ -75,6 +76,16 @@ class TopicDetailScreen extends StatelessWidget {
               child: Text(
                 topic.explain.value(isArabic),
                 style: const TextStyle(color: Color(0xFFCBD5E1), height: 1.6),
+              ),
+            ),
+            12.heightBox,
+            _ExplainCard(
+              icon: Icons.play_circle_filled_rounded,
+              title: isArabic ? 'المعاينة الحية والنتيجة التفاعلية' : 'Live Output & Interactive Sandbox',
+              child: TopicLivePreview(
+                level: level,
+                topic: topic,
+                isArabic: isArabic,
               ),
             ),
             12.heightBox,
