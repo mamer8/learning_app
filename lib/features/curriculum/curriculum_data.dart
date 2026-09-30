@@ -2228,16 +2228,26 @@ const curriculumLevels = [
       // 8. Implicit & Explicit Animations
       CurriculumTopic(
         title: LocalText(
-          ar: '8. ويدجتس الحركة والأنيميشن (AnimatedContainer, Hero & Transitions)',
+          ar: '8. ويدجتس الحركة والأنيميشن (AnimatedContainer, Hero, AnimatedSwitcher & Transitions)',
           en: '8. Implicit & Explicit Animations (AnimatedContainer, Hero, AnimatedSwitcher & Transitions)',
         ),
         summary: LocalText(
-          ar: 'تحريك الأبعاد والألوان تلقائياً بـ AnimatedContainer، انتقال العناصر الملحمي بين الشاشات بـ Hero، والتبديل السلس بـ AnimatedSwitcher.',
-          en: 'Animate styles automatically with implicit widgets, seamlessly morph hero assets between screens, and switch states smoothly.',
+          ar: 'تحريك الأبعاد والألوان تلقائياً بـ AnimatedContainer، انتقال العناصر الملحمي بين الشاشات بـ Hero، والتبديل السلس بـ AnimatedSwitcher، والتحكم بالشفافية بـ AnimatedOpacity.',
+          en: 'Animate styles automatically with implicit widgets, seamlessly morph hero assets between screens, switch states smoothly, and interpolate with TweenAnimationBuilder.',
         ),
         explain: LocalText(
-          ar: 'توفر Flutter نوعين من الأنيميشن: الأنيميشن التلقائي (Implicit Animations) مثل `AnimatedContainer` و `AnimatedOpacity` و `AnimatedAlign` التي تتحرك تلقائياً بمجرد تغيير القيم وبدون الحاجة لـ AnimationController. والأنيميشن الملحمي عبر الشاشات بـ `Hero` الذي ينقل الصور بسلاسة بين صفحتين أثناء التنقل.',
-          en: 'Flutter delivers two animation tiers: Implicit Animations (`AnimatedContainer`, `AnimatedOpacity`, `AnimatedSwitcher`) which animate property changes automatically without controllers, and Explicit/Hero transitions which coordinate continuous morphing across navigator routes.',
+          ar: 'توفر Flutter ترسانة متكاملة من ويدجتس الحركة بمعدل 60/120 إطار في الثانية:\n'
+              '• `AnimatedContainer`: يغير الأبعاد (width, height)، والألوان (color, gradient)، والحواف (borderRadius) بحركة ناعمة تلقائياً بمجرد تغير القيم.\n'
+              '• `Hero`: ينقل الصور والعناصر بسلاسة ملحمية بين شاشتين مختلفتين أثناء التنقل عبر `Navigator` باستخدام نفس المعرّف (`tag`).\n'
+              '• `AnimatedSwitcher`: يبدل بين عنصرين مختلفين (مثل الانتقال من أيقونة التحميل 🔄 إلى علامة النجاح ✅) بحركة تلاشي وتقريب.\n'
+              '• `AnimatedOpacity`: إخفاء وإظهار العناصر بتأثير التلاشي الناعم (Fade in / Fade out).\n'
+              '• `TweenAnimationBuilder`: تحريك أي قيمة رقمية مخصصة (مثل عداد من 0 إلى 100) بسلاسة فائقة وبدون الحاجة لـ AnimationController.',
+          en: 'Flutter delivers a rich animation suite:\n'
+              '• `AnimatedContainer`: Smoothly animates size, color, padding, and shape automatically.\n'
+              '• `Hero`: Morphs flight elements between routes using shared unique tags.\n'
+              '• `AnimatedSwitcher`: Crossfades between distinct widget states.\n'
+              '• `AnimatedOpacity`: Smoothly fades widget visibility in and out.\n'
+              '• `TweenAnimationBuilder`: Custom property tweening without AnimationController boilerplate.',
         ),
         whenToUse: [
           LocalText(
@@ -2245,41 +2255,57 @@ const curriculumLevels = [
             en: 'Morphing product thumbnails into full-screen covers across pages with `Hero`.',
           ),
           LocalText(
-            ar: 'توسيع وتصغير البطاقات والأزرار بسلاسة 60fps عبر `AnimatedContainer`.',
+            ar: 'توسيع وتصغير البطاقات والأزرار وتغيير ألوانها عند التفاعل عبر `AnimatedContainer`.',
             en: 'Expanding card accordions and pulsing notification icons with `AnimatedContainer`.',
+          ),
+          LocalText(
+            ar: 'التبديل بين حالات الزر (نص عادي ⬅️ مؤشر تحميل ⬅️ علامة صح) بـ `AnimatedSwitcher`.',
+            en: 'Switching button states between text, spinner, and checkmark with `AnimatedSwitcher`.',
           ),
         ],
         steps: [
           LocalText(
-            ar: 'استخدم `Hero(tag: item.id, child: ...)` بنفس الـ tag الفريد في كلتا الشاشتين.',
+            ar: 'استخدم `Hero(tag: item.id, child: ...)` بنفس الـ tag الفريد في كلا الشاشتين لنقل العنصر.',
             en: 'Tag corresponding widgets with matching `Hero(tag: ...)` identifiers across routes.',
           ),
           LocalText(
-            ar: 'استخدم `AnimatedSwitcher` لتبديل المحتوى (مثل التحميل 🔄 إلى أيقونة النجاح ✅) بحركة ناعمة.',
-            en: 'Wrap dynamic child swaps in `AnimatedSwitcher` for automated fade/scale crossfades.',
+            ar: 'استخدم `AnimatedSwitcher(duration: ..., child: ...)` مع تحديد `Key` فريد لكل حالة لتبديل المحتوى بنعومة.',
+            en: 'Wrap dynamic child swaps in `AnimatedSwitcher` providing distinct Keys for each state.',
+          ),
+          LocalText(
+            ar: 'استخدم `TweenAnimationBuilder<double>(tween: Tween(begin: 0, end: 1), duration: ..., builder: ...)` للتحريك المخصص.',
+            en: 'Use `TweenAnimationBuilder` for controllerless custom numeric/color interpolations.',
           ),
         ],
         code:
-            '// 1. تحريك الأبعاد واللون تلقائياً بدون Controller\n'
-            'class AnimatedExpandableBox extends StatefulWidget {\n'
-            '  const AnimatedExpandableBox({super.key});\n'
+            '// =========================================================================\n'
+            '// 1. تحريك الأبعاد واللون تلقائياً بدون Controller (AnimatedContainer)\n'
+            '// =========================================================================\n'
+            'class AnimatedExpandableCard extends StatefulWidget {\n'
+            '  const AnimatedExpandableCard({super.key});\n'
             '  @override\n'
-            '  State<AnimatedExpandableBox> createState() => _AnimatedExpandableBoxState();\n'
+            '  State<AnimatedExpandableCard> createState() => _AnimatedExpandableCardState();\n'
             '}\n\n'
-            'class _AnimatedExpandableBoxState extends State<AnimatedExpandableBox> {\n'
+            'class _AnimatedExpandableCardState extends State<AnimatedExpandableCard> {\n'
             '  bool _isExpanded = false;\n\n'
             '  @override\n'
             '  Widget build(BuildContext context) {\n'
             '    return GestureDetector(\n'
             '      onTap: () => setState(() => _isExpanded = !_isExpanded),\n'
             '      child: AnimatedContainer(\n'
-            '        duration: const Duration(milliseconds: 350),\n'
-            '        curve: Curves.easeOutBack,\n'
-            '        width: _isExpanded ? 300 : 120,\n'
+            '        duration: const Duration(milliseconds: 400),\n'
+            '        curve: Curves.easeOutBack, // حركة فيزيائية نابضة\n'
+            '        width: _isExpanded ? 300 : 140,\n'
             '        height: _isExpanded ? 160 : 60,\n'
             '        decoration: BoxDecoration(\n'
-            '          color: _isExpanded ? Colors.teal : Colors.indigo,\n'
+            '          color: _isExpanded ? const Color(0xFF14B8A6) : const Color(0xFF1E293B),\n'
             '          borderRadius: BorderRadius.circular(_isExpanded ? 24 : 12),\n'
+            '          boxShadow: [\n'
+            '            BoxShadow(\n'
+            '              color: (_isExpanded ? Colors.teal : Colors.black).withOpacity(0.3),\n'
+            '              blurRadius: 15,\n'
+            '            ),\n'
+            '          ],\n'
             '        ),\n'
             '        child: Center(\n'
             '          child: Text(\n'
@@ -2290,15 +2316,65 @@ const curriculumLevels = [
             '      ),\n'
             '    );\n'
             '  }\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 2. انتقال العناصر الملحمي بين الشاشات (Hero Animation)\n'
+            '// =========================================================================\n'
+            '// في شاشة القائمة (Screen A):\n'
+            'Widget buildListHeroItem(BuildContext context, String productId, String imageUrl) {\n'
+            '  return GestureDetector(\n'
+            '    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProductDetailScreen(id: productId, img: imageUrl))),\n'
+            '    child: Hero(\n'
+            '      tag: "product_hero_\$productId", // نفس الـ Tag الفريد في الشاشتين\n'
+            '      child: ClipRRect(\n'
+            '        borderRadius: BorderRadius.circular(12),\n'
+            '        child: Image.network(imageUrl, width: 80, height: 80, fit: BoxFit.cover),\n'
+            '      ),\n'
+            '    ),\n'
+            '  );\n'
+            '}\n\n'
+            '// في صفحة التفاصيل (Screen B):\n'
+            'Widget buildDetailHeroCover(String productId, String imageUrl) {\n'
+            '  return Hero(\n'
+            '    tag: "product_hero_\$productId", // يطير العنصر بسلاسة ليملأ مكانه الجديد\n'
+            '    child: Image.network(imageUrl, width: double.infinity, height: 280, fit: BoxFit.cover),\n'
+            '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 3. التبديل الناعم بين الحالات (AnimatedSwitcher)\n'
+            '// =========================================================================\n'
+            'Widget buildStatusSwitcher(bool isLoading) {\n'
+            '  return AnimatedSwitcher(\n'
+            '    duration: const Duration(milliseconds: 350),\n'
+            '    transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),\n'
+            '    child: isLoading\n'
+            '        ? const CircularProgressIndicator(key: ValueKey("loading"))\n'
+            '        : const Icon(Icons.check_circle_rounded, color: Colors.green, size: 40, key: ValueKey("success")),\n'
+            '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 4. تحريك مخصص بالأرقام دون Controller (TweenAnimationBuilder)\n'
+            '// =========================================================================\n'
+            'Widget buildSmoothCounter(int targetScore) {\n'
+            '  return TweenAnimationBuilder<double>(\n'
+            '    tween: Tween<double>(begin: 0, end: targetScore.toDouble()),\n'
+            '    duration: const Duration(milliseconds: 1200),\n'
+            '    builder: (context, value, child) {\n'
+            '      return Text(\n'
+            '        "النقاط: \${value.toInt()} 🏆",\n'
+            '        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.amber),\n'
+            '      );\n'
+            '    },\n'
+            '  );\n'
             '}',
         commonMistakes: [
           LocalText(
-            ar: 'تكرار نفس الـ `Hero(tag: ...)` لأكثر من عنصرين على نفس الشاشة، مما يسبب كراش فوري.',
+            ar: 'تكرار نفس الـ `Hero(tag: ...)` لأكثر من عنصرين في شجرة الويدجتس في نفس الوقت، مما يسبب كراش فوري.',
             en: 'Duplicating `Hero(tag: ...)` tags simultaneously in the same route tree.',
           ),
           LocalText(
-            ar: 'استخدام `AnimationController` معقد لعمليات بسيطة يمكن لـ `AnimatedContainer` إنجازها في سطر واحد.',
-            en: 'Overcomplicating simple state animations with explicit controllers instead of implicit widgets.',
+            ar: 'نسيان تمرير `Key` مختلف لكل عنصر داخل `AnimatedSwitcher` مما يمنع فلاتر من تمييز التغيير وتشغيل الحركة.',
+            en: 'Omitting distinct Keys on children within `AnimatedSwitcher`.',
           ),
         ],
       ),
@@ -2306,65 +2382,231 @@ const curriculumLevels = [
       // 9. Dialogs, BottomSheets & Overlays
       CurriculumTopic(
         title: LocalText(
-          ar: '9. ويدجتس الحوارات والنوافذ والـ Overlays (AlertDialog, BottomSheet & Tooltip)',
-          en: '9. Modals, Dialogs, BottomSheets & Floating Overlays',
+          ar: '9. ويدجتس الحوارات والنوافذ والـ Overlays (AlertDialog, BottomSheet, SnackBar, Tooltip & OverlayEntry)',
+          en: '9. Dialogs, BottomSheets, SnackBars, Tooltips & Floating Overlays',
         ),
         summary: LocalText(
-          ar: 'إظهار نوافذ التأكيد بـ AlertDialog، القوائم السفلية بـ showModalBottomSheet، والطبقات العائمة بـ OverlayEntry.',
-          en: 'Display alert modals, modal bottom sheets, contextual tooltips, and custom floating overlay menus.',
+          ar: 'نوافذ التأكيد بـ AlertDialog، القوائم السفلية بـ showModalBottomSheet، التنبيهات بـ SnackBar، التلميحات بـ Tooltip، والطبقات العائمة بـ OverlayEntry.',
+          en: 'Display alert modals, modal bottom sheets, floating snackbars, contextual tooltips, and custom floating overlay layers.',
         ),
         explain: LocalText(
-          ar: 'تتيح فلاتر عرض النوافذ المؤقتة فوق الشاشة الحالية بسهولة: `AlertDialog` لتأكيد العمليات الحساسة، `showModalBottomSheet` لعرض الخيارات السفلية المنسدلة، و `OverlayEntry` لرسم عناصر عائمة في أي موضع فوق شجرة الويدجتس بالكامل (مثل القوائم المنسدلة المخصصة ومربعات الشرح التعليمية).',
-          en: 'Overlay mechanisms render floating layers above normal route stacks. `AlertDialog` handles critical user prompts, `showModalBottomSheet` serves bottom menus, and raw `OverlayEntry` attaches floating badges and guides anywhere on the root viewport.',
+          ar: 'توفر Flutter منظومة عرض طبقات متكاملة فوق الشاشة الحالية:\n'
+              '• `AlertDialog`: نافذة حوارية تتوسط الشاشة لتأكيد العمليات الحساسة (مثل الحذف أو تسجيل الخروج) مع أزرار الإجراءات وإرجاع النتيجة بـ `Navigator.pop(context, result)`.\n'
+              '• `showModalBottomSheet`: نافذة سفلية تنبثق بسلاسة لعرض قوائم الخيارات ومشاركة المحتوى واختيار الصور.\n'
+              '• `ScaffoldMessenger.showSnackBar`: شريط تنبيهات عائم في أسفل الشاشة لإشعار المستخدم بنجاح العملية مع إمكانية إضافة زر تراجع (`SnackBarAction`).\n'
+              '• `Tooltip`: تلميح نصي يظهر عند تحويم الماوس أو الضغط المطول لتوضيح وظيفة الأزرار والأيقونات.\n'
+              '• `OverlayEntry` و `Overlay`: حقن ويدجت عائمة في أي إحداثيات (X, Y) فوق شجرة التطبيق بالكامل (مثل شارات التنبيهات المباشرة ومربعات الشرح الإرشادي).',
+          en: 'Flutter delivers a complete overlay layer system:\n'
+              '• `AlertDialog`: Centered confirmation modals with action buttons returning async results.\n'
+              '• `showModalBottomSheet`: Smooth bottom action sheets for choices and menus.\n'
+              '• `ScaffoldMessenger.showSnackBar`: Floating status banners with undo actions.\n'
+              '• `Tooltip`: Contextual hover/long-press tooltips.\n'
+              '• `OverlayEntry`: Injected floating widgets rendered anywhere across the viewport stack.',
         ),
         whenToUse: [
           LocalText(
-            ar: 'تأكيد الحذف أو تسجيل الخروج عبر `AlertDialog`.',
+            ar: 'تأكيد الحذف أو تسجيل الخروج أو إدخال كود التحقق عبر `AlertDialog`.',
             en: 'Confirming destructive actions (deletion/logout) with `AlertDialog`.',
           ),
           LocalText(
-            ar: 'خيارات المشاركة واختيار الصور من الكاميرا/المعرض عبر `showModalBottomSheet`.',
+            ar: 'عرض خيارات المشاركة، اختيار الملفات، أو تعديل الملف الشخصي عبر `showModalBottomSheet`.',
             en: 'Presenting photo pickers and action sheets via `showModalBottomSheet`.',
+          ),
+          LocalText(
+            ar: 'إشعار المستخدم بنجاح الحفظ أو انقطاع الإنترنت مع زر إعادة المحاولة عبر `SnackBar`.',
+            en: 'Notifying users of operation status with retry/undo actions via `SnackBar`.',
+          ),
+          LocalText(
+            ar: 'توضيح وظيفة الأزرار والأيقونات للمستخدم عند الوقوف عليها بالماوس بـ `Tooltip`.',
+            en: 'Explaining icon button purposes on desktop/web hover via `Tooltip`.',
+          ),
+          LocalText(
+            ar: 'بناء جولات تعليمية (Walkthroughs)، وقوائم بحث عائمة مخصصة بـ `OverlayEntry`.',
+            en: 'Building in-app feature onboarding guides and floating badges via `OverlayEntry`.',
           ),
         ],
         steps: [
           LocalText(
-            ar: 'استخدم `showModalBottomSheet(context: context, isScrollControlled: true, builder: ...)` لقوائم قابلة للتمرير.',
-            en: 'Set `isScrollControlled: true` on bottom sheets containing text fields or scroll views.',
+            ar: 'استخدم `showDialog<bool>(context: context, builder: ...)` واطلب من الأزرار تنفيذ `Navigator.pop(context, true/false)`.',
+            en: 'Call `showDialog<bool>()` and return boolean results from dialog action buttons.',
           ),
           LocalText(
-            ar: 'استخدم `Navigator.pop(context)` لإغلاق النافذة وإرجاع النتيجة للشاشة السابقة.',
-            en: 'Call `Navigator.pop(context, result)` to dismiss dialogues and return values.',
+            ar: 'استخدم `showModalBottomSheet(context: context, isScrollControlled: true, shape: ..., builder: ...)` لقوائم سفلية مستديرة الحواف.',
+            en: 'Set `isScrollControlled: true` and custom rounded borders on `showModalBottomSheet`.',
+          ),
+          LocalText(
+            ar: 'اعرض التنبيهات بـ `ScaffoldMessenger.of(context).showSnackBar(SnackBar(behavior: SnackBarBehavior.floating, ...))`.',
+            en: 'Display floating snackbars using `ScaffoldMessenger.of(context).showSnackBar()`.',
+          ),
+          LocalText(
+            ar: 'غلف الأيقونة بـ `Tooltip(message: "تعديل", child: ...)` لإظهار التلميح التلقائي.',
+            en: 'Wrap interactive icon buttons with `Tooltip(message: "...", child: ...)`.',
+          ),
+          LocalText(
+            ar: 'للطبقات العائمة: أنشئ `final entry = OverlayEntry(builder: ...);` وأدرجها بـ `Overlay.of(context).insert(entry);` مع استدعاء `entry.remove();` عند الانتهاء.',
+            en: 'Insert `OverlayEntry` into `Overlay.of(context)` and clean up with `.remove()`.',
           ),
         ],
         code:
-            '// 1. فتح نافذة سفلية حديثة بحواف دائرية\n'
-            'Future<String?> showActionSheet(BuildContext context) {\n'
+            '// =========================================================================\n'
+            '// 1. نافذة تأكيد حوارية (AlertDialog) مع استرجاع النتيجة\n'
+            '// =========================================================================\n'
+            'Future<bool> showDeleteConfirmationDialog(BuildContext context) async {\n'
+            '  final bool? result = await showDialog<bool>(\n'
+            '    context: context,\n'
+            '    barrierDismissible: false, // إجبار المستخدم على الاختيار\n'
+            '    builder: (BuildContext ctx) {\n'
+            '      return AlertDialog(\n'
+            '        backgroundColor: const Color(0xFF1E293B),\n'
+            '        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),\n'
+            '        icon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFEF4444), size: 32),\n'
+            '        title: const Text("تأكيد حذف الحساب؟", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),\n'
+            '        content: const Text(\n'
+            '          "سيتم حذف جميع بياناتك ومشاريعك نهائياً ولن تتمكن من استعادتها.",\n'
+            '          style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 13, height: 1.4),\n'
+            '        ),\n'
+            '        actions: [\n'
+            '          // زر الإلغاء\n'
+            '          OutlinedButton(\n'
+            '            onPressed: () => Navigator.pop(ctx, false),\n'
+            '            style: OutlinedButton.styleFrom(foregroundColor: Colors.white70),\n'
+            '            child: const Text("إلغاء"),\n'
+            '          ),\n'
+            '          // زر الحذف والتأكيد\n'
+            '          FilledButton(\n'
+            '            onPressed: () => Navigator.pop(ctx, true),\n'
+            '            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFEF4444)),\n'
+            '            child: const Text("تأكيد الحذف"),\n'
+            '          ),\n'
+            '        ],\n'
+            '      );\n'
+            '    },\n'
+            '  );\n'
+            '  return result ?? false;\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 2. نافذة خيارات سفلية حديثة (showModalBottomSheet)\n'
+            '// =========================================================================\n'
+            'Future<String?> showActionBottomSheet(BuildContext context) {\n'
             '  return showModalBottomSheet<String>(\n'
             '    context: context,\n'
+            '    backgroundColor: const Color(0xFF101828),\n'
             '    shape: const RoundedRectangleBorder(\n'
             '      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),\n'
             '    ),\n'
-            '    builder: (context) => SafeArea(\n'
-            '      child: Column(\n'
-            '        mainAxisSize: MainAxisSize.min,\n'
-            '        children: [\n'
-            '          const SizedBox(height: 12),\n'
-            '          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade600, borderRadius: BorderRadius.circular(2))),\n'
-            '          ListTile(\n'
-            '            leading: const Icon(Icons.camera_alt, color: Colors.teal),\n'
-            '            title: const Text("التقاط صورة بالكاميرا"),\n'
-            '            onTap: () => Navigator.pop(context, "camera"),\n'
-            '          ),\n'
-            '          ListTile(\n'
-            '            leading: const Icon(Icons.photo_library, color: Colors.indigo),\n'
-            '            title: const Text("اختيار من المعرض"),\n'
-            '            onTap: () => Navigator.pop(context, "gallery"),\n'
-            '          ),\n'
-            '        ],\n'
+            '    builder: (ctx) => SafeArea(\n'
+            '      child: Padding(\n'
+            '        padding: const EdgeInsets.symmetric(vertical: 12),\n'
+            '        child: Column(\n'
+            '          mainAxisSize: MainAxisSize.min,\n'
+            '          children: [\n'
+            '            // مقبض السحب بالأعلى (Drag Handle)\n'
+            '            Container(\n'
+            '              width: 42,\n'
+            '              height: 4,\n'
+            '              decoration: BoxDecoration(color: Colors.grey.shade600, borderRadius: BorderRadius.circular(2)),\n'
+            '            ),\n'
+            '            const SizedBox(height: 16),\n'
+            '            ListTile(\n'
+            '              leading: const Icon(Icons.camera_alt_rounded, color: Color(0xFF14B8A6)),\n'
+            '              title: const Text("التقاط صورة بالكاميرا", style: TextStyle(color: Colors.white)),\n'
+            '              onTap: () => Navigator.pop(ctx, "camera"),\n'
+            '            ),\n'
+            '            ListTile(\n'
+            '              leading: const Icon(Icons.photo_library_rounded, color: Color(0xFF38BDF8)),\n'
+            '              title: const Text("اختيار من معرض الصور", style: TextStyle(color: Colors.white)),\n'
+            '              onTap: () => Navigator.pop(ctx, "gallery"),\n'
+            '            ),\n'
+            '          ],\n'
+            '        ),\n'
             '      ),\n'
             '    ),\n'
             '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 3. شريط تنبيهات عائم مع زر تراجع (Floating SnackBar)\n'
+            '// =========================================================================\n'
+            'void showSuccessFloatingSnackBar(BuildContext context, String message) {\n'
+            '  ScaffoldMessenger.of(context).hideCurrentSnackBar();\n'
+            '  ScaffoldMessenger.of(context).showSnackBar(\n'
+            '    SnackBar(\n'
+            '      content: Row(\n'
+            '        children: [\n'
+            '          const Icon(Icons.check_circle_rounded, color: Color(0xFF34D399), size: 20),\n'
+            '          const SizedBox(width: 8),\n'
+            '          Expanded(child: Text(message, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),\n'
+            '        ],\n'
+            '      ),\n'
+            '      backgroundColor: const Color(0xFF1E293B),\n'
+            '      behavior: SnackBarBehavior.floating,\n'
+            '      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),\n'
+            '      duration: const Duration(seconds: 3),\n'
+            '      action: SnackBarAction(\n'
+            '        label: "تراجع (Undo)",\n'
+            '        textColor: const Color(0xFF38BDF8),\n'
+            '        onPressed: () => print("تم التراجع!"),\n'
+            '      ),\n'
+            '    ),\n'
+            '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 4. تلميح نصي احترافي (Tooltip Widget)\n'
+            '// =========================================================================\n'
+            'Widget buildHelpTooltip({\n'
+            '  required String message,\n'
+            '  required Widget child,\n'
+            '}) {\n'
+            '  return Tooltip(\n'
+            '    message: message,\n'
+            '    waitDuration: const Duration(milliseconds: 300), // وقت الانتظار قبل الظهور\n'
+            '    showDuration: const Duration(seconds: 2),\n'
+            '    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),\n'
+            '    decoration: BoxDecoration(\n'
+            '      color: const Color(0xFF0F172A),\n'
+            '      borderRadius: BorderRadius.circular(8),\n'
+            '      border: Border.all(color: const Color(0xFF14B8A6), width: 1),\n'
+            '    ),\n'
+            '    textStyle: const TextStyle(color: Color(0xFF5EEAD4), fontSize: 12, fontWeight: FontWeight.bold),\n'
+            '    child: child,\n'
+            '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 5. طبقة عائمة مخصصة فوق كامل التطبيق (OverlayEntry)\n'
+            '// =========================================================================\n'
+            'void showFloatingBadgeOverlay(BuildContext context) {\n'
+            '  late OverlayEntry overlayEntry;\n'
+            '  overlayEntry = OverlayEntry(\n'
+            '    builder: (ctx) => Positioned(\n'
+            '      top: 60,\n'
+            '      right: 20,\n'
+            '      child: Material(\n'
+            '        color: Colors.transparent,\n'
+            '        child: Container(\n'
+            '          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),\n'
+            '          decoration: BoxDecoration(\n'
+            '            color: const Color(0xFF14B8A6),\n'
+            '            borderRadius: BorderRadius.circular(20),\n'
+            '            boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 10)],\n'
+            '          ),\n'
+            '          child: Row(\n'
+            '            mainAxisSize: MainAxisSize.min,\n'
+            '            children: [\n'
+            '              const Icon(Icons.notifications_active, color: Colors.black, size: 18),\n'
+            '              const SizedBox(width: 8),\n'
+            '              const Text("إشعار عائم بـ Overlay! 🚀", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),\n'
+            '              const SizedBox(width: 8),\n'
+            '              GestureDetector(\n'
+            '                onTap: () => overlayEntry.remove(), // إزالة الطبقة العائمة\n'
+            '                child: const Icon(Icons.close, color: Colors.black, size: 16),\n'
+            '              ),\n'
+            '            ],\n'
+            '          ),\n'
+            '        ),\n'
+            '      ),\n'
+            '    ),\n'
+            '  );\n'
+            '  // إدراج الطبقة في شجرة الـ Overlay\n'
+            '  Overlay.of(context).insert(overlayEntry);\n'
             '}',
         commonMistakes: [
           LocalText(
@@ -2372,8 +2614,12 @@ const curriculumLevels = [
             en: 'Invoking dialog methods across async gaps without checking `if (mounted)`.',
           ),
           LocalText(
-            ar: 'نسيان إزالة `OverlayEntry.remove()` مما يترك طبقات عائمة تالفة في الذاكرة.',
+            ar: 'نسيان إزالة `OverlayEntry.remove()` مما يترك طبقات عائمة تالفة في الذاكرة تؤثر على التفاعل.',
             en: 'Forgetting to call `.remove()` on floating `OverlayEntry` instances.',
+          ),
+          LocalText(
+            ar: 'استخدام `ScaffoldMessenger.of(context)` مع `BuildContext` غير متصل بـ Scaffold مناسب.',
+            en: 'Calling ScaffoldMessenger from a context that does not inherit an ancestor Scaffold.',
           ),
         ],
       ),
@@ -2413,7 +2659,7 @@ const curriculumLevels = [
           ),
         ],
         code:
-            '// 1. بناء واجهة غير متزامنة ذكية لمعالجة التحميل والبيانات والخطأ\n'
+            '// 1. FutureBuilder: معالجة حالات الـ API غير المتزامنة (Loading / Error / Success)\n'
             'Widget buildAsyncUserCard(Future<String> userFuture) {\n'
             '  return FutureBuilder<String>(\n'
             '    future: userFuture,\n'
@@ -2433,7 +2679,43 @@ const curriculumLevels = [
             '    },\n'
             '  );\n'
             '}\n\n'
-            '// 2. تصميم متجاوب يعتمد على قياسات الأب عبر LayoutBuilder\n'
+            '// 2. StreamBuilder: الاستماع للبيانات اللحظية المتدفقة (Real-time Stream / WebSockets)\n'
+            'Widget buildLiveTicker(Stream<int> tickerStream) {\n'
+            '  return StreamBuilder<int>(\n'
+            '    stream: tickerStream,\n'
+            '    initialData: 0,\n'
+            '    builder: (context, snapshot) {\n'
+            '      if (snapshot.hasError) return Text("Error: \${snapshot.error}");\n'
+            '      return Chip(\n'
+            '        avatar: const Icon(Icons.sensors, color: Colors.cyanAccent, size: 16),\n'
+            '        label: Text("النبض اللحظي: #\${snapshot.data}"),\n'
+            '      );\n'
+            '    },\n'
+            '  );\n'
+            '}\n\n'
+            '// 3. ValueListenableBuilder: تحديث جزء معزول دون إعادة بناء الشاشة كاملة (Micro-Rebuild)\n'
+            'class IsolatedCounter extends StatelessWidget {\n'
+            '  final ValueNotifier<int> counterNotifier = ValueNotifier<int>(0);\n'
+            '  IsolatedCounter({super.key});\n\n'
+            '  @override\n'
+            '  Widget build(BuildContext context) {\n'
+            '    return Row(\n'
+            '      children: [\n'
+            '        ValueListenableBuilder<int>(\n'
+            '          valueListenable: counterNotifier,\n'
+            '          builder: (context, value, child) {\n'
+            '            return Text("العدد: \$value", style: const TextStyle(fontWeight: FontWeight.bold));\n'
+            '          },\n'
+            '        ),\n'
+            '        IconButton(\n'
+            '          icon: const Icon(Icons.add_circle, color: Colors.teal),\n'
+            '          onPressed: () => counterNotifier.value++,\n'
+            '        ),\n'
+            '      ],\n'
+            '    );\n'
+            '  }\n'
+            '}\n\n'
+            '// 4. LayoutBuilder: تصميم متجاوب يعتمد على قياسات الأب المتاحة (Constraints)\n'
             'Widget buildResponsiveGrid() {\n'
             '  return LayoutBuilder(\n'
             '    builder: (context, constraints) {\n'

@@ -36,14 +36,36 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   double _fontSize = 24.0;
   int _selectedGradientIndex = 0;
   final List<List<Color>> _gradients = [
-    [const Color(0xFFFFD700), const Color(0xFFFF8C00), const Color(0xFFFF0080)], // Gold Sunset
-    [const Color(0xFF00F2FE), const Color(0xFF4FACFE), const Color(0xFF6B11FF)], // Ocean Electric
-    [const Color(0xFF00FF87), const Color(0xFF60EFFF), const Color(0xFF00B4D8)], // Cyber Emerald
-    [const Color(0xFFFF416C), const Color(0xFFFF4B2B), const Color(0xFFF9D423)], // Fiery Lava
+    [
+      const Color(0xFFFFD700),
+      const Color(0xFFFF8C00),
+      const Color(0xFFFF0080),
+    ], // Gold Sunset
+    [
+      const Color(0xFF00F2FE),
+      const Color(0xFF4FACFE),
+      const Color(0xFF6B11FF),
+    ], // Ocean Electric
+    [
+      const Color(0xFF00FF87),
+      const Color(0xFF60EFFF),
+      const Color(0xFF00B4D8),
+    ], // Cyber Emerald
+    [
+      const Color(0xFFFF416C),
+      const Color(0xFFFF4B2B),
+      const Color(0xFFF9D423),
+    ], // Fiery Lava
   ];
 
   // --- Layout State (Level 2 Topic 1) ---
-  final List<String> _tags = ['Flutter', 'Dart 3', 'Clean Arch', 'Slivers', 'Wasm'];
+  final List<String> _tags = [
+    'Flutter',
+    'Dart 3',
+    'Clean Arch',
+    'Slivers',
+    'Wasm',
+  ];
   final TextEditingController _newTagCtrl = TextEditingController();
   bool _showBadge = true;
 
@@ -65,11 +87,16 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   int _longPressCount = 0;
   Offset _lastPanOffset = Offset.zero;
   bool _isBadgeDropped = false;
-  List<String> _dismissibleTasks = ['مهمة 1: إتقان Flutter Widgets 🚀', 'مهمة 2: اسحبني لليسار للحذف 🗑️'];
+  List<String> _dismissibleTasks = [
+    'مهمة 1: إتقان Flutter Widgets 🚀',
+    'مهمة 2: اسحبني لليسار للحذف 🗑️',
+  ];
   String _selectedSegment = 'خيار 1';
 
-  // --- Async Future State (Level 2 Topic 10) ---
+  // --- Async Builders State (Level 2 Topic 10) ---
+  int _asyncTab = 0;
   Future<String>? _apiSimulationFuture;
+  final ValueNotifier<int> _microCounterNotifier = ValueNotifier<int>(0);
 
   // --- Lists State (Level 2 Topic 3) ---
   late List<String> _liveProducts;
@@ -101,6 +128,7 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   void dispose() {
     _newTagCtrl.dispose();
     _emailCtrl.dispose();
+    _microCounterNotifier.dispose();
     _streamTimer?.cancel();
     super.dispose();
   }
@@ -113,7 +141,10 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
       decoration: BoxDecoration(
         color: const Color(0xFF101828),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: widget.level.color.withValues(alpha: 0.35), width: 1.5),
+        border: Border.all(
+          color: widget.level.color.withValues(alpha: 0.35),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: widget.level.color.withValues(alpha: 0.08),
@@ -130,13 +161,20 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: const Color(0xFF172033),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-              border: Border(bottom: BorderSide(color: const Color(0xFF24324A))),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(10),
+              ),
+              border: Border(
+                bottom: BorderSide(color: const Color(0xFF24324A)),
+              ),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF10B981).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(6),
@@ -154,7 +192,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                       ),
                       6.widthBox,
                       Text(
-                        isAr ? 'معاينة حية تفاعلية' : 'LIVE INTERACTIVE PREVIEW',
+                        isAr
+                            ? 'معاينة حية تفاعلية'
+                            : 'LIVE INTERACTIVE PREVIEW',
                         style: const TextStyle(
                           color: Color(0xFF34D399),
                           fontSize: 11,
@@ -167,8 +207,13 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 ),
                 const Spacer(),
                 Text(
-                  isAr ? 'جرّب وعدّل في الوقت الفعلي' : 'Tweak & test in real-time',
-                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                  isAr
+                      ? 'جرّب وعدّل في الوقت الفعلي'
+                      : 'Tweak & test in real-time',
+                  style: const TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
@@ -192,23 +237,37 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
     if (lvl == 2) {
       if (title.contains('تخطيط') || title.contains('layout')) {
         return _buildLayoutSandbox(isAr);
-      } else if (title.contains('صناديق') || title.contains('glass') || title.contains('زجاج')) {
+      } else if (title.contains('صناديق') ||
+          title.contains('glass') ||
+          title.contains('زجاج')) {
         return _buildGlassmorphismSandbox(isAr);
       } else if (title.contains('قوائم') || title.contains('list')) {
         return _buildListsSandbox(isAr);
       } else if (title.contains('slivers') || title.contains('سلايفر')) {
         return _buildSliversSandbox(isAr);
-      } else if (title.contains('نصوص') || title.contains('text') || title.contains('shader')) {
+      } else if (title.contains('نصوص') ||
+          title.contains('text') ||
+          title.contains('shader')) {
         return _buildTypographySandbox(isAr);
-      } else if (title.contains('نماذج') || title.contains('form') || title.contains('إدخال')) {
+      } else if (title.contains('نماذج') ||
+          title.contains('form') ||
+          title.contains('إدخال')) {
         return _buildFormSandbox(isAr);
-      } else if (title.contains('أزرار') || title.contains('gesture') || title.contains('interactive')) {
+      } else if (title.contains('أزرار') ||
+          title.contains('gesture') ||
+          title.contains('interactive')) {
         return _buildGesturesSandbox(isAr);
-      } else if (title.contains('حركة') || title.contains('animation') || title.contains('animated')) {
+      } else if (title.contains('حركة') ||
+          title.contains('animation') ||
+          title.contains('animated')) {
         return _buildAnimationsSandbox(isAr);
-      } else if (title.contains('حوارات') || title.contains('dialog') || title.contains('bottomsheet')) {
+      } else if (title.contains('حوارات') ||
+          title.contains('dialog') ||
+          title.contains('bottomsheet')) {
         return _buildDialogsSandbox(isAr);
-      } else if (title.contains('بناء') || title.contains('async') || title.contains('futurebuilder')) {
+      } else if (title.contains('بناء') ||
+          title.contains('async') ||
+          title.contains('futurebuilder')) {
         return _buildAsyncBuildersSandbox(isAr);
       }
     }
@@ -219,7 +278,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
         return _buildRecordsPatternSandbox(isAr);
       } else if (title.contains('stream') || title.contains('تدفق')) {
         return _buildStreamSandbox(isAr);
-      } else if (title.contains('typed') || title.contains('byte') || title.contains('ثنائية')) {
+      } else if (title.contains('typed') ||
+          title.contains('byte') ||
+          title.contains('ثنائية')) {
         return _buildTypedDataSandbox(isAr);
       }
     }
@@ -243,18 +304,29 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               height: 120,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
-                gradient: const LinearGradient(colors: [Color(0xFF1E293B), Color(0xFF334155)]),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1E293B), Color(0xFF334155)],
+                ),
                 border: Border.all(color: const Color(0xFF475569)),
               ),
               child: Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.layers_rounded, color: Colors.cyanAccent, size: 28),
+                    const Icon(
+                      Icons.layers_rounded,
+                      color: Colors.cyanAccent,
+                      size: 28,
+                    ),
                     8.widthBox,
                     Text(
-                      isAr ? 'عنصر الحاوية الأساسي (Stack Base)' : 'Stack Base Container',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      isAr
+                          ? 'عنصر الحاوية الأساسي (Stack Base)'
+                          : 'Stack Base Container',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -266,17 +338,27 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 right: isAr ? null : 10,
                 left: isAr ? 10 : null,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.redAccent,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
-                      BoxShadow(color: Colors.red.withValues(alpha: 0.5), blurRadius: 8),
+                      BoxShadow(
+                        color: Colors.red.withValues(alpha: 0.5),
+                        blurRadius: 8,
+                      ),
                     ],
                   ),
                   child: const Text(
                     'Positioned: جديد 🔥',
-                    style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -289,14 +371,25 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              isAr ? 'عناصر الـ Wrap التلقائية (تلتف تلقائياً):' : 'Wrap Dynamic Flow Tags:',
-              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.bold),
+              isAr
+                  ? 'عناصر الـ Wrap التلقائية (تلتف تلقائياً):'
+                  : 'Wrap Dynamic Flow Tags:',
+              style: const TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             TextButton.icon(
               onPressed: () => setState(() => _showBadge = !_showBadge),
-              icon: Icon(_showBadge ? Icons.visibility : Icons.visibility_off, size: 16),
+              icon: Icon(
+                _showBadge ? Icons.visibility : Icons.visibility_off,
+                size: 16,
+              ),
               label: Text(
-                _showBadge ? (isAr ? 'إخفاء الشارة' : 'Hide Badge') : (isAr ? 'إظهار الشارة' : 'Show Badge'),
+                _showBadge
+                    ? (isAr ? 'إخفاء الشارة' : 'Hide Badge')
+                    : (isAr ? 'إظهار الشارة' : 'Show Badge'),
                 style: const TextStyle(fontSize: 11),
               ),
             ),
@@ -310,8 +403,15 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
             return Chip(
               backgroundColor: const Color(0xFF1E293B),
               side: const BorderSide(color: Color(0xFF38BDF8)),
-              label: Text(tag, style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 12)),
-              deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white70),
+              label: Text(
+                tag,
+                style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 12),
+              ),
+              deleteIcon: const Icon(
+                Icons.close,
+                size: 14,
+                color: Colors.white70,
+              ),
               onDeleted: () => setState(() => _tags.remove(tag)),
             );
           }).toList(),
@@ -326,12 +426,20 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   controller: _newTagCtrl,
                   style: const TextStyle(color: Colors.white, fontSize: 12),
                   decoration: InputDecoration(
-                    hintText: isAr ? 'أضف وسماً جديداً للـ Wrap...' : 'Add tag to Wrap...',
-                    hintStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                    hintText: isAr
+                        ? 'أضف وسماً جديداً للـ Wrap...'
+                        : 'Add tag to Wrap...',
+                    hintStyle: const TextStyle(
+                      color: Color(0xFF64748B),
+                      fontSize: 11,
+                    ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                     filled: true,
                     fillColor: const Color(0xFF1E293B),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                   onSubmitted: (v) {
                     if (v.trim().isNotEmpty) {
@@ -354,8 +462,17 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   });
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF38BDF8)),
-              child: Text(isAr ? 'إضافة' : 'Add', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF38BDF8),
+              ),
+              child: Text(
+                isAr ? 'إضافة' : 'Add',
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
             ),
           ],
         ),
@@ -385,14 +502,20 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(_glassRadius),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: _blurSigma, sigmaY: _blurSigma),
+                filter: ImageFilter.blur(
+                  sigmaX: _blurSigma,
+                  sigmaY: _blurSigma,
+                ),
                 child: Container(
                   width: 280,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: _glassOpacity),
                     borderRadius: BorderRadius.circular(_glassRadius),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      width: 1.5,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.15),
@@ -406,11 +529,21 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.auto_awesome_rounded, color: _glassTint, size: 22),
+                          Icon(
+                            Icons.auto_awesome_rounded,
+                            color: _glassTint,
+                            size: 22,
+                          ),
                           8.widthBox,
                           Text(
-                            isAr ? 'كارت زجاجي بلوري حقيقي' : 'Live Glassmorphism Card',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                            isAr
+                                ? 'كارت زجاجي بلوري حقيقي'
+                                : 'Live Glassmorphism Card',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ),
@@ -419,7 +552,10 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                         isAr
                             ? 'الضبابية: ${_blurSigma.toInt()}px | الشفافية: ${(_glassOpacity * 100).toInt()}%'
                             : 'Blur: ${_blurSigma.toInt()}px | Opacity: ${(_glassOpacity * 100).toInt()}%',
-                        style: const TextStyle(color: Colors.white70, fontSize: 11),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -438,8 +574,13 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isAr ? 'درجة الضبابية (Blur Sigma): ${_blurSigma.toInt()}' : 'Blur Sigma: ${_blurSigma.toInt()}',
-                    style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11),
+                    isAr
+                        ? 'درجة الضبابية (Blur Sigma): ${_blurSigma.toInt()}'
+                        : 'Blur Sigma: ${_blurSigma.toInt()}',
+                    style: const TextStyle(
+                      color: Color(0xFFCBD5E1),
+                      fontSize: 11,
+                    ),
                   ),
                   Slider(
                     value: _blurSigma,
@@ -457,8 +598,13 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isAr ? 'الشفافية (Opacity): ${(_glassOpacity * 100).toInt()}%' : 'Opacity: ${(_glassOpacity * 100).toInt()}%',
-                    style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11),
+                    isAr
+                        ? 'الشفافية (Opacity): ${(_glassOpacity * 100).toInt()}%'
+                        : 'Opacity: ${(_glassOpacity * 100).toInt()}%',
+                    style: const TextStyle(
+                      color: Color(0xFFCBD5E1),
+                      fontSize: 11,
+                    ),
                   ),
                   Slider(
                     value: _glassOpacity,
@@ -487,17 +633,26 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              isAr ? 'اسحب أي عنصر لحذفه مع تأثير فوري:' : 'Swipe item to dismiss with live animation:',
+              isAr
+                  ? 'اسحب أي عنصر لحذفه مع تأثير فوري:'
+                  : 'Swipe item to dismiss with live animation:',
               style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
             ),
             TextButton.icon(
               onPressed: () {
                 setState(() {
-                  _liveProducts.add(isAr ? 'منتج إضافي جديد #${_liveProducts.length + 1} 📦' : 'New Item #${_liveProducts.length + 1} 📦');
+                  _liveProducts.add(
+                    isAr
+                        ? 'منتج إضافي جديد #${_liveProducts.length + 1} 📦'
+                        : 'New Item #${_liveProducts.length + 1} 📦',
+                  );
                 });
               },
               icon: const Icon(Icons.add_circle, size: 14),
-              label: Text(isAr ? 'إضافة عنصر' : 'Add Item', style: const TextStyle(fontSize: 11)),
+              label: Text(
+                isAr ? 'إضافة عنصر' : 'Add Item',
+                style: const TextStyle(fontSize: 11),
+              ),
             ),
           ],
         ),
@@ -512,7 +667,8 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           child: ListView.separated(
             shrinkWrap: true,
             itemCount: _liveProducts.length,
-            separatorBuilder: (_, index) => const Divider(height: 1, color: Color(0xFF1E293B)),
+            separatorBuilder: (_, index) =>
+                const Divider(height: 1, color: Color(0xFF1E293B)),
             itemBuilder: (context, i) {
               final product = _liveProducts[i];
               return Dismissible(
@@ -529,10 +685,13 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       duration: const Duration(seconds: 2),
-                      content: Text(isAr ? 'تم حذف: $product' : 'Deleted: $product'),
+                      content: Text(
+                        isAr ? 'تم حذف: $product' : 'Deleted: $product',
+                      ),
                       action: SnackBarAction(
                         label: isAr ? 'تراجع' : 'Undo',
-                        onPressed: () => setState(() => _liveProducts.insert(i, product)),
+                        onPressed: () =>
+                            setState(() => _liveProducts.insert(i, product)),
                       ),
                     ),
                   );
@@ -542,10 +701,24 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   leading: CircleAvatar(
                     radius: 12,
                     backgroundColor: const Color(0xFF38BDF8),
-                    child: Text('${i + 1}', style: const TextStyle(fontSize: 10, color: Colors.black, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      '${i + 1}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  title: Text(product, style: const TextStyle(color: Colors.white, fontSize: 12)),
-                  trailing: const Icon(Icons.swipe_left_rounded, color: Color(0xFF64748B), size: 16),
+                  title: Text(
+                    product,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                  trailing: const Icon(
+                    Icons.swipe_left_rounded,
+                    color: Color(0xFF64748B),
+                    size: 16,
+                  ),
                 ),
               );
             },
@@ -563,7 +736,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          isAr ? 'مسار تمرير CustomScrollView مصغر (مرر وشاهد تقلص الـ SliverAppBar):' : 'Interactive mini CustomScrollView (Scroll down to watch SliverAppBar collapse):',
+          isAr
+              ? 'مسار تمرير CustomScrollView مصغر (مرر وشاهد تقلص الـ SliverAppBar):'
+              : 'Interactive mini CustomScrollView (Scroll down to watch SliverAppBar collapse):',
           style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
         ),
         8.heightBox,
@@ -572,7 +747,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.5)),
+            border: Border.all(
+              color: const Color(0xFF38BDF8).withValues(alpha: 0.5),
+            ),
           ),
           child: CustomScrollView(
             slivers: [
@@ -583,12 +760,18 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
                     isAr ? 'SliverAppBar المطاطي' : 'Collapsible SliverAppBar',
-                    style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   centerTitle: true,
                   background: Container(
                     decoration: const BoxDecoration(
-                      gradient: LinearGradient(colors: [Color(0xFF0F766E), Color(0xFF0369A1)]),
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF0F766E), Color(0xFF0369A1)],
+                      ),
                     ),
                   ),
                 ),
@@ -597,8 +780,14 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(
-                    isAr ? 'عناصر داخل SliverGrid:' : 'Items inside SliverGrid:',
-                    style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold),
+                    isAr
+                        ? 'عناصر داخل SliverGrid:'
+                        : 'Items inside SliverGrid:',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -619,7 +808,10 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   child: Center(
                     child: Text(
                       isAr ? 'عنصر #${i + 1} 📦' : 'Item #${i + 1} 📦',
-                      style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 11),
+                      style: const TextStyle(
+                        color: Color(0xFF38BDF8),
+                        fontSize: 11,
+                      ),
                     ),
                   ),
                 ),
@@ -672,12 +864,20 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
         TextField(
           style: const TextStyle(color: Colors.white, fontSize: 13),
           decoration: InputDecoration(
-            labelText: isAr ? 'اكتب نصاً لتطبيق التدرج عليه مباشرة:' : 'Type custom text for live gradient shader:',
+            labelText: isAr
+                ? 'اكتب نصاً لتطبيق التدرج عليه مباشرة:'
+                : 'Type custom text for live gradient shader:',
             labelStyle: const TextStyle(color: Color(0xFF38BDF8), fontSize: 11),
             filled: true,
             fillColor: const Color(0xFF1E293B),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
           ),
           onChanged: (v) => setState(() => _customText = v),
         ),
@@ -691,8 +891,13 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isAr ? 'حجم الخط: ${_fontSize.toInt()}px' : 'Font Size: ${_fontSize.toInt()}px',
-                    style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11),
+                    isAr
+                        ? 'حجم الخط: ${_fontSize.toInt()}px'
+                        : 'Font Size: ${_fontSize.toInt()}px',
+                    style: const TextStyle(
+                      color: Color(0xFFCBD5E1),
+                      fontSize: 11,
+                    ),
                   ),
                   Slider(
                     value: _fontSize,
@@ -718,7 +923,10 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(colors: _gradients[idx]),
-                      border: Border.all(color: isSel ? Colors.white : Colors.transparent, width: 2),
+                      border: Border.all(
+                        color: isSel ? Colors.white : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
                   ),
                 );
@@ -744,19 +952,46 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
             style: const TextStyle(color: Colors.white, fontSize: 12),
             decoration: InputDecoration(
               labelText: isAr ? 'البريد الإلكتروني' : 'Email Address',
-              prefixIcon: const Icon(Icons.email, size: 18, color: Color(0xFF38BDF8)),
+              prefixIcon: const Icon(
+                Icons.email,
+                size: 18,
+                color: Color(0xFF38BDF8),
+              ),
               filled: true,
               fillColor: const Color(0xFF1E293B),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
             ),
-            validator: (v) => (v == null || !v.contains('@')) ? (isAr ? 'أدخل بريداً إلكترونياً صحيحاً' : 'Invalid email') : null,
+            validator: (v) => (v == null || !v.contains('@'))
+                ? (isAr ? 'أدخل بريداً إلكترونياً صحيحاً' : 'Invalid email')
+                : null,
           ),
           10.heightBox,
           SegmentedButton<String>(
             segments: [
-              ButtonSegment(value: 'developer', label: Text(isAr ? 'مطور' : 'Dev', style: const TextStyle(fontSize: 11))),
-              ButtonSegment(value: 'designer', label: Text(isAr ? 'مصمم' : 'UI', style: const TextStyle(fontSize: 11))),
-              ButtonSegment(value: 'manager', label: Text(isAr ? 'مدير' : 'PM', style: const TextStyle(fontSize: 11))),
+              ButtonSegment(
+                value: 'developer',
+                label: Text(
+                  isAr ? 'مطور' : 'Dev',
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
+              ButtonSegment(
+                value: 'designer',
+                label: Text(
+                  isAr ? 'مصمم' : 'UI',
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
+              ButtonSegment(
+                value: 'manager',
+                label: Text(
+                  isAr ? 'مدير' : 'PM',
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
             ],
             selected: {_selectedRole},
             onSelectionChanged: (s) => setState(() => _selectedRole = s.first),
@@ -765,7 +1000,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           Row(
             children: [
               Text(
-                isAr ? 'الخبرة: ${_experienceYears.toInt()} سنوات' : 'Experience: ${_experienceYears.toInt()} yrs',
+                isAr
+                    ? 'الخبرة: ${_experienceYears.toInt()} سنوات'
+                    : 'Experience: ${_experienceYears.toInt()} yrs',
                 style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11),
               ),
               Expanded(
@@ -786,13 +1023,20 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     backgroundColor: const Color(0xFF059669),
-                    content: Text(isAr ? '✅ تم التحقق من البيانات وحفظ النموذج بنجاح!' : '✅ Form validated successfully!'),
+                    content: Text(
+                      isAr
+                          ? '✅ تم التحقق من البيانات وحفظ النموذج بنجاح!'
+                          : '✅ Form validated successfully!',
+                    ),
                   ),
                 );
               }
             },
             icon: const Icon(Icons.check_circle_rounded, size: 18),
-            label: Text(isAr ? 'تحقق من صحة النموذج الآن' : 'Validate Form Now', style: const TextStyle(fontWeight: FontWeight.bold)),
+            label: Text(
+              isAr ? 'تحقق من صحة النموذج الآن' : 'Validate Form Now',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -819,9 +1063,21 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           ),
           child: Row(
             children: [
-              _buildGestureTabItem(0, isAr ? '🔘 معرض الأزرار (Buttons)' : 'Buttons Suite', Icons.smart_button_rounded),
-              _buildGestureTabItem(1, isAr ? '👆 الإيماءات (Gestures & Ink)' : 'Gestures & Ink', Icons.touch_app_rounded),
-              _buildGestureTabItem(2, isAr ? '🎯 السحب والتكبير (Drag/Zoom)' : 'Drag & Zoom', Icons.drag_indicator_rounded),
+              _buildGestureTabItem(
+                0,
+                isAr ? '🔘 معرض الأزرار (Buttons)' : 'Buttons Suite',
+                Icons.smart_button_rounded,
+              ),
+              _buildGestureTabItem(
+                1,
+                isAr ? '👆 الإيماءات (Gestures & Ink)' : 'Gestures & Ink',
+                Icons.touch_app_rounded,
+              ),
+              _buildGestureTabItem(
+                2,
+                isAr ? '🎯 السحب والتكبير (Drag/Zoom)' : 'Drag & Zoom',
+                Icons.drag_indicator_rounded,
+              ),
             ],
           ),
         ),
@@ -853,7 +1109,13 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 14, color: isSelected ? const Color(0xFF04111C) : const Color(0xFF94A3B8)),
+              Icon(
+                icon,
+                size: 14,
+                color: isSelected
+                    ? const Color(0xFF04111C)
+                    : const Color(0xFF94A3B8),
+              ),
               4.widthBox,
               Flexible(
                 child: Text(
@@ -861,7 +1123,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: isSelected ? const Color(0xFF04111C) : const Color(0xFF94A3B8),
+                    color: isSelected
+                        ? const Color(0xFF04111C)
+                        : const Color(0xFF94A3B8),
                     fontSize: 11,
                     fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                   ),
@@ -889,14 +1153,26 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.info_outline_rounded, color: Color(0xFF38BDF8), size: 16),
+              const Icon(
+                Icons.info_outline_rounded,
+                color: Color(0xFF38BDF8),
+                size: 16,
+              ),
               8.widthBox,
               Expanded(
                 child: Text(
                   _lastClickedButton.isEmpty
-                      ? (isAr ? 'انقر على أي زر لتجربة الاستجابة والمظهر الحقيقي:' : 'Click any button to test live reaction & style:')
-                      : (isAr ? '⚡ تم النقر على: $_lastClickedButton' : '⚡ Tapped: $_lastClickedButton'),
-                  style: const TextStyle(color: Color(0xFFE2E8F0), fontSize: 11.5, fontWeight: FontWeight.bold),
+                      ? (isAr
+                            ? 'انقر على أي زر لتجربة الاستجابة والمظهر الحقيقي:'
+                            : 'Click any button to test live reaction & style:')
+                      : (isAr
+                            ? '⚡ تم النقر على: $_lastClickedButton'
+                            : '⚡ Tapped: $_lastClickedButton'),
+                  style: const TextStyle(
+                    color: Color(0xFFE2E8F0),
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -911,46 +1187,76 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           children: [
             // 1. FilledButton
             FilledButton.icon(
-              onPressed: () => setState(() => _lastClickedButton = 'FilledButton (الزر الرئيسي الممتلئ)'),
+              onPressed: () => setState(
+                () =>
+                    _lastClickedButton = 'FilledButton (الزر الرئيسي الممتلئ)',
+              ),
               icon: const Icon(Icons.check_circle_rounded, size: 16),
               label: const Text('FilledButton'),
-              style: FilledButton.styleFrom(backgroundColor: const Color(0xFF14B8A6), foregroundColor: const Color(0xFF04111C)),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF14B8A6),
+                foregroundColor: const Color(0xFF04111C),
+              ),
             ),
 
             // 2. ElevatedButton
             ElevatedButton.icon(
-              onPressed: () => setState(() => _lastClickedButton = 'ElevatedButton (زر بارز بظل)'),
+              onPressed: () => setState(
+                () => _lastClickedButton = 'ElevatedButton (زر بارز بظل)',
+              ),
               icon: const Icon(Icons.arrow_upward_rounded, size: 16),
               label: const Text('ElevatedButton'),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E293B), foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+              ),
             ),
 
             // 3. OutlinedButton
             OutlinedButton.icon(
-              onPressed: () => setState(() => _lastClickedButton = 'OutlinedButton (زر بإطار مفرغ)'),
+              onPressed: () => setState(
+                () => _lastClickedButton = 'OutlinedButton (زر بإطار مفرغ)',
+              ),
               icon: const Icon(Icons.border_all_rounded, size: 16),
               label: const Text('OutlinedButton'),
-              style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF38BDF8), side: const BorderSide(color: Color(0xFF38BDF8))),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF38BDF8),
+                side: const BorderSide(color: Color(0xFF38BDF8)),
+              ),
             ),
 
             // 4. TextButton
             TextButton.icon(
-              onPressed: () => setState(() => _lastClickedButton = 'TextButton (زر نصي شفاف)'),
+              onPressed: () => setState(
+                () => _lastClickedButton = 'TextButton (زر نصي شفاف)',
+              ),
               icon: const Icon(Icons.text_fields_rounded, size: 16),
               label: const Text('TextButton'),
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFFA78BFA)),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFFA78BFA),
+              ),
             ),
 
             // 5. IconButton
             IconButton.filledTonal(
-              onPressed: () => setState(() => _lastClickedButton = 'IconButton.filledTonal (أيقونة بإضاءة)'),
-              icon: const Icon(Icons.favorite_rounded, color: Color(0xFFEC4899), size: 18),
+              onPressed: () => setState(
+                () => _lastClickedButton =
+                    'IconButton.filledTonal (أيقونة بإضاءة)',
+              ),
+              icon: const Icon(
+                Icons.favorite_rounded,
+                color: Color(0xFFEC4899),
+                size: 18,
+              ),
               tooltip: 'IconButton',
             ),
 
             // 6. FloatingActionButton
             FloatingActionButton.small(
-              onPressed: () => setState(() => _lastClickedButton = 'FloatingActionButton (FAB العائم)'),
+              heroTag: null,
+              onPressed: () => setState(
+                () => _lastClickedButton = 'FloatingActionButton (FAB العائم)',
+              ),
               backgroundColor: const Color(0xFFF59E0B),
               foregroundColor: Colors.black,
               child: const Icon(Icons.add, size: 20),
@@ -960,7 +1266,10 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
             PopupMenuButton<String>(
               color: const Color(0xFF1E293B),
               icon: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF334155),
                   borderRadius: BorderRadius.circular(8),
@@ -968,16 +1277,36 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Popup Menu', style: TextStyle(color: Colors.white, fontSize: 11.5)),
+                    Text(
+                      'Popup Menu',
+                      style: TextStyle(color: Colors.white, fontSize: 11.5),
+                    ),
                     SizedBox(width: 4),
-                    Icon(Icons.arrow_drop_down, color: Colors.white70, size: 16),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.white70,
+                      size: 16,
+                    ),
                   ],
                 ),
               ),
-              onSelected: (val) => setState(() => _lastClickedButton = 'PopupMenu: $val'),
+              onSelected: (val) =>
+                  setState(() => _lastClickedButton = 'PopupMenu: $val'),
               itemBuilder: (ctx) => [
-                const PopupMenuItem(value: 'تعديل (Edit)', child: Text('✏️ تعديل (Edit)', style: TextStyle(color: Colors.white))),
-                const PopupMenuItem(value: 'حذف (Delete)', child: Text('🗑️ حذف (Delete)', style: TextStyle(color: Color(0xFFEF4444)))),
+                const PopupMenuItem(
+                  value: 'تعديل (Edit)',
+                  child: Text(
+                    '✏️ تعديل (Edit)',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'حذف (Delete)',
+                  child: Text(
+                    '🗑️ حذف (Delete)',
+                    style: TextStyle(color: Color(0xFFEF4444)),
+                  ),
+                ),
               ],
             ),
           ],
@@ -988,8 +1317,16 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
         Center(
           child: SegmentedButton<String>(
             segments: const [
-              ButtonSegment(value: 'خيار 1', label: Text('خيار 1 (Single)'), icon: Icon(Icons.person, size: 14)),
-              ButtonSegment(value: 'خيار 2', label: Text('خيار 2 (Team)'), icon: Icon(Icons.groups, size: 14)),
+              ButtonSegment(
+                value: 'خيار 1',
+                label: Text('خيار 1 (Single)'),
+                icon: Icon(Icons.person, size: 14),
+              ),
+              ButtonSegment(
+                value: 'خيار 2',
+                label: Text('خيار 2 (Team)'),
+                icon: Icon(Icons.groups, size: 14),
+              ),
             ],
             selected: {_selectedSegment},
             onSelectionChanged: (set) {
@@ -1000,10 +1337,14 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
             },
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.resolveWith(
-                (states) => states.contains(WidgetState.selected) ? const Color(0xFF14B8A6) : const Color(0xFF1E293B),
+                (states) => states.contains(WidgetState.selected)
+                    ? const Color(0xFF14B8A6)
+                    : const Color(0xFF1E293B),
               ),
               foregroundColor: WidgetStateProperty.resolveWith(
-                (states) => states.contains(WidgetState.selected) ? const Color(0xFF04111C) : Colors.white70,
+                (states) => states.contains(WidgetState.selected)
+                    ? const Color(0xFF04111C)
+                    : Colors.white70,
               ),
             ),
           ),
@@ -1022,21 +1363,31 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           onTap: () => setState(() => _tapCount++),
           onDoubleTap: () => setState(() => _doubleTapCount++),
           onLongPress: () => setState(() => _longPressCount++),
-          onPanUpdate: (details) => setState(() => _lastPanOffset = details.localPosition),
+          onPanUpdate: (details) =>
+              setState(() => _lastPanOffset = details.localPosition),
           child: Container(
             height: 110,
             decoration: BoxDecoration(
               color: const Color(0xFF1E293B),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.6), width: 1.5),
+              border: Border.all(
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.6),
+                width: 1.5,
+              ),
             ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    isAr ? 'منطقة رصد GestureDetector (انقر، انقر مرتين، اضغط مطولاً، أو اسحب)' : 'GestureDetector Sandbox (Tap, DoubleTap, LongPress, or Pan)',
-                    style: const TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.bold, fontSize: 11),
+                    isAr
+                        ? 'منطقة رصد GestureDetector (انقر، انقر مرتين، اضغط مطولاً، أو اسحب)'
+                        : 'GestureDetector Sandbox (Tap, DoubleTap, LongPress, or Pan)',
+                    style: const TextStyle(
+                      color: Color(0xFF38BDF8),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
                   ),
                   8.heightBox,
                   Wrap(
@@ -1047,7 +1398,10 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                       _badgeCount('Tap: $_tapCount', Colors.cyan),
                       _badgeCount('Double: $_doubleTapCount', Colors.amber),
                       _badgeCount('Long: $_longPressCount', Colors.pinkAccent),
-                      _badgeCount('Pan (X:${_lastPanOffset.dx.toInt()}, Y:${_lastPanOffset.dy.toInt()})', const Color(0xFF34D399)),
+                      _badgeCount(
+                        'Pan (X:${_lastPanOffset.dx.toInt()}, Y:${_lastPanOffset.dy.toInt()})',
+                        const Color(0xFF34D399),
+                      ),
                     ],
                   ),
                 ],
@@ -1066,7 +1420,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('🌊 تم إطلاق تموجات الماء المادية (InkWell Material Ripple)!'),
+                  content: Text(
+                    '🌊 تم إطلاق تموجات الماء المادية (InkWell Material Ripple)!',
+                  ),
                   duration: Duration(milliseconds: 900),
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -1080,11 +1436,21 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.waves_rounded, color: Color(0xFF5EEAD4), size: 18),
+                  const Icon(
+                    Icons.waves_rounded,
+                    color: Color(0xFF5EEAD4),
+                    size: 18,
+                  ),
                   8.widthBox,
                   Text(
-                    isAr ? 'اضغط هنا لتجربة تموجات الماء المادية (InkWell Splash) 🌊' : 'Tap here to trigger Material InkWell Ripple 🌊',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                    isAr
+                        ? 'اضغط هنا لتجربة تموجات الماء المادية (InkWell Splash) 🌊'
+                        : 'Tap here to trigger Material InkWell Ripple 🌊',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -1110,16 +1476,30 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   color: Colors.transparent,
                   child: Chip(
                     backgroundColor: Colors.amber,
-                    label: Text(isAr ? '🌟 وسام PRO (أثناء السحب)' : '🌟 PRO Badge (Dragging)'),
+                    label: Text(
+                      isAr
+                          ? '🌟 وسام PRO (أثناء السحب)'
+                          : '🌟 PRO Badge (Dragging)',
+                    ),
                   ),
                 ),
                 childWhenDragging: Opacity(
                   opacity: 0.3,
-                  child: Chip(label: Text(isAr ? 'مكان العنصر المسحوب ⬅️' : 'Dragging... ➡️')),
+                  child: Chip(
+                    label: Text(
+                      isAr ? 'مكان العنصر المسحوب ⬅️' : 'Dragging... ➡️',
+                    ),
+                  ),
                 ),
                 child: Chip(
                   backgroundColor: const Color(0xFFF59E0B),
-                  label: Text(isAr ? 'اسحبني للهدف 🌟' : 'Drag me 🌟', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  label: Text(
+                    isAr ? 'اسحبني للهدف 🌟' : 'Drag me 🌟',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -1133,17 +1513,28 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   return Container(
                     height: 48,
                     decoration: BoxDecoration(
-                      color: candidateData.isNotEmpty ? const Color(0xFF059669) : const Color(0xFF0F172A),
+                      color: candidateData.isNotEmpty
+                          ? const Color(0xFF059669)
+                          : const Color(0xFF0F172A),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: candidateData.isNotEmpty ? Colors.white : const Color(0xFF334155), width: 1.5),
+                      border: Border.all(
+                        color: candidateData.isNotEmpty
+                            ? Colors.white
+                            : const Color(0xFF334155),
+                        width: 1.5,
+                      ),
                     ),
                     child: Center(
                       child: Text(
                         _isBadgeDropped
                             ? (isAr ? '✅ تم الإسقاط بنجاح!' : '✅ Dropped!')
-                            : (isAr ? 'مستقبل السحب (Drop Target) 📥' : 'Drop Target Here 📥'),
+                            : (isAr
+                                  ? 'مستقبل السحب (Drop Target) 📥'
+                                  : 'Drop Target Here 📥'),
                         style: TextStyle(
-                          color: _isBadgeDropped ? const Color(0xFF34D399) : Colors.white70,
+                          color: _isBadgeDropped
+                              ? const Color(0xFF34D399)
+                              : Colors.white70,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
@@ -1172,16 +1563,34 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isAr ? '🗑️ تجربة Dismissible (اسحب العنصر لليسار لحذفه):' : '🗑️ Dismissible (Swipe left to delete):',
-                    style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11, fontWeight: FontWeight.bold),
+                    isAr
+                        ? '🗑️ تجربة Dismissible (اسحب العنصر لليسار لحذفه):'
+                        : '🗑️ Dismissible (Swipe left to delete):',
+                    style: const TextStyle(
+                      color: Color(0xFFCBD5E1),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   if (_dismissibleTasks.length < 2)
                     TextButton(
                       onPressed: () => setState(() {
-                        _dismissibleTasks = ['مهمة 1: إتقان Flutter Widgets 🚀', 'مهمة 2: اسحبني لليسار للحذف 🗑️'];
+                        _dismissibleTasks = [
+                          'مهمة 1: إتقان Flutter Widgets 🚀',
+                          'مهمة 2: اسحبني لليسار للحذف 🗑️',
+                        ];
                       }),
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 20)),
-                      child: const Text('استعادة العناصر 🔄', style: TextStyle(fontSize: 10.5, color: Color(0xFF38BDF8))),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(50, 20),
+                      ),
+                      child: const Text(
+                        'استعادة العناصر 🔄',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: Color(0xFF38BDF8),
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -1197,14 +1606,21 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                       color: const Color(0xFFEF4444),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.delete_forever_rounded, color: Colors.white, size: 20),
+                    child: const Icon(
+                      Icons.delete_forever_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                   onDismissed: (_) {
                     setState(() => _dismissibleTasks.remove(task));
                   },
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF101828),
                       borderRadius: BorderRadius.circular(8),
@@ -1212,10 +1628,26 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.drag_indicator_rounded, color: Color(0xFF64748B), size: 16),
+                        const Icon(
+                          Icons.drag_indicator_rounded,
+                          color: Color(0xFF64748B),
+                          size: 16,
+                        ),
                         8.widthBox,
-                        Expanded(child: Text(task, style: const TextStyle(color: Colors.white, fontSize: 11.5))),
-                        const Icon(Icons.swipe_left_rounded, color: Color(0xFF94A3B8), size: 14),
+                        Expanded(
+                          child: Text(
+                            task,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11.5,
+                            ),
+                          ),
+                        ),
+                        const Icon(
+                          Icons.swipe_left_rounded,
+                          color: Color(0xFF94A3B8),
+                          size: 14,
+                        ),
                       ],
                     ),
                   ),
@@ -1251,9 +1683,21 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                     child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.flutter_dash_rounded, color: Colors.white, size: 30),
+                        Icon(
+                          Icons.flutter_dash_rounded,
+                          color: Colors.white,
+                          size: 30,
+                        ),
                         SizedBox(height: 4),
-                        Text('InteractiveViewer\nكبرني بإصبعين 🔍', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                        Text(
+                          'InteractiveViewer\nكبرني بإصبعين 🔍',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -1263,12 +1707,18 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 top: 6,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black54,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text('Pinch-to-zoom (0.5x - 4x)', style: TextStyle(color: Colors.white70, fontSize: 9)),
+                  child: const Text(
+                    'Pinch-to-zoom (0.5x - 4x)',
+                    style: TextStyle(color: Colors.white70, fontSize: 9),
+                  ),
                 ),
               ),
             ],
@@ -1281,8 +1731,14 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   Widget _badgeCount(String label, Color col) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(color: col.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(6)),
-      child: Text(label, style: TextStyle(color: col, fontSize: 11, fontWeight: FontWeight.bold)),
+      decoration: BoxDecoration(
+        color: col.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: col, fontSize: 11, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
@@ -1302,19 +1758,28 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               width: _isExpanded ? 260 : 130,
               height: _isExpanded ? 90 : 50,
               decoration: BoxDecoration(
-                color: _isExpanded ? const Color(0xFF0D9488) : const Color(0xFF4F46E5),
+                color: _isExpanded
+                    ? const Color(0xFF0D9488)
+                    : const Color(0xFF4F46E5),
                 borderRadius: BorderRadius.circular(_isExpanded ? 24 : 10),
                 boxShadow: [
                   BoxShadow(
-                    color: (_isExpanded ? Colors.teal : Colors.indigo).withValues(alpha: 0.4),
+                    color: (_isExpanded ? Colors.teal : Colors.indigo)
+                        .withValues(alpha: 0.4),
                     blurRadius: 16,
                   ),
                 ],
               ),
               child: Center(
                 child: Text(
-                  _isExpanded ? (isAr ? 'انقر للتصغير 🔽' : 'Tap to Shrink 🔽') : (isAr ? 'انقر للتوسيع 🔼' : 'Tap to Expand 🔼'),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  _isExpanded
+                      ? (isAr ? 'انقر للتصغير 🔽' : 'Tap to Shrink 🔽')
+                      : (isAr ? 'انقر للتوسيع 🔼' : 'Tap to Expand 🔼'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ),
@@ -1334,10 +1799,22 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               dropdownColor: const Color(0xFF1E293B),
               style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 12),
               items: const [
-                DropdownMenuItem(value: Curves.easeOutBack, child: Text('Curves.easeOutBack')),
-                DropdownMenuItem(value: Curves.bounceOut, child: Text('Curves.bounceOut')),
-                DropdownMenuItem(value: Curves.elasticOut, child: Text('Curves.elasticOut')),
-                DropdownMenuItem(value: Curves.easeInOut, child: Text('Curves.easeInOut')),
+                DropdownMenuItem(
+                  value: Curves.easeOutBack,
+                  child: Text('Curves.easeOutBack'),
+                ),
+                DropdownMenuItem(
+                  value: Curves.bounceOut,
+                  child: Text('Curves.bounceOut'),
+                ),
+                DropdownMenuItem(
+                  value: Curves.elasticOut,
+                  child: Text('Curves.elasticOut'),
+                ),
+                DropdownMenuItem(
+                  value: Curves.easeInOut,
+                  child: Text('Curves.easeInOut'),
+                ),
               ],
               onChanged: (c) {
                 if (c != null) setState(() => _selectedCurve = c);
@@ -1350,63 +1827,363 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   }
 
   // ===========================================================================
-  // 9. Dialogs & BottomSheets Sandbox
+  // 9. Dialogs, BottomSheets, SnackBars, Tooltips & Overlays Sandbox
   // ===========================================================================
   Widget _buildDialogsSandbox(bool isAr) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                builder: (_) => Container(
-                  padding: const EdgeInsets.all(20),
-                  color: const Color(0xFF101828),
-                  child: Column(
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            // 1. AlertDialog Button
+            ElevatedButton.icon(
+              onPressed: () async {
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: const Color(0xFF101828),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    icon: const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Color(0xFFEF4444),
+                      size: 28,
+                    ),
+                    title: Text(
+                      isAr
+                          ? 'تأكيد الحذف؟ (AlertDialog)'
+                          : 'Confirm Action? (AlertDialog)',
+                    ),
+                    content: Text(
+                      isAr
+                          ? 'هذه نافذة AlertDialog تفاعلية. اضغط على أي زر لإرجاع النتيجة للواجهة.'
+                          : 'This is an interactive AlertDialog. Pick an action to return boolean results.',
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 12,
+                      ),
+                    ),
+                    actions: [
+                      OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: Text(isAr ? 'إلغاء' : 'Cancel'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFFEF4444),
+                        ),
+                        child: Text(isAr ? 'تأكيد' : 'Confirm'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (mounted && result != null) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        result
+                            ? (isAr
+                                  ? '✅ تم اختيار: تأكيد الحذف'
+                                  : '✅ Confirmed')
+                            : (isAr ? '❌ تم اختيار: إلغاء' : '❌ Cancelled'),
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(
+                Icons.warning_amber_rounded,
+                size: 16,
+                color: Color(0xFFEF4444),
+              ),
+              label: Text(
+                isAr ? 'AlertDialog ⚠️' : 'AlertDialog ⚠️',
+                style: const TextStyle(fontSize: 11),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+              ),
+            ),
+
+            // 2. BottomSheet Button
+            ElevatedButton.icon(
+              onPressed: () {
+                showModalBottomSheet<String>(
+                  context: context,
+                  backgroundColor: const Color(0xFF101828),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  builder: (ctx) => SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade600,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          14.heightBox,
+                          ListTile(
+                            leading: const Icon(
+                              Icons.camera_alt,
+                              color: Color(0xFF38BDF8),
+                            ),
+                            title: Text(
+                              isAr ? 'التقاط صورة بالكاميرا' : 'Take Photo',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            onTap: () => Navigator.pop(ctx, 'camera'),
+                          ),
+                          ListTile(
+                            leading: const Icon(
+                              Icons.photo_library,
+                              color: Color(0xFFEC4899),
+                            ),
+                            title: Text(
+                              isAr
+                                  ? 'اختيار من الاستوديو'
+                                  : 'Choose from Gallery',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            onTap: () => Navigator.pop(ctx, 'gallery'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.vertical_align_top_rounded,
+                size: 16,
+                color: Color(0xFF38BDF8),
+              ),
+              label: Text(
+                isAr ? 'BottomSheet 📋' : 'BottomSheet 📋',
+                style: const TextStyle(fontSize: 11),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+              ),
+            ),
+
+            // 3. Floating SnackBar Button
+            ElevatedButton.icon(
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          color: Color(0xFF34D399),
+                          size: 18,
+                        ),
+                        8.widthBox,
+                        Expanded(
+                          child: Text(
+                            isAr
+                                ? 'تمت العملية بنجاح! 🚀'
+                                : 'Operation successful! 🚀',
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: const Color(0xFF1E293B),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    action: SnackBarAction(
+                      label: isAr ? 'تراجع' : 'Undo',
+                      textColor: const Color(0xFF38BDF8),
+                      onPressed: () {},
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.chat_bubble_outline_rounded,
+                size: 16,
+                color: Color(0xFF34D399),
+              ),
+              label: Text(
+                isAr ? 'SnackBar 💬' : 'SnackBar 💬',
+                style: const TextStyle(fontSize: 11),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+              ),
+            ),
+
+            // 4. OverlayEntry Button
+            ElevatedButton.icon(
+              onPressed: () {
+                late OverlayEntry overlayEntry;
+                overlayEntry = OverlayEntry(
+                  builder: (ctx) => Positioned(
+                    top: 80,
+                    right: 20,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF14B8A6),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black45,
+                              blurRadius: 12,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.notifications_active_rounded,
+                              color: Colors.black,
+                              size: 18,
+                            ),
+                            8.widthBox,
+                            Text(
+                              isAr
+                                  ? 'طبقة OverlayEntry عائمة! ⚡'
+                                  : 'Floating OverlayEntry! ⚡',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            8.widthBox,
+                            InkWell(
+                              onTap: () => overlayEntry.remove(),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                color: Colors.black,
+                                size: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+                Overlay.of(context).insert(overlayEntry);
+              },
+              icon: const Icon(
+                Icons.layers_rounded,
+                size: 16,
+                color: Color(0xFFF59E0B),
+              ),
+              label: Text(
+                isAr ? 'OverlayEntry 🌟' : 'OverlayEntry 🌟',
+                style: const TextStyle(fontSize: 11),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E293B),
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        10.heightBox,
+
+        // 5. Tooltip Interactive Demo
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFF334155)),
+          ),
+          child: Row(
+            children: [
+              Text(
+                isAr
+                    ? 'تلميح Tooltip (قف بالماوس أو اضغط مطولاً):'
+                    : 'Tooltip Widget (Hover/Long press):',
+                style: const TextStyle(
+                  color: Color(0xFF94A3B8),
+                  fontSize: 11.5,
+                ),
+              ),
+              const Spacer(),
+              Tooltip(
+                message: isAr
+                    ? 'تلميح تفاعلي عبر Tooltip Widget 💡'
+                    : 'Contextual info from Tooltip Widget 💡',
+                waitDuration: const Duration(milliseconds: 200),
+                showDuration: const Duration(seconds: 2),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF14B8A6),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                textStyle: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E293B),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF14B8A6)),
+                  ),
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade600, borderRadius: BorderRadius.circular(2))),
-                      14.heightBox,
-                      ListTile(
-                        leading: const Icon(Icons.camera_alt, color: Color(0xFF38BDF8)),
-                        title: Text(isAr ? 'التقاط صورة بالكاميرا' : 'Take Photo', style: const TextStyle(color: Colors.white)),
-                        onTap: () => Navigator.pop(context),
+                      Icon(
+                        Icons.help_outline_rounded,
+                        color: Color(0xFF14B8A6),
+                        size: 16,
                       ),
-                      ListTile(
-                        leading: const Icon(Icons.photo_library, color: Color(0xFFEC4899)),
-                        title: Text(isAr ? 'اختيار من الاستوديو' : 'Choose from Gallery', style: const TextStyle(color: Colors.white)),
-                        onTap: () => Navigator.pop(context),
+                      SizedBox(width: 4),
+                      Text(
+                        'Hover Me 💡',
+                        style: TextStyle(
+                          color: Color(0xFF14B8A6),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                 ),
-              );
-            },
-            icon: const Icon(Icons.vertical_align_top_rounded, size: 16),
-            label: Text(isAr ? 'BottomSheet' : 'BottomSheet', style: const TextStyle(fontSize: 11)),
-          ),
-        ),
-        8.widthBox,
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  backgroundColor: const Color(0xFF101828),
-                  title: Text(isAr ? 'تأكيد الحذف؟' : 'Confirm Action?'),
-                  content: Text(isAr ? 'هذا تطبيق حي للـ AlertDialog في فلاتر.' : 'This is a live AlertDialog demonstration in Flutter.'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: Text(isAr ? 'إلغاء' : 'Cancel')),
-                    ElevatedButton(onPressed: () => Navigator.pop(context), child: Text(isAr ? 'موافق' : 'OK')),
-                  ],
-                ),
-              );
-            },
-            icon: const Icon(Icons.warning_amber_rounded, size: 16),
-            label: Text(isAr ? 'AlertDialog' : 'AlertDialog', style: const TextStyle(fontSize: 11)),
+              ),
+            ],
           ),
         ),
       ],
@@ -1420,75 +2197,438 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  setState(() {
-                    _apiSimulationFuture = Future.delayed(
-                      const Duration(seconds: 2),
-                      () => isAr ? 'بيانات المستخدم: أحمد محمود (تم التحميل بنجاح ✅)' : 'User Data: Ahmed (Loaded successfully ✅)',
-                    );
-                  });
-                },
-                icon: const Icon(Icons.download_rounded, size: 16),
-                label: Text(isAr ? 'محاكاة API ناجح (2ث)' : 'Simulate API Success', style: const TextStyle(fontSize: 11)),
+        // Sub-tabs for Builders
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildSmallTab(
+                0,
+                'FutureBuilder ⏳',
+                _asyncTab == 0,
+                () => setState(() => _asyncTab = 0),
               ),
-            ),
-            8.widthBox,
-            Expanded(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent.withValues(alpha: 0.2)),
-                onPressed: () {
-                  setState(() {
-                    _apiSimulationFuture = Future.delayed(
-                      const Duration(seconds: 2),
-                      () => throw Exception(isAr ? 'تعذر الاتصال بالخادم (خطأ 500)' : 'Server 500 Network Error'),
-                    );
-                  });
-                },
-                icon: const Icon(Icons.error_outline, size: 16, color: Colors.redAccent),
-                label: Text(isAr ? 'محاكاة خطأ' : 'Simulate Error', style: const TextStyle(color: Colors.redAccent, fontSize: 11)),
+              6.widthBox,
+              _buildSmallTab(
+                1,
+                'StreamBuilder 🌊',
+                _asyncTab == 1,
+                () => setState(() => _asyncTab = 1),
               ),
-            ),
-          ],
-        ),
-        10.heightBox,
-        Container(
-          height: 70,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF1E293B)),
+              6.widthBox,
+              _buildSmallTab(
+                2,
+                'ValueListenable ⚡',
+                _asyncTab == 2,
+                () => setState(() => _asyncTab = 2),
+              ),
+              6.widthBox,
+              _buildSmallTab(
+                3,
+                'LayoutBuilder 📐',
+                _asyncTab == 3,
+                () => setState(() => _asyncTab = 3),
+              ),
+            ],
           ),
-          child: Center(
-            child: _apiSimulationFuture == null
-                ? Text(isAr ? 'اضغط على أحد الأزرار لتشغيل الـ FutureBuilder ⏳' : 'Press a button to trigger FutureBuilder ⏳', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11))
-                : FutureBuilder<String>(
-                    future: _apiSimulationFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
-                            SizedBox(width: 10),
-                            Text('جاري الاتصال بالخادم...', style: TextStyle(color: Colors.amberAccent, fontSize: 12)),
-                          ],
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('⚠️ ${snapshot.error}', style: const TextStyle(color: Colors.redAccent, fontSize: 11));
-                      } else if (snapshot.hasData) {
-                        return Text(snapshot.data!, style: const TextStyle(color: Color(0xFF34D399), fontSize: 12, fontWeight: FontWeight.bold));
-                      }
-                      return const SizedBox.shrink();
-                    },
+        ),
+        12.heightBox,
+
+        // Tab Content
+        if (_asyncTab == 0) ...[
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _apiSimulationFuture = Future.delayed(
+                        const Duration(seconds: 2),
+                        () => isAr
+                            ? 'بيانات المستخدم: أحمد محمود (تم التحميل بنجاح ✅)'
+                            : 'User Data: Ahmed (Loaded successfully ✅)',
+                      );
+                    });
+                  },
+                  icon: const Icon(Icons.download_rounded, size: 16),
+                  label: Text(
+                    isAr ? 'محاكاة API ناجح' : 'Simulate API Success',
+                    style: const TextStyle(fontSize: 11),
                   ),
+                ),
+              ),
+              8.widthBox,
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent.withValues(alpha: 0.2),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _apiSimulationFuture = Future.delayed(
+                        const Duration(seconds: 2),
+                        () => throw Exception(
+                          isAr
+                              ? 'تعذر الاتصال بالخادم (خطأ 500)'
+                              : 'Server 500 Network Error',
+                        ),
+                      );
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.error_outline,
+                    size: 16,
+                    color: Colors.redAccent,
+                  ),
+                  label: Text(
+                    isAr ? 'محاكاة خطأ' : 'Simulate Error',
+                    style: const TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          10.heightBox,
+          Container(
+            height: 60,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFF1E293B)),
+            ),
+            child: Center(
+              child: _apiSimulationFuture == null
+                  ? Text(
+                      isAr
+                          ? 'اضغط على أحد الأزرار لتشغيل FutureBuilder ⏳'
+                          : 'Press a button to trigger FutureBuilder ⏳',
+                      style: const TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 11,
+                      ),
+                    )
+                  : FutureBuilder<String>(
+                      future: _apiSimulationFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'جاري الاتصال بالخادم...',
+                                style: TextStyle(
+                                  color: Colors.amberAccent,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text(
+                            '⚠️ ${snapshot.error}',
+                            style: const TextStyle(
+                              color: Colors.redAccent,
+                              fontSize: 11,
+                            ),
+                          );
+                        } else if (snapshot.hasData) {
+                          return Text(
+                            snapshot.data!,
+                            style: const TextStyle(
+                              color: Color(0xFF34D399),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+            ),
+          ),
+        ] else if (_asyncTab == 1) ...[
+          // StreamBuilder Demo
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isAr ? 'بث أحداث مستمر (Stream):' : 'Live Event Stream:',
+                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (_isStreamRunning) {
+                    _streamTimer?.cancel();
+                    setState(() => _isStreamRunning = false);
+                  } else {
+                    setState(() => _isStreamRunning = true);
+                    _streamTimer = Timer.periodic(
+                      const Duration(milliseconds: 600),
+                      (t) {
+                        setState(() => _streamTick++);
+                      },
+                    );
+                  }
+                },
+                icon: Icon(
+                  _isStreamRunning ? Icons.pause : Icons.play_arrow,
+                  size: 16,
+                ),
+                label: Text(
+                  _isStreamRunning
+                      ? (isAr ? 'إيقاف' : 'Pause')
+                      : (isAr ? 'بدء البث' : 'Start Stream'),
+                  style: const TextStyle(fontSize: 11),
+                ),
+              ),
+            ],
+          ),
+          8.heightBox,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.4),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.sensors, color: Color(0xFF38BDF8), size: 22),
+                10.widthBox,
+                Text(
+                  isAr
+                      ? 'StreamBuilder استقبل: #$_streamTick'
+                      : 'StreamBuilder consumed: #$_streamTick',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ] else if (_asyncTab == 2) ...[
+          // ValueListenableBuilder Demo
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFF14B8A6).withValues(alpha: 0.4),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isAr
+                          ? 'تحديث معزول بدون setState:'
+                          : 'Micro-rebuild without setState:',
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 11,
+                      ),
+                    ),
+                    4.heightBox,
+                    ValueListenableBuilder<int>(
+                      valueListenable: _microCounterNotifier,
+                      builder: (context, val, _) {
+                        return Text(
+                          isAr
+                              ? 'قيمة العداد المعزولة: $val'
+                              : 'Isolated Value: $val',
+                          style: const TextStyle(
+                            color: Color(0xFF34D399),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.remove_circle_outline,
+                        color: Colors.amberAccent,
+                      ),
+                      onPressed: () => _microCounterNotifier.value--,
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.add_circle,
+                        color: Color(0xFF34D399),
+                      ),
+                      onPressed: () => _microCounterNotifier.value++,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ] else if (_asyncTab == 3) ...[
+          // LayoutBuilder Demo
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth > 400;
+              return Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F172A),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: const Color(0xFFA855F7).withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isAr
+                              ? 'عرض الحاوية المتاح: ${constraints.maxWidth.toInt()}px'
+                              : 'Available Width: ${constraints.maxWidth.toInt()}px',
+                          style: const TextStyle(
+                            color: Color(0xFFA855F7),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFFA855F7,
+                            ).withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isWide
+                                ? (isAr
+                                      ? 'وضع الشاشة الواسعة (2 أعمدة)'
+                                      : 'Wide Mode (2 cols)')
+                                : (isAr
+                                      ? 'وضع الشاشة الضيقة (عمود واحد)'
+                                      : 'Compact Mode (1 col)'),
+                            style: const TextStyle(
+                              color: Color(0xFFA855F7),
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    8.heightBox,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E293B),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Center(
+                              child: Text(
+                                isAr ? 'صندوق A' : 'Box A',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (isWide) ...[
+                          8.widthBox,
+                          Expanded(
+                            child: Container(
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E293B),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  isAr ? 'صندوق B' : 'Box B',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSmallTab(
+    int index,
+    String label,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF0284C7) : const Color(0xFF0F172A),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF38BDF8)
+                : const Color(0xFF334155),
           ),
         ),
-      ],
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 
@@ -1498,17 +2638,43 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   Widget _buildRecordsPatternSandbox(bool isAr) {
     // Live pattern matching switch
     final (statusIcon, statusColor, statusDesc) = switch (_selectedStatusCode) {
-      200 => (Icons.check_circle, Colors.greenAccent, isAr ? '200 OK: استجابة ناجحة وتفكيك البيانات' : '200 OK: Success & Destructured'),
-      401 => (Icons.lock, Colors.amberAccent, isAr ? '401 Unauthorized: جلسة منتهية' : '401 Unauthorized: Expired token'),
-      404 => (Icons.search_off, Colors.orangeAccent, isAr ? '404 Not Found: الصفحة غير موجودة' : '404 Not Found: Resource missing'),
-      _ => (Icons.error, Colors.redAccent, isAr ? '500 Server Error: خطأ غير متوقع' : '500 Server Error: Unexpected error'),
+      200 => (
+        Icons.check_circle,
+        Colors.greenAccent,
+        isAr
+            ? '200 OK: استجابة ناجحة وتفكيك البيانات'
+            : '200 OK: Success & Destructured',
+      ),
+      401 => (
+        Icons.lock,
+        Colors.amberAccent,
+        isAr
+            ? '401 Unauthorized: جلسة منتهية'
+            : '401 Unauthorized: Expired token',
+      ),
+      404 => (
+        Icons.search_off,
+        Colors.orangeAccent,
+        isAr
+            ? '404 Not Found: الصفحة غير موجودة'
+            : '404 Not Found: Resource missing',
+      ),
+      _ => (
+        Icons.error,
+        Colors.redAccent,
+        isAr
+            ? '500 Server Error: خطأ غير متوقع'
+            : '500 Server Error: Unexpected error',
+      ),
     };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          isAr ? 'اختر رمز الحالة لمشاهدة مطابقة النمط (Pattern Matching) في سطر واحد:' : 'Select HTTP status to watch single-line Pattern Matching:',
+          isAr
+              ? 'اختر رمز الحالة لمشاهدة مطابقة النمط (Pattern Matching) في سطر واحد:'
+              : 'Select HTTP status to watch single-line Pattern Matching:',
           style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
         ),
         8.heightBox,
@@ -1519,7 +2685,14 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 3),
                 child: ChoiceChip(
-                  label: Text('$code', style: TextStyle(color: isSel ? Colors.black : Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+                  label: Text(
+                    '$code',
+                    style: TextStyle(
+                      color: isSel ? Colors.black : Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                  ),
                   selected: isSel,
                   selectedColor: const Color(0xFF38BDF8),
                   backgroundColor: const Color(0xFF1E293B),
@@ -1542,7 +2715,14 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               Icon(statusIcon, color: statusColor, size: 24),
               10.widthBox,
               Expanded(
-                child: Text(statusDesc, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 12)),
+                child: Text(
+                  statusDesc,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
               ),
             ],
           ),
@@ -1562,7 +2742,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              isAr ? 'عداد تدفق الأحداث الحية (Stream Ticker):' : 'Live Stream Event Ticker:',
+              isAr
+                  ? 'عداد تدفق الأحداث الحية (Stream Ticker):'
+                  : 'Live Stream Event Ticker:',
               style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
             ),
             ElevatedButton.icon(
@@ -1572,13 +2754,24 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                   setState(() => _isStreamRunning = false);
                 } else {
                   setState(() => _isStreamRunning = true);
-                  _streamTimer = Timer.periodic(const Duration(milliseconds: 600), (t) {
-                    setState(() => _streamTick++);
-                  });
+                  _streamTimer = Timer.periodic(
+                    const Duration(milliseconds: 600),
+                    (t) {
+                      setState(() => _streamTick++);
+                    },
+                  );
                 }
               },
-              icon: Icon(_isStreamRunning ? Icons.pause : Icons.play_arrow, size: 16),
-              label: Text(_isStreamRunning ? (isAr ? 'إيقاف' : 'Pause') : (isAr ? 'بدء التدفق' : 'Start Stream'), style: const TextStyle(fontSize: 11)),
+              icon: Icon(
+                _isStreamRunning ? Icons.pause : Icons.play_arrow,
+                size: 16,
+              ),
+              label: Text(
+                _isStreamRunning
+                    ? (isAr ? 'إيقاف' : 'Pause')
+                    : (isAr ? 'بدء التدفق' : 'Start Stream'),
+                style: const TextStyle(fontSize: 11),
+              ),
             ),
           ],
         ),
@@ -1588,7 +2781,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           decoration: BoxDecoration(
             color: const Color(0xFF0F172A),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.4)),
+            border: Border.all(
+              color: const Color(0xFF38BDF8).withValues(alpha: 0.4),
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1596,8 +2791,14 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               const Icon(Icons.sensors, color: Color(0xFF38BDF8), size: 24),
               10.widthBox,
               Text(
-                isAr ? 'الأحداث المستلمة عبر التدفق: #$_streamTick' : 'Stream Events Emitted: #$_streamTick',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                isAr
+                    ? 'الأحداث المستلمة عبر التدفق: #$_streamTick'
+                    : 'Stream Events Emitted: #$_streamTick',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -1613,13 +2814,18 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
     final byteData = ByteData(6);
     byteData.setUint16(0, _rawPacketId, Endian.big);
     byteData.setFloat32(2, _rawSpeed, Endian.big);
-    final hexBytes = byteData.buffer.asUint8List().map((b) => b.toRadixString(16).padLeft(2, '0').toUpperCase()).join(' ');
+    final hexBytes = byteData.buffer
+        .asUint8List()
+        .map((b) => b.toRadixString(16).padLeft(2, '0').toUpperCase())
+        .join(' ');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          isAr ? 'تشفير فوري في الذاكرة بـ Uint8List و ByteData:' : 'In-Memory Binary Encoding with ByteData:',
+          isAr
+              ? 'تشفير فوري في الذاكرة بـ Uint8List و ByteData:'
+              : 'In-Memory Binary Encoding with ByteData:',
           style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
         ),
         8.heightBox,
@@ -1634,15 +2840,29 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 onChanged: (v) => setState(() => _rawSpeed = v),
               ),
             ),
-            Text('${_rawSpeed.toStringAsFixed(1)} km/h', style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(
+              '${_rawSpeed.toStringAsFixed(1)} km/h',
+              style: const TextStyle(
+                color: Colors.cyanAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Text(
             'Raw Hex Bytes: [ $hexBytes ] (Big-Endian)',
-            style: const TextStyle(fontFamily: 'monospace', color: Color(0xFF34D399), fontSize: 12),
+            style: const TextStyle(
+              fontFamily: 'monospace',
+              color: Color(0xFF34D399),
+              fontSize: 12,
+            ),
           ),
         ),
       ],
@@ -1670,12 +2890,21 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               children: [
                 Text(
                   widget.topic.title.value(isAr),
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
                 4.heightBox,
                 Text(
-                  isAr ? '✅ الكود أدناه جاهز للتشغيل والتطبيق المباشر في مشروعك.' : '✅ Ready-to-use production code snippet below.',
-                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                  isAr
+                      ? '✅ الكود أدناه جاهز للتشغيل والتطبيق المباشر في مشروعك.'
+                      : '✅ Ready-to-use production code snippet below.',
+                  style: const TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),

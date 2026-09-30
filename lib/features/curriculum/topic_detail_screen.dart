@@ -49,6 +49,7 @@ class TopicDetailScreen extends StatelessWidget {
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
+          heroTag: 'topic_detail_ai_fab',
           onPressed: () {
             ContextualAiSheet.show(
               context,
