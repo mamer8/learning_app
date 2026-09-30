@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// ⚡ مختبر امتدادات الـ Core (Extensions Playground)
 /// شاشة تفاعلية لتجربة جميع الـ Extensions المنشأة مع فحص حي لخصائص الشاشة والتحقق من النصوص
@@ -23,6 +24,27 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
     super.dispose();
   }
 
+  String _getExtensionsCode() {
+    return '// التطبيق العملي للـ Extensions مع القيم المكتوبة حالياً:\n'
+        'final email = "${_emailController.text}";\n'
+        'final isEmailValid = email.isValidEmail; // النتيجة: ${_emailController.text.isValidEmail}\n\n'
+        'final phone = "${_phoneController.text}";\n'
+        'final isPhoneValid = phone.isValidPhone; // النتيجة: ${_phoneController.text.isValidPhone}\n\n'
+        '// تبسيط الـ Spacing والـ Context:\n'
+        '16.heightBox; // بدلاً من SizedBox(height: 16)\n'
+        'context.width; // بدلاً من MediaQuery.sizeOf(context).width';
+  }
+
+  void _openAiCopilot(BuildContext context) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الـ Dart Extensions والـ Utilities',
+      topicCode: _getExtensionsCode(),
+      levelTitle: 'إنتاجية الكود وامتدادات لغة Dart',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,9 +52,25 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
       appBar: AppBar(
         title: const Text('مختبر Extensions & Utilities'),
         backgroundColor: const Color(0xFF1E293B),
+        actions: [
+          IconButton(
+            tooltip: 'اسأل المساعد الذكي',
+            icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+            onPressed: () => _openAiCopilot(context),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openAiCopilot(context),
+        icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+        label: const Text(
+          'اسأل المساعد الذكي عن هذا الكود',
+          style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF14B8A6),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -50,6 +88,10 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
 
             // 4. مختبر التحقق من النصوص (String Validation Extensions)
             _buildStringValidatorsCard(),
+            16.heightBox,
+
+            // 5. كود الـ Extensions الحي
+            _buildCodeCard(),
           ],
         ),
       ),
@@ -291,6 +333,47 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCodeCard() {
+    final code = _getExtensionsCode();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: 16.circularRadius,
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '💻 كود الـ Extensions الحي التفاعلي:',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF14B8A6).withValues(alpha: 0.2),
+                  borderRadius: 6.circularRadius,
+                ),
+                child: const Text('Dynamic Live Code', style: TextStyle(color: Color(0xFF14B8A6), fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          10.heightBox,
+          CopyableCodeBlock(
+            code: code,
+            copiedMessage: 'تم نسخ كود الـ Extensions',
+            copyTooltip: 'نسخ الكود',
+          ),
+        ],
+      ),
     );
   }
 }

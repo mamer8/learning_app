@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🎨 مختبر الـ RepaintBoundary وتحسين أداء الرسوميات
 /// يوضح كيف يعزل Flutter عمليات الرسم (Painting) لمنع إعادة رسم العناصر الثابتة المجاورة
@@ -52,6 +53,26 @@ class _RepaintBoundaryScreenState extends State<RepaintBoundaryScreen>
     });
   }
 
+  String _getRepaintCode() {
+    return '// هيكل شجرة الرسم الحالية (${_isRepaintBoundaryEnabled ? "✅ العزل مفعل" : "❌ العزل معطل"})\n'
+        'Row(\n'
+        '  children: [\n'
+        '    ${_isRepaintBoundaryEnabled ? "RepaintBoundary(\n      child: HeavyPulseAnimationWidget(), // طبقة منفصلة في GPU\n    )" : "HeavyPulseAnimationWidget(), // ⚠️ يسبب إعادة رسم الـ StaticWidget المجاورة معه"},\n'
+        '    StaticCardWidget(), // عداد إعادة رسمه: ${_isRepaintBoundaryEnabled ? "0 (محمي)" : "$_staticRepaintCount (إهدار معالجة!)"}\n'
+        '  ],\n'
+        ');';
+  }
+
+  void _openAiCopilot(BuildContext context) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الـ RepaintBoundary وتحسين الرسوميات',
+      topicCode: _getRepaintCode(),
+      levelTitle: 'تحسين الرسوميات وعزل طبقات الـ GPU',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,14 +82,28 @@ class _RepaintBoundaryScreenState extends State<RepaintBoundaryScreen>
         backgroundColor: const Color(0xFF1E293B),
         actions: [
           IconButton(
+            tooltip: 'اسأل المساعد الذكي',
+            icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+            onPressed: () => _openAiCopilot(context),
+          ),
+          IconButton(
             tooltip: 'تصفير العدادات',
             onPressed: _resetCounters,
             icon: const Icon(Icons.refresh_rounded),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openAiCopilot(context),
+        icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+        label: const Text(
+          'اسأل المساعد الذكي عن هذا الكود',
+          style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF14B8A6),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -390,16 +425,12 @@ class _RepaintBoundaryScreenState extends State<RepaintBoundaryScreen>
           ),
           14.heightBox,
           const Text(
-            '💻 كود الاستخدام الصحيح لعزل الرسم:',
+            '💻 كود الاستخدام وعزل الرسم (يتغير ديناميكياً مع التبديل):',
             style: TextStyle(color: Colors.tealAccent, fontSize: 12, fontWeight: FontWeight.bold),
           ),
           8.heightBox,
-          const CopyableCodeBlock(
-            code:
-                '// تغليف العنصر سريع الحركة بـ RepaintBoundary لعزل طبقة الرسم\n'
-                'RepaintBoundary(\n'
-                '  child: HighFrequencyAnimatedWidget(),\n'
-                ');',
+          CopyableCodeBlock(
+            code: _getRepaintCode(),
             copiedMessage: 'تم نسخ كود RepaintBoundary',
             copyTooltip: 'نسخ الكود',
           ),

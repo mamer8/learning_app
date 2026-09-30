@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 class _OfflineTask {
   final String id;
@@ -22,14 +23,53 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
   bool _isSyncing = false;
   final TextEditingController _taskController = TextEditingController();
   final List<_OfflineTask> _tasks = [
-    _OfflineTask(id: '1', title: 'تجهيز ملف key.properties للإنتاج', isSynced: true),
-    _OfflineTask(id: '2', title: 'فحص استهلاك الذاكرة بـ DevTools', isSynced: true),
+    _OfflineTask(
+      id: '1',
+      title: 'تجهيز ملف key.properties للإنتاج',
+      isSynced: true,
+    ),
+    _OfflineTask(
+      id: '2',
+      title: 'فحص استهلاك الذاكرة بـ DevTools',
+      isSynced: true,
+    ),
   ];
 
   @override
   void dispose() {
     _taskController.dispose();
     super.dispose();
+  }
+
+  void _openAiAssistant(int pendingCount) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الـ Offline-First والتزامن التفاؤلي',
+      topicCode: _buildDynamicOfflineCode(pendingCount),
+      levelTitle: 'مستوى متقدم (Senior Architecture & Caching)',
+      isArabic: true,
+    );
+  }
+
+  String _buildDynamicOfflineCode(int pendingCount) {
+    return '// === Dynamic Offline Sync & Optimistic UI ===\n'
+        '// حالة الشبكة الحالية: ${_isOnline ? "🟢 Online (متصل)" : "🔴 Offline (غير متصل)"}\n'
+        '// عناصر في طابور المزامنة: $pendingCount معلقة | إجمالي المهام: ${_tasks.length}\n\n'
+        'Future<void> addTask(Task task) async {\n'
+        '  // 1. تحديث تفاؤلي فوري في الـ Local Cache (Hive/Drift)\n'
+        '  final isConnected = $_isOnline;\n'
+        '  final localTask = task.copyWith(isSynced: isConnected);\n'
+        '  await localDataSource.saveTask(localTask);\n'
+        '  emit(TaskLoaded(localDataSource.getAllTasks()));\n\n'
+        '  // 2. طابور المزامنة التلقائي (Sync Queue Engine)\n'
+        '  if (isConnected) {\n'
+        '    // إرسال مباشر وفوري\n'
+        '    await syncQueueWithServer(); // ${_isSyncing ? "جاري التزامن الآن..." : "متزامن"}\n'
+        '  } else {\n'
+        '    // إدراج المهمة في طابور الـ Pending (طابور العمليات المعلقة: $pendingCount)\n'
+        '    syncQueue.enqueue(localTask.id);\n'
+        '  }\n'
+        '}';
   }
 
   void _addNewTask() {
@@ -43,7 +83,8 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
         _OfflineTask(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           title: text,
-          isSynced: _isOnline, // لو أونلاين يتزامن فوراً، لو أوفلاين يدخل طابور الانتظار
+          isSynced:
+              _isOnline, // لو أونلاين يتزامن فوراً، لو أوفلاين يدخل طابور الانتظار
         ),
       );
       _taskController.clear();
@@ -93,9 +134,26 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
       appBar: AppBar(
         title: const Text('مختبر Offline-First والتزامن'),
         backgroundColor: const Color(0xFF1E293B),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: Color(0xFF38BDF8)),
+            tooltip: 'اسأل الذكاء الاصطناعي عن Offline-First',
+            onPressed: () => _openAiAssistant(pendingCount),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF38BDF8),
+        foregroundColor: const Color(0xFF04111C),
+        icon: const Icon(Icons.auto_awesome),
+        label: const Text(
+          'اسأل الـ AI عن المزامنة',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        onPressed: () => _openAiAssistant(pendingCount),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -116,7 +174,7 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
             20.heightBox,
 
             // الكود الجاهز للنسخ
-            _buildCodeSnippetCard(),
+            _buildCodeSnippetCard(pendingCount),
           ],
         ),
       ),
@@ -129,18 +187,28 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFF38BDF8).withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.cloud_sync_rounded, color: Color(0xFF38BDF8), size: 22),
+              const Icon(
+                Icons.cloud_sync_rounded,
+                color: Color(0xFF38BDF8),
+                size: 22,
+              ),
               8.widthBox,
               const Text(
                 'مفهوم الـ Offline-First & Optimistic UI',
-                style: TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.bold, fontSize: 14),
+                style: TextStyle(
+                  color: Color(0xFF38BDF8),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
             ],
           ),
@@ -164,7 +232,9 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: _isOnline ? Colors.greenAccent.withValues(alpha: 0.4) : Colors.orangeAccent.withValues(alpha: 0.4),
+          color: _isOnline
+              ? Colors.greenAccent.withValues(alpha: 0.4)
+              : Colors.orangeAccent.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
@@ -175,7 +245,9 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isOnline ? '🟢 متصل بالإنترنت (Online)' : '🔴 غير متصل (Offline Mode)',
+                  _isOnline
+                      ? '🟢 متصل بالإنترنت (Online)'
+                      : '🔴 غير متصل (Offline Mode)',
                   style: TextStyle(
                     color: _isOnline ? Colors.greenAccent : Colors.orangeAccent,
                     fontWeight: FontWeight.bold,
@@ -219,7 +291,9 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
               fillColor: const Color(0xFF1E293B),
               hintText: 'أضف مهمة لاختبار التزامن التفاؤلي...',
               hintStyle: const TextStyle(color: Colors.white38, fontSize: 12),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
@@ -230,9 +304,14 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
             backgroundColor: const Color(0xFF38BDF8),
             foregroundColor: const Color(0xFF04111C),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
-          child: const Text('إضافة', style: TextStyle(fontWeight: FontWeight.bold)),
+          child: const Text(
+            'إضافة',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );
@@ -247,13 +326,20 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
           children: [
             const Text(
               '📋 قائمة المهام وطابور المزامنة:',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
             ),
             if (_isSyncing)
               const SizedBox(
                 width: 16,
                 height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.cyanAccent),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.cyanAccent,
+                ),
               ),
           ],
         ),
@@ -266,14 +352,20 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
               color: const Color(0xFF1E293B),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: task.isSynced ? Colors.white10 : Colors.amber.withValues(alpha: 0.5),
+                color: task.isSynced
+                    ? Colors.white10
+                    : Colors.amber.withValues(alpha: 0.5),
               ),
             ),
             child: Row(
               children: [
                 Icon(
-                  task.isSynced ? Icons.check_circle_rounded : Icons.pending_rounded,
-                  color: task.isSynced ? Colors.greenAccent : Colors.amberAccent,
+                  task.isSynced
+                      ? Icons.check_circle_rounded
+                      : Icons.pending_rounded,
+                  color: task.isSynced
+                      ? Colors.greenAccent
+                      : Colors.amberAccent,
                   size: 20,
                 ),
                 10.widthBox,
@@ -284,7 +376,10 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: task.isSynced
                         ? Colors.green.withValues(alpha: 0.15)
@@ -294,7 +389,9 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
                   child: Text(
                     task.isSynced ? 'متزامن (Synced)' : 'في الانتظار (Pending)',
                     style: TextStyle(
-                      color: task.isSynced ? Colors.greenAccent : Colors.amberAccent,
+                      color: task.isSynced
+                          ? Colors.greenAccent
+                          : Colors.amberAccent,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -308,18 +405,8 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
     );
   }
 
-  Widget _buildCodeSnippetCard() {
-    const code =
-        '// 1. Optimistic Update في الـ Cubit/Repository\n'
-        'Future<void> addTask(Task task) async {\n'
-        '  // حفظ فوري في قاعدة البيانات المحلية (Hive/Drift)\n'
-        '  await localDataSource.saveTask(task.copyWith(isSynced: false));\n'
-        '  emit(TaskLoaded(localDataSource.getAllTasks()));\n\n'
-        '  // محاولة الإرسال للسيرفر إن توفر الإنترنت\n'
-        '  if (await networkInfo.isConnected) {\n'
-        '    await syncQueueWithServer();\n'
-        '  }\n'
-        '}';
+  Widget _buildCodeSnippetCard(int pendingCount) {
+    final code = _buildDynamicOfflineCode(pendingCount);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -331,14 +418,38 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '💻 معمارية المزامنة والتحديث التفاؤلي:',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '💻 معمارية المزامنة والتحديث التفاؤلي الحية:',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF38BDF8).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'Dynamic Live Code',
+                  style: TextStyle(
+                    color: Color(0xFF38BDF8),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
           10.heightBox,
-          const CopyableCodeBlock(
+          CopyableCodeBlock(
             code: code,
-            copiedMessage: 'تم نسخ كود Offline Sync',
+            copiedMessage: 'تم نسخ كود Offline Sync المحدث',
             copyTooltip: 'نسخ الكود',
           ),
         ],

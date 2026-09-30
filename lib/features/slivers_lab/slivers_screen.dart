@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🌊 مختبر الـ Slivers وهندسة التمرير المتقدمة ومفتش الـ Geometry
 class SliversScreen extends StatefulWidget {
@@ -30,10 +31,48 @@ class _SliversScreenState extends State<SliversScreen> {
     super.dispose();
   }
 
+  String _getSliversCode() {
+    return '// هيكل CustomScrollView المتوافق مع الإعدادات الحالية:\n'
+        'CustomScrollView(\n'
+        '  slivers: [\n'
+        '    SliverAppBar(\n'
+        '      expandedHeight: 180.0,\n'
+        '      pinned: $_isPinned,   // ${_isPinned ? "يثبت عند التمرير" : "يختفي مع التمرير"}\n'
+        '      floating: $_isFloating, // ${_isFloating ? "يظهر فور التمرير للأعلى" : "لا يطفو"}\n'
+        '      flexibleSpace: FlexibleSpaceBar(title: Text("Slivers Lab")),\n'
+        '    ),\n'
+        '    SliverPersistentHeader(pinned: true, delegate: StickyHeaderDelegate()),\n'
+        '    ${_isGrid ? "SliverGrid(\n      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),\n      delegate: SliverChildBuilderDelegate(...),\n    )" : "SliverList(\n      delegate: SliverChildBuilderDelegate(...),\n    )"},\n'
+        '  ],\n'
+        ');';
+  }
+
+  void _openAiCopilot(BuildContext context) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الـ Slivers وهندسة التمرير المتقدمة',
+      topicCode: _getSliversCode(),
+      levelTitle: 'بنية التمرير المتقدمة وميكانيكا الـ Viewport والـ Slivers',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 60),
+        child: FloatingActionButton.extended(
+          onPressed: () => _openAiCopilot(context),
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: const Text(
+            'اسأل المساعد الذكي عن هذا الكود',
+            style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
+        ),
+      ),
       body: Stack(
         children: [
           CustomScrollView(
@@ -45,6 +84,13 @@ class _SliversScreenState extends State<SliversScreen> {
                 pinned: _isPinned,
                 floating: _isFloating,
                 backgroundColor: const Color(0xFF1E293B),
+                actions: [
+                  IconButton(
+                    tooltip: 'اسأل المساعد الذكي',
+                    icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+                    onPressed: () => _openAiCopilot(context),
+                  ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   title: const Text('مختبر Slivers المتقدم', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   background: Container(
@@ -293,15 +339,6 @@ class _SliversScreenState extends State<SliversScreen> {
   }
 
   Widget _buildCodeCard() {
-    const code =
-        'CustomScrollView(\n'
-        '  slivers: [\n'
-        '    SliverAppBar(expandedHeight: 180, pinned: true),\n'
-        '    SliverPersistentHeader(pinned: true, delegate: MyHeaderDelegate()),\n'
-        '    SliverList.builder(itemCount: 50, itemBuilder: (ctx, i) => ItemTile(i)),\n'
-        '  ],\n'
-        ');';
-
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -312,9 +349,9 @@ class _SliversScreenState extends State<SliversScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('💻 كود معمارية الـ CustomScrollView:', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5)),
+          const Text('💻 كود معمارية الـ CustomScrollView (يتغير ديناميكياً مع الخيارات):', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5)),
           8.heightBox,
-          const CopyableCodeBlock(code: code, copiedMessage: 'تم نسخ كود Slivers', copyTooltip: 'نسخ الكود'),
+          CopyableCodeBlock(code: _getSliversCode(), copiedMessage: 'تم نسخ كود Slivers', copyTooltip: 'نسخ الكود'),
         ],
       ),
     );

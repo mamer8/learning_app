@@ -6,6 +6,7 @@ import '../../data/repositories/user_repository_impl.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../cubit/user_cubit.dart';
 import '../cubit/user_state.dart';
+import '../../../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🏛️ مختبر الـ Functional Error Handling مع `Either<Failure, Success>` و Cubit
 class ErrorHandlingScreen extends StatelessWidget {
@@ -28,6 +29,34 @@ class ErrorHandlingScreen extends StatelessWidget {
 class _ErrorHandlingView extends StatelessWidget {
   const _ErrorHandlingView();
 
+  void _openAiCopilot(BuildContext context) {
+    const code =
+        'Future<Either<Failure, UserProfile>> getUserProfile(String scenario) async {\n'
+        '  try {\n'
+        '    final remoteData = await remoteDataSource.fetchUserData(scenario);\n'
+        '    return Right(remoteData);\n'
+        '  } on ServerException catch (e) {\n'
+        '    return Left(ServerFailure(e.message));\n'
+        '  } on NetworkException catch (_) {\n'
+        '    return Left(NetworkFailure("تعذر الاتصال بالخادم"));\n'
+        '  }\n'
+        '}\n\n'
+        '// استقبال النتيجة وفكها بطريقة آمنة:\n'
+        'final result = await repository.getUserProfile(scenario);\n'
+        'result.fold(\n'
+        '  (failure) => emit(UserError(failure)), // Left  <- Failure\n'
+        '  (user)    => emit(UserLoaded(user)),   // Right <- Success\n'
+        ');';
+
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر المعالجة الوظيفية للأخطاء (dartz Either & Failures)',
+      topicCode: code,
+      levelTitle: 'معمارية معالجة الأخطاء والبرمجة الوظيفية',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,14 +66,28 @@ class _ErrorHandlingView extends StatelessWidget {
         backgroundColor: const Color(0xFF1E293B),
         actions: [
           IconButton(
+            tooltip: 'اسأل المساعد الذكي',
+            icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+            onPressed: () => _openAiCopilot(context),
+          ),
+          IconButton(
             tooltip: 'إعادة التعيين',
             onPressed: () => context.read<UserCubit>().reset(),
             icon: const Icon(Icons.refresh_rounded),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openAiCopilot(context),
+        icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+        label: const Text(
+          'اسأل المساعد الذكي عن هذا الكود',
+          style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF14B8A6),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

@@ -2,6 +2,7 @@ import 'dart:isolate';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🧪 مختبر الـ Isolates والـ Concurrency
 /// يوضح الفرق الجوهري بين تشغيل العمليات الثقيلة على الـ Main Thread (UI Thread)
@@ -120,6 +121,30 @@ class _IsolatesScreenState extends State<IsolatesScreen>
     return primeCount;
   }
 
+  String _getIsolatesCode() {
+    return '// 1. الطريقة الصحيحة: تشغيل المهام الثقيلة في Worker Isolate مستقل\n'
+        '// بدون حجز Main Event Loop والحفاظ على معدل إطارات 60/120 FPS\n'
+        'final result = await Isolate.run(() => heavyTask(250000));\n\n'
+        '// 2. دالة الحسابات (يجب أن تكون Top-level أو Static Function):\n'
+        'static int heavyTask(int count) {\n'
+        '  int primes = 0;\n'
+        '  for (int i = 2; i <= count; i++) {\n'
+        '    if (isPrime(i)) primes++;\n'
+        '  }\n'
+        '  return primes;\n'
+        '}';
+  }
+
+  void _openAiCopilot(BuildContext context) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الـ Isolates والـ Multi-threading في Dart',
+      topicCode: _getIsolatesCode(),
+      levelTitle: 'الأداء الفائق وهندسة الـ Concurrency',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,9 +153,25 @@ class _IsolatesScreenState extends State<IsolatesScreen>
         title: const Text('مختبر الـ Isolates والـ Concurrency'),
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
+        actions: [
+          IconButton(
+            tooltip: 'اسأل المساعد الذكي',
+            icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+            onPressed: () => _openAiCopilot(context),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openAiCopilot(context),
+        icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+        label: const Text(
+          'اسأل المساعد الذكي عن هذا الكود',
+          style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF14B8A6),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -353,10 +394,8 @@ class _IsolatesScreenState extends State<IsolatesScreen>
                     ),
                   ),
                   10.heightBox,
-                  const CopyableCodeBlock(
-                    code:
-                        '// تشغيل الحسابات الثقيلة في Worker Isolate مستقل دون تجميد الـ UI\n'
-                        'final result = await Isolate.run(() => heavyTask(250000));',
+                  CopyableCodeBlock(
+                    code: _getIsolatesCode(),
                     copiedMessage: 'تم نسخ كود Isolate',
                     copyTooltip: 'نسخ الكود',
                   ),

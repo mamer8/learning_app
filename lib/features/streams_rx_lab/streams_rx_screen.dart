@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// حدث في خط تتبع الـ Stream (Stream Event)
 class StreamLogItem {
@@ -89,6 +90,27 @@ class _StreamsRxScreenState extends State<StreamsRxScreen> {
     });
   }
 
+  String _getStreamsCode() {
+    return '// خط معالجة الـ Streams التفاعلي (محدث بالخيارات الحالية):\n'
+        'rawStreamController.stream\n'
+        '  ${_filterEvenOnly ? ".where((val) => val % 2 == 0) // فلترة الأرقام الزوجية فقط\n  " : "// فلترة الزوجي معطلة\n  "}'
+        '${_distinctOnly ? ".distinct() // منع تكرار نفس الرقم مرتين متتاليتين\n  " : "// منع التكرار معطل\n  "}'
+        '.map((val) => val * 10) // ضرب القيمة في 10\n'
+        '  .listen((transformedVal) {\n'
+        '    print("Output: \$transformedVal");\n'
+        '  });';
+  }
+
+  void _openAiCopilot(BuildContext context, bool isArabic) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: isArabic ? 'مختبر الـ Streams والبرمجة التفاعلية (Reactive Streams)' : 'Streams & Reactive Programming Lab',
+      topicCode: _getStreamsCode(),
+      levelTitle: isArabic ? 'البرمجة التفاعلية وهندسة تدفق البيانات' : 'Reactive Programming & Data Pipelines',
+      isArabic: isArabic,
+    );
+  }
+
   @override
   void dispose() {
     _rawSub?.cancel();
@@ -109,14 +131,28 @@ class _StreamsRxScreenState extends State<StreamsRxScreen> {
           title: Text(isArabic ? 'مختبر Streams والبرمجة التفاعلية' : 'Streams & Reactive Lab'),
           actions: [
             IconButton(
+              tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
+              icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+              onPressed: () => _openAiCopilot(context, isArabic),
+            ),
+            IconButton(
               icon: const Icon(Icons.delete_sweep_rounded),
               tooltip: isArabic ? 'مسح السجلات' : 'Clear',
               onPressed: _clearLogs,
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _openAiCopilot(context, isArabic),
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: Text(
+            isArabic ? 'اسأل المساعد الذكي عن هذا الكود' : 'Ask AI About This Code',
+            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
+        ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           children: [
             _buildIntroCard(isArabic),
             16.heightBox,
@@ -129,8 +165,12 @@ class _StreamsRxScreenState extends State<StreamsRxScreen> {
             _buildPipelineSettings(isArabic),
             16.heightBox,
 
-            // العرض الحي للأحداث المارة
+            // مساحة العرض البصري الحية
             _buildStreamsVisualizer(isArabic),
+            16.heightBox,
+
+            // كود الـ Stream الحي
+            _buildCodeSection(isArabic),
             24.heightBox,
           ],
         ),
@@ -380,6 +420,31 @@ class _StreamsRxScreenState extends State<StreamsRxScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCodeSection(bool isArabic) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101828),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF24324A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? '💻 كود خط المعالجة التفاعلي (يتغير مباشرة مع الخيارات):' : '💻 Reactive Pipeline Code:',
+            style: const TextStyle(color: Color(0xFF34D399), fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          10.heightBox,
+          CopyableCodeBlock(
+            code: _getStreamsCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود الـ Streams' : 'Streams code copied',
+          ),
+        ],
+      ),
     );
   }
 }

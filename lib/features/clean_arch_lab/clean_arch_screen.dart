@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 1. Domain Layer: Entity
 class ArticleEntity {
@@ -109,6 +110,29 @@ class _CleanArchScreenState extends State<CleanArchScreen> {
     });
   }
 
+  String _getCleanArchCode() {
+    return '// 1. إنشاء الـ Repository وتحديد مصدر البيانات (حالياً: ${_useRemoteSource ? "Remote API" : "Local SQLite"})\n'
+        'final repository = ArticleRepositoryImpl(\n'
+        '  useRemote: $_useRemoteSource,\n'
+        '  remoteDataSource: RemoteArticleDataSource(),\n'
+        '  localDataSource: LocalArticleDataSource(),\n'
+        ');\n\n'
+        '// 2. حقن الـ Repository داخل الـ UseCase (Domain Layer معزولة تماماً)\n'
+        'final getArticlesUseCase = GetArticlesUseCase(repository);\n\n'
+        '// 3. استدعاء الـ UseCase من الـ UI دون معرفة تفاصيل الـ Network أو الـ Database\n'
+        'final List<ArticleEntity> articles = await getArticlesUseCase();';
+  }
+
+  void _openAiCopilot(BuildContext context, bool isArabic) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: isArabic ? 'مختبر المعمارية النظيفة (Clean Architecture & SOLID)' : 'Clean Architecture & SOLID Lab',
+      topicCode: _getCleanArchCode(),
+      levelTitle: isArabic ? 'هندسة معمارية البرمجيات وفصل الاهتمامات' : 'Software Architecture & SOLID Principles',
+      isArabic: isArabic,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = AppLocaleScope.of(context);
@@ -119,9 +143,25 @@ class _CleanArchScreenState extends State<CleanArchScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر المعمارية النظيفة (Clean Architecture)' : 'Clean Architecture & SOLID Lab'),
+          actions: [
+            IconButton(
+              tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
+              icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+              onPressed: () => _openAiCopilot(context, isArabic),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _openAiCopilot(context, isArabic),
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: Text(
+            isArabic ? 'اسأل المساعد الذكي عن هذا الكود' : 'Ask AI About This Code',
+            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
         ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           children: [
             _buildIntroCard(isArabic),
             16.heightBox,
@@ -136,6 +176,10 @@ class _CleanArchScreenState extends State<CleanArchScreen> {
 
             // 3. المخرجات في طبقة Presentation
             _buildPresentationList(isArabic),
+            16.heightBox,
+
+            // 4. كود الـ Clean Architecture المحدث ديناميكياً
+            _buildCodeSection(isArabic),
             24.heightBox,
           ],
         ),
@@ -368,6 +412,31 @@ class _CleanArchScreenState extends State<CleanArchScreen> {
                 ),
               );
             }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeSection(bool isArabic) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101828),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF24324A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? '💻 الكود الحي للحقن واستدعاء الـ UseCase (يتغير مع مصدر البيانات):' : '💻 Live UseCase Code (Updates dynamically):',
+            style: const TextStyle(color: Color(0xFFFBBF24), fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          10.heightBox,
+          CopyableCodeBlock(
+            code: _getCleanArchCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود المعمارية النظيفة' : 'Clean Architecture code copied',
+          ),
         ],
       ),
     );

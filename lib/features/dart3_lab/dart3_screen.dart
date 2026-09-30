@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// نماذج حالات Dart 3 Sealed Classes
 sealed class AuthState {
@@ -76,6 +77,58 @@ class _Dart3ScreenState extends State<Dart3Screen> {
     }
   }
 
+  String _getSealedClassCode() {
+    final stateType = _currentState.runtimeType.toString();
+    return '// 1. تعريف الهيكل المغلق (Exhaustive Sealed Hierarchy)\n'
+        'sealed class AuthState {}\n'
+        'class AuthInitial extends AuthState {}\n'
+        'class AuthLoading extends AuthState { final String message; ... }\n'
+        'class AuthSuccess extends AuthState { final ({String name, String role, int level}) user; ... }\n'
+        'class AuthFailure extends AuthState { final String error; final int code; ... }\n\n'
+        '// 2. مطابقة شاملة بالحالة الحالية ($stateType) دون الحاجة لـ default:\n'
+        'final (icon, color, text) = switch (state) {\n'
+        '  AuthInitial() => (Icons.lock, Colors.grey, "Initial"),\n'
+        '  AuthLoading(:final message) => (Icons.hourglass_top, Colors.amber, "Loading: \$message"),\n'
+        '  AuthSuccess(:final user) => (Icons.verified, Colors.green, "User: \${user.name}"),\n'
+        '  AuthFailure(:final error, :final code) => (Icons.error, Colors.red, "Error \$code: \$error"),\n'
+        '};';
+  }
+
+  String _getRecordsCode() {
+    return '// 1. تعريف سجل بالأنواع والحقول المسماة (Record):\n'
+        '({String name, int age, double score, bool isPro}) user = (\n'
+        '  name: "${_userRecord.name}",\n'
+        '  age: ${_userRecord.age},\n'
+        '  score: ${_userRecord.score},\n'
+        '  isPro: ${_userRecord.isPro},\n'
+        ');\n\n'
+        '// 2. تفكيك السجل (Pattern Destructuring):\n'
+        'final (:name, :age, :score, :isPro) = user;\n'
+        'print("User: \$name, Age: \$age, Pro: \$isPro");';
+  }
+
+  String _getPatternMatchingCode() {
+    return '// مطابقة الأنماط داخل Maps و Json مع شرط الحراسة (Guard Clause):\n'
+        'final data = $_jsonInput;\n\n'
+        'final message = switch (data) {\n'
+        '  {"type": "admin", "permissions": List p, "quota": int q} when q >= 1000 =>\n'
+        '    "👑 Super Admin with \${p.length} permissions & \$q quota",\n'
+        '  {"type": "admin", "permissions": List p} => "⚡ Normal Admin",\n'
+        '  {"type": "guest", "permissions": ["read"]} => "👀 Read-only Guest",\n'
+        '  _ => "❓ Unknown"\n'
+        '};';
+  }
+
+  void _openAiCopilot(BuildContext context, bool isArabic) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: isArabic ? 'مختبر ميزات Dart 3 الحديثة' : 'Dart 3 Modern Features Lab',
+      topicCode: '${_getSealedClassCode()}\n\n${_getRecordsCode()}\n\n${_getPatternMatchingCode()}',
+      levelTitle: isArabic ? 'ميزات لغة Dart 3 ومطابقة الأنماط' : 'Dart 3 Language Features',
+      isArabic: isArabic,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = AppLocaleScope.of(context);
@@ -86,9 +139,25 @@ class _Dart3ScreenState extends State<Dart3Screen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر ميزات Dart 3 الحديثة' : 'Dart 3 Modern Features Lab'),
+          actions: [
+            IconButton(
+              tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
+              icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+              onPressed: () => _openAiCopilot(context, isArabic),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _openAiCopilot(context, isArabic),
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: Text(
+            isArabic ? 'اسأل المساعد الذكي عن هذا الكود' : 'Ask AI About This Code',
+            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
         ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           children: [
             // بطاقة التقديم
             _buildIntroCard(isArabic),
@@ -255,6 +324,12 @@ class _Dart3ScreenState extends State<Dart3Screen> {
               ),
             ],
           ),
+          14.heightBox,
+
+          CopyableCodeBlock(
+            code: _getSealedClassCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود Sealed Class' : 'Sealed Class code copied',
+          ),
         ],
       ),
     );
@@ -322,6 +397,12 @@ class _Dart3ScreenState extends State<Dart3Screen> {
             },
             icon: const Icon(Icons.shuffle_rounded, size: 16, color: Colors.white),
             label: Text(isArabic ? 'تحديث السجل بمطابقة جديدة' : 'Mutate Record Values', style: const TextStyle(color: Colors.white)),
+          ),
+          14.heightBox,
+
+          CopyableCodeBlock(
+            code: _getRecordsCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود السجلات' : 'Records code copied',
           ),
         ],
       ),
@@ -405,6 +486,12 @@ class _Dart3ScreenState extends State<Dart3Screen> {
                 ),
               ],
             ),
+          ),
+          14.heightBox,
+
+          CopyableCodeBlock(
+            code: _getPatternMatchingCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود Pattern Matching' : 'Pattern Matching code copied',
           ),
         ],
       ),

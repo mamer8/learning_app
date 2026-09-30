@@ -749,59 +749,77 @@ class _AiChatScreenState extends State<AiChatScreen> {
         color: Color(0xFF0B1220),
         border: Border(top: BorderSide(color: Color(0xFF1E293B))),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF101828),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF24324A)),
-              ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
               child: TextField(
                 controller: _textController,
                 maxLines: 4,
                 minLines: 1,
                 style: const TextStyle(color: Colors.white, fontSize: 13),
-                decoration: const InputDecoration(
-                  filled: false,
+                textInputAction: TextInputAction.send,
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  fillColor: const Color(0xFF101828),
                   hintText: 'اسأل عن بنية الأكواد، الأداء، الأمان، أو حل المشاكل...',
-                  hintStyle: TextStyle(color: Color(0xFF64748B), fontSize: 12),
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  hintStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: const BorderSide(color: Color(0xFF24324A)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: const BorderSide(color: Color(0xFF24324A)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: const BorderSide(color: Color(0xFF14B8A6), width: 1.5),
+                  ),
                 ),
                 onSubmitted: _sendMessage,
               ),
             ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            height: 44,
-            width: 44,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(22),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x4414B8A6),
-                  blurRadius: 8,
-                  offset: Offset(0, 3),
+            const SizedBox(width: 8),
+            Material(
+              color: Colors.transparent,
+              child: Ink(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x3314B8A6),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(22),
+                  onTap: () => _sendMessage(_textController.text),
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_upward_rounded,
+                      color: Color(0xFF04111C),
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
             ),
-            child: IconButton(
-              icon: const Icon(Icons.send_rounded, color: Color(0xFF04111C), size: 19),
-              onPressed: () => _sendMessage(_textController.text),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// ⚡ مختبر الـ CustomPainter ومحاكي الجسيمات الفيزيائية
 /// يوضح قوة الـ Canvas والـ Direct GPU Drawing في معالجة آلاف العناصر بحسابات رياضية سلسة بمعدل 60/120 FPS
@@ -108,6 +109,50 @@ class _PhysicsPainterScreenState extends State<PhysicsPainterScreen>
     if (mounted) setState(() {});
   }
 
+  String _getPhysicsCode() {
+    return '// كود الـ CustomPainter المباشر على كرت الشاشة GPU (محدث بالقيم الحالية):\n'
+        '// عدد الجسيمات الحالية: $_particleCount | الجاذبية: ${_enableGravity ? "مفعلة (vy += 0.08)" : "معطلة"} | شبكة الروابط: ${_enableConnections ? "مفعلة" : "معطلة"}\n\n'
+        'class ParticleCanvasPainter extends CustomPainter {\n'
+        '  final List<Particle> particles; // $_particleCount جسيم في تمريرة رسم واحدة\n'
+        '  final bool enableConnections = $_enableConnections;\n'
+        '  final bool enableGravity = $_enableGravity;\n\n'
+        '  @override\n'
+        '  void paint(Canvas canvas, Size size) {\n'
+        '    final circlePaint = Paint()..style = PaintingStyle.fill;\n'
+        '    final linePaint = Paint()..strokeWidth = 0.6;\n\n'
+        '    // 1. رسم خطوط الروابط الذكية بين الجسيمات القريبة\n'
+        '    if (enableConnections) {\n'
+        '      for (int i = 0; i < particles.length; i++) {\n'
+        '        for (int j = i + 1; j < particles.length; j++) {\n'
+        '          final dist = calculateDistance(particles[i], particles[j]);\n'
+        '          if (dist < 45) {\n'
+        '            linePaint.color = Colors.cyan.withOpacity(1.0 - (dist / 45));\n'
+        '            canvas.drawLine(particles[i].pos, particles[j].pos, linePaint);\n'
+        '          }\n'
+        '        }\n'
+        '      }\n'
+        '    }\n\n'
+        '    // 2. رسم جميع الجسيمات بـ Single Draw Pass فائقة الكفاءة\n'
+        '    for (final p in particles) {\n'
+        '      circlePaint.color = p.color;\n'
+        '      canvas.drawCircle(Offset(p.x, p.y), p.radius, circlePaint);\n'
+        '    }\n'
+        '  }\n\n'
+        '  @override\n'
+        '  bool shouldRepaint(covariant CustomPainter old) => true;\n'
+        '}';
+  }
+
+  void _openAiCopilot(BuildContext context) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر CustomPainter والمحاكي الفيزيائي للجسيمات',
+      topicCode: _getPhysicsCode(),
+      levelTitle: 'الرسم المباشر على GPU والأداء الرسومي',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,9 +160,25 @@ class _PhysicsPainterScreenState extends State<PhysicsPainterScreen>
       appBar: AppBar(
         title: const Text('مختبر CustomPainter & الفيزياء'),
         backgroundColor: const Color(0xFF1E293B),
+        actions: [
+          IconButton(
+            tooltip: 'اسأل المساعد الذكي',
+            icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+            onPressed: () => _openAiCopilot(context),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openAiCopilot(context),
+        icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+        label: const Text(
+          'اسأل المساعد الذكي عن هذا الكود',
+          style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF14B8A6),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -266,22 +327,6 @@ class _PhysicsPainterScreenState extends State<PhysicsPainterScreen>
   }
 
   Widget _buildCodeCard() {
-    const code =
-        'class ParticlePainter extends CustomPainter {\n'
-        '  final List<Particle> particles;\n'
-        '  ParticlePainter({required this.particles});\n\n'
-        '  @override\n'
-        '  void paint(Canvas canvas, Size size) {\n'
-        '    final paint = Paint()..style = PaintingStyle.fill;\n'
-        '    for (final p in particles) {\n'
-        '      paint.color = p.color;\n'
-        '      canvas.drawCircle(Offset(p.x, p.y), p.radius, paint);\n'
-        '    }\n'
-        '  }\n\n'
-        '  @override\n'
-        '  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;\n'
-        '}';
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -293,12 +338,12 @@ class _PhysicsPainterScreenState extends State<PhysicsPainterScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '💻 كود الرسم المباشر على الكانفاس (Direct Canvas Drawing):',
+            '💻 كود الرسم المباشر على الكانفاس (Direct Canvas Drawing - يتغير مع الإعدادات):',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
           ),
           10.heightBox,
-          const CopyableCodeBlock(
-            code: code,
+          CopyableCodeBlock(
+            code: _getPhysicsCode(),
             copiedMessage: 'تم نسخ كود CustomPainter',
             copyTooltip: 'نسخ الكود',
           ),

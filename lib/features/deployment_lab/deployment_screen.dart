@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🚀 مختبر النشر على المتاجر وهندسة الإصدارات (App Stores & CI/CD)
 class DeploymentScreen extends StatefulWidget {
@@ -47,6 +48,43 @@ class _DeploymentScreenState extends State<DeploymentScreen> {
     ),
   ];
 
+  void _openAiAssistant() {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر النشر على المتاجر وهندسة الإصدارات CI/CD',
+      topicCode: _buildDynamicCiCdCode(),
+      levelTitle: 'مستوى خبير (DevOps & Mobile Release Engineering)',
+      isArabic: true,
+    );
+  }
+
+  String _buildDynamicCiCdCode() {
+    final activeCommand = _commands[_selectedCommandIndex].command;
+    final completedCount = _checklist.values.where((v) => v).length;
+    return '# === GitHub Actions Workflow (.github/workflows/deploy.yml) ===\n'
+        '# حالة الجاهزية الحالية: $completedCount من ${_checklist.length} متطلبات مكتملة\n'
+        '# مرحلة الـ Pipeline الحالية: Step $_pipelineStep / 4 (${_isRunningPipeline ? "Running..." : "Idle"})\n\n'
+        'name: Production Release Pipeline\n'
+        'on:\n'
+        '  push:\n'
+        '    branches: [ main ]\n'
+        'jobs:\n'
+        '  build:\n'
+        '    runs-on: ubuntu-latest\n'
+        '    steps:\n'
+        '      - uses: actions/checkout@v4\n'
+        '      - uses: subosito/flutter-action@v2\n'
+        '        with:\n'
+        '          channel: "stable"\n'
+        '      - name: Analyze & Test\n'
+        '        run: |\n'
+        '          flutter analyze\n'
+        '          flutter test\n'
+        '      - name: Build Target Artifact (${_commands[_selectedCommandIndex].title})\n'
+        '        run: |\n'
+        '          ${activeCommand.replaceAll("\n", "\n          ")}';
+  }
+
   Future<void> _runPipelineSimulation() async {
     setState(() {
       _isRunningPipeline = true;
@@ -84,9 +122,23 @@ class _DeploymentScreenState extends State<DeploymentScreen> {
       appBar: AppBar(
         title: const Text('مختبر النشر على المتاجر و CI/CD'),
         backgroundColor: const Color(0xFF1E293B),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: Color(0xFFF59E0B)),
+            tooltip: 'اسأل الذكاء الاصطناعي عن CI/CD والنشر',
+            onPressed: _openAiAssistant,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFFF59E0B),
+        foregroundColor: const Color(0xFF04111C),
+        icon: const Icon(Icons.auto_awesome),
+        label: const Text('اسأل الـ AI عن النشر', style: TextStyle(fontWeight: FontWeight.bold)),
+        onPressed: _openAiAssistant,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -108,6 +160,10 @@ class _DeploymentScreenState extends State<DeploymentScreen> {
 
             // محاكي CI/CD Pipeline
             _buildPipelineSimulatorCard(),
+            16.heightBox,
+
+            // كود GitHub Actions التفاعلي الحي
+            _buildCiCdYamlCard(),
           ],
         ),
       ),
@@ -362,6 +418,48 @@ class _DeploymentScreenState extends State<DeploymentScreen> {
               title,
               style: TextStyle(color: color, fontSize: 12, fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCiCdYamlCard() {
+    final yamlCode = _buildDynamicCiCdCode();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '🤖 كود الـ CI/CD Pipeline الحي (.github/workflows):',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text('Dynamic Live Code', style: TextStyle(color: Color(0xFFF59E0B), fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          10.heightBox,
+          CopyableCodeBlock(
+            code: yamlCode,
+            language: 'YAML / GitHub Actions',
+            copiedMessage: 'تم نسخ ملف الـ CI/CD المحدث',
+            copyTooltip: 'نسخ ملف الـ CI/CD',
           ),
         ],
       ),

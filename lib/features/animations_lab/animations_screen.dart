@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// شاشة مختبر الحركات المتقدمة (Advanced Animations & Physics)
 class AnimationsScreen extends StatefulWidget {
@@ -77,6 +78,58 @@ class _AnimationsScreenState extends State<AnimationsScreen> with TickerProvider
     _springController.animateWith(simulation);
   }
 
+  String _getSpringCode() {
+    return '// 1. تعريف خصائص النابض الفيزيائي (تتغير القيم تلقائياً مع السلايدر)\n'
+        'final spring = SpringDescription(\n'
+        '  mass: ${_mass.toStringAsFixed(1)},        // الكتلة بالكيلوغرام\n'
+        '  stiffness: ${_stiffness.toStringAsFixed(1)}, // صلابة وقوة ارتداد النابض (Stiffness)\n'
+        '  damping: ${_damping.toStringAsFixed(1)},   // مقاومة وتخميد الحركة (Damping)\n'
+        ');\n\n'
+        '// 2. إنشاء المحاكاة الفيزيائية وتمرير الموضع والسرعة الابتدائية\n'
+        'final simulation = SpringSimulation(\n'
+        '  spring,\n'
+        '  0.0,    // نقطة البداية (Start position)\n'
+        '  150.0,  // نقطة الاستقرار والهدف (End position)\n'
+        '  -500.0, // سرعة الانطلاق الابتدائية (Initial velocity)\n'
+        ');\n\n'
+        '// 3. تشغيل المحاكاة على AnimationController غير مقيد بـ Duration محدد\n'
+        'springController.animateWith(simulation);';
+  }
+
+  String _getStaggeredCode() {
+    return '// تقسيم AnimationController واحد إلى مراحل زمنية متسلسلة عبر Interval\n'
+        'final controller = AnimationController(\n'
+        '  duration: const Duration(milliseconds: 1400),\n'
+        '  vsync: this,\n'
+        ');\n\n'
+        '// 1. مرحلة الإزاحة (من 0% إلى 40% من الوقت الكلي)\n'
+        'final slide = Tween<double>(begin: -80, end: 0).animate(\n'
+        '  CurvedAnimation(parent: controller, curve: const Interval(0.0, 0.4, curve: Curves.easeOutCubic)),\n'
+        ');\n\n'
+        '// 2. مرحلة الظهور والتلاشي (من 10% إلى 50%)\n'
+        'final fade = Tween<double>(begin: 0.0, end: 1.0).animate(\n'
+        '  CurvedAnimation(parent: controller, curve: const Interval(0.1, 0.5, curve: Curves.easeIn)),\n'
+        ');\n\n'
+        '// 3. مرحلة التكبير المرن (من 40% إلى 75%)\n'
+        'final scale = Tween<double>(begin: 0.4, end: 1.0).animate(\n'
+        '  CurvedAnimation(parent: controller, curve: const Interval(0.4, 0.75, curve: Curves.elasticOut)),\n'
+        ');\n\n'
+        '// 4. مرحلة الدوران الكامل (من 70% إلى 100%)\n'
+        'final rotate = Tween<double>(begin: 0.0, end: 6.28).animate(\n'
+        '  CurvedAnimation(parent: controller, curve: const Interval(0.7, 1.0, curve: Curves.easeInOutBack)),\n'
+        ');';
+  }
+
+  void _openAiCopilot(BuildContext context, bool isArabic) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: isArabic ? 'مختبر الأنيميشن المتقدم والنوابض الفيزيائية' : 'Advanced Animations & Physics Lab',
+      topicCode: '${_getStaggeredCode()}\n\n${_getSpringCode()}',
+      levelTitle: isArabic ? 'هندسة الأنيميشن والفيزياء (Animations & SpringSimulation)' : 'Animation & Physics Engineering',
+      isArabic: isArabic,
+    );
+  }
+
   @override
   void dispose() {
     _staggerController.dispose();
@@ -94,9 +147,25 @@ class _AnimationsScreenState extends State<AnimationsScreen> with TickerProvider
       child: Scaffold(
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر الحركات والفيزياء (Animations)' : 'Advanced Animations Lab'),
+          actions: [
+            IconButton(
+              tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
+              icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+              onPressed: () => _openAiCopilot(context, isArabic),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _openAiCopilot(context, isArabic),
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: Text(
+            isArabic ? 'اسأل المساعد الذكي عن هذا الكود' : 'Ask AI About This Code',
+            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
         ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           children: [
             _buildIntroCard(isArabic),
             16.heightBox,
@@ -255,6 +324,18 @@ class _AnimationsScreenState extends State<AnimationsScreen> with TickerProvider
               ),
             ],
           ),
+          16.heightBox,
+
+          // الكود الفعلي الحي المعبر عن الشرح
+          Text(
+            isArabic ? '💻 الكود البرمجي الدقيق لتقسيم المراحل:' : '💻 Exact Staggered Code:',
+            style: const TextStyle(color: Color(0xFFA78BFA), fontWeight: FontWeight.bold, fontSize: 12),
+          ),
+          6.heightBox,
+          CopyableCodeBlock(
+            code: _getStaggeredCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود Staggered Animation' : 'Staggered animation code copied',
+          ),
         ],
       ),
     );
@@ -351,6 +432,18 @@ class _AnimationsScreenState extends State<AnimationsScreen> with TickerProvider
             onPressed: _runSpringSimulation,
             icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 18),
             label: Text(isArabic ? 'إطلاق النابض الفيزيائي' : 'Release Spring Impulse', style: const TextStyle(color: Colors.white)),
+          ),
+          16.heightBox,
+
+          // الكود التفاعلي المباشر الذي يتغير مع قيم التخميد والصلابة
+          Text(
+            isArabic ? '💻 الكود الفعلي الحي (يتغير فوراً مع تغيير قيم التخميد والصلابة أعلاه):' : '💻 Live Reactive Code (Updates instantly with damping/stiffness values):',
+            style: const TextStyle(color: Color(0xFF5EEAD4), fontWeight: FontWeight.bold, fontSize: 12),
+          ),
+          6.heightBox,
+          CopyableCodeBlock(
+            code: _getSpringCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود SpringSimulation الحي' : 'Live SpringSimulation code copied',
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// شاشة مختبر Platform Channels و Native Bridge
 class PlatformChannelsScreen extends StatefulWidget {
@@ -15,9 +16,45 @@ class _PlatformChannelsScreenState extends State<PlatformChannelsScreen> {
   bool _isNativeLoading = false;
   final int _simulatedBattery = 86;
   bool _isListeningSensor = false;
+  String _lastMethodInvoked = 'getBatteryLevel';
+
+  void _openAiAssistant(bool isArabic) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: isArabic ? 'مختبر جسر المنصات (Platform Channels & FFI)' : 'Platform Channels & Native Bridge Lab',
+      topicCode: _buildDynamicChannelsCode(isArabic),
+      levelTitle: 'مستوى خبير (Senior Architecture & Native)',
+      isArabic: isArabic,
+    );
+  }
+
+  String _buildDynamicChannelsCode(bool isArabic) {
+    return '// === 1. MethodChannel (Dart <-> Native Android/iOS) ===\n'
+        'const platform = MethodChannel("com.example.learning/native_channel");\n\n'
+        '// استدعاء آخر دالة: "$_lastMethodInvoked"\n'
+        'Future<void> invokePlatformMethod() async {\n'
+        '  try {\n'
+        '    final result = await platform.invokeMethod<dynamic>(\n'
+        '      "$_lastMethodInvoked",\n'
+        '      {"timestamp": DateTime.now().millisecondsSinceEpoch},\n'
+        '    );\n'
+        '    print("Native Result: \$result");\n'
+        '  } on PlatformException catch (e) {\n'
+        '    print("Bridge Error: \${e.message}");\n'
+        '  }\n'
+        '}\n\n'
+        '// === 2. EventChannel (Real-time Sensor Stream) ===\n'
+        '// حالة الاستماع الحالية: ${_isListeningSensor ? "نشط (Listening...)" : "متوقف (Paused)"}\n'
+        'const sensorEventChannel = EventChannel("com.example.learning/gyroscope_stream");\n'
+        'StreamSubscription? _sensorSub;\n\n'
+        'void toggleSensorStream() {\n'
+        '${_isListeningSensor ? "  _sensorSub = sensorEventChannel.receiveBroadcastStream().listen((data) {\n    print(\"Live Sensor: \$data\");\n  });" : "  _sensorSub?.cancel();\n  _sensorSub = null;"}\n'
+        '}';
+  }
 
   void _invokeMethodChannel(String method) async {
     setState(() {
+      _lastMethodInvoked = method;
       _isNativeLoading = true;
       _bridgeLogs.insert(0, '📤 [MethodChannel] Invoking native method: "$method" via BinaryMessenger...');
     });
@@ -59,13 +96,28 @@ class _PlatformChannelsScreenState extends State<PlatformChannelsScreen> {
           title: Text(isArabic ? 'مختبر جسر المنصات (Platform Channels)' : 'Platform Channels & FFI Lab'),
           actions: [
             IconButton(
+              icon: const Icon(Icons.auto_awesome, color: Color(0xFF22D3EE)),
+              tooltip: isArabic ? 'اسأل الذكاء الاصطناعي عن Platform Channels' : 'Ask AI Copilot',
+              onPressed: () => _openAiAssistant(isArabic),
+            ),
+            IconButton(
               icon: const Icon(Icons.clear_all_rounded),
               onPressed: () => setState(() => _bridgeLogs.clear()),
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: const Color(0xFF0891B2),
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.auto_awesome),
+          label: Text(
+            isArabic ? 'اسأل الـ AI عن Native Bridge' : 'Ask Native AI',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          onPressed: () => _openAiAssistant(isArabic),
+        ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           children: [
             _buildIntroCard(isArabic),
             16.heightBox,
@@ -80,6 +132,10 @@ class _PlatformChannelsScreenState extends State<PlatformChannelsScreen> {
 
             // 3. سجلات الباكيتات عبر الجسر (Bridge Packet Logs)
             _buildPacketLogs(isArabic),
+            16.heightBox,
+
+            // 4. Dynamic Code Snippet Card
+            _buildCodeSnippetCard(isArabic),
             24.heightBox,
           ],
         ),
@@ -290,6 +346,47 @@ class _PlatformChannelsScreenState extends State<PlatformChannelsScreen> {
                       );
                     },
                   ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeSnippetCard(bool isArabic) {
+    final code = _buildDynamicChannelsCode(isArabic);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101828),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF24324A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isArabic ? '💻 كود جسر الـ Platform Channels الحي:' : '💻 Dynamic Platform Channels Code:',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0891B2).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text('Dynamic Live Code', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          10.heightBox,
+          CopyableCodeBlock(
+            code: code,
+            copiedMessage: isArabic ? 'تم نسخ كود Platform Channels المحدث' : 'Platform Channels code copied',
+            copyTooltip: isArabic ? 'نسخ الكود' : 'Copy Code',
           ),
         ],
       ),

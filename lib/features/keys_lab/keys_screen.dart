@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🔑 نموذج عنصر البيانات في القائمة
 class LabItem {
@@ -67,6 +68,36 @@ class _KeysScreenState extends State<KeysScreen> {
     });
   }
 
+  String _getKeysCode() {
+    return '// كود بناء القائمة (الحالة الحالية: ${_useKeys ? "✅ استخدام ValueKey" : "❌ بدون Key"})\n'
+        'ListView.builder(\n'
+        '  itemCount: items.length,\n'
+        '  itemBuilder: (context, index) {\n'
+        '    final item = items[index];\n'
+        '    return StatefulColorTile(\n'
+        '      ${_useKeys ? "key: ValueKey(item.id), // يحافظ على ترابط الـ State مع العنصر الصحيح" : "// بدون key: سيفترض Flutter أن نوع الويدجت لم يتغير ويحتفظ بـ State العنصر السابق!"}\n'
+        '      item: item,\n'
+        '      index: index,\n'
+        '      onDelete: () => removeItem(index),\n'
+        '    );\n'
+        '  },\n'
+        ');\n\n'
+        '// قاعدة المطابقة في Flutter Core (Widget.canUpdate):\n'
+        'static bool canUpdate(Widget oldWidget, Widget newWidget) {\n'
+        '  return oldWidget.runtimeType == newWidget.runtimeType && oldWidget.key == newWidget.key;\n'
+        '}';
+  }
+
+  void _openAiCopilot(BuildContext context) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الـ 3 Trees والـ Keys في Flutter',
+      topicCode: _getKeysCode(),
+      levelTitle: 'بنية الشجرة وإدارة الحالة الموضعية (Keys & Elements)',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,14 +107,28 @@ class _KeysScreenState extends State<KeysScreen> {
         backgroundColor: const Color(0xFF1E293B),
         actions: [
           IconButton(
+            tooltip: 'اسأل المساعد الذكي',
+            icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+            onPressed: () => _openAiCopilot(context),
+          ),
+          IconButton(
             tooltip: 'إعادة تعيين القائمة',
             onPressed: _resetItems,
             icon: const Icon(Icons.refresh_rounded),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openAiCopilot(context),
+        icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+        label: const Text(
+          'اسأل المساعد الذكي عن هذا الكود',
+          style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF14B8A6),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -268,12 +313,6 @@ class _KeysScreenState extends State<KeysScreen> {
   }
 
   Widget _buildThreeTreesArchitectureCard() {
-    const code =
-        'static bool canUpdate(Widget oldWidget, Widget newWidget) {\n'
-        '  return oldWidget.runtimeType == newWidget.runtimeType\n'
-        '      && oldWidget.key == newWidget.key;\n'
-        '}';
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -285,7 +324,7 @@ class _KeysScreenState extends State<KeysScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '🔍 معادلة المطابقة في Flutter (Widget.canUpdate):',
+            '🔍 كود القائمة ومعادلة المطابقة (يتغير ديناميكياً مع المفتاح):',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -293,8 +332,8 @@ class _KeysScreenState extends State<KeysScreen> {
             ),
           ),
           10.heightBox,
-          const CopyableCodeBlock(
-            code: code,
+          CopyableCodeBlock(
+            code: _getKeysCode(),
             copiedMessage: 'تم نسخ الكود',
             copyTooltip: 'نسخ الكود',
           ),

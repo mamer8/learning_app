@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 enum DemoAspect { counter, color, theme }
 
@@ -60,6 +61,27 @@ class _StateInheritedScreenState extends State<StateInheritedScreen> {
   Color _color = const Color(0xFF14B8A6);
   final String _themeName = 'Cyber Dark';
 
+  String _getInheritedCode() {
+    return '// 1. اشتراك حبيبي (Granular Subscription) للعداد فقط:\n'
+        'final config = InheritedModel.inheritFrom<AppConfigModel>(context, aspect: DemoAspect.counter);\n'
+        '// العداد الحالي: $_counter (تغيير اللون لا يسبب إعادة بناء هذا الويدجت!)\n\n'
+        '// 2. اشتراك حبيبي للون فقط:\n'
+        'final color = InheritedModel.inheritFrom<AppConfigModel>(context, aspect: DemoAspect.color)?.activeColor;\n\n'
+        '// 3. فحص التبعيات الذكي داخل updateShouldNotifyDependent:\n'
+        'if (dependencies.contains(DemoAspect.counter) && counter != oldWidget.counter) return true;\n'
+        'if (dependencies.contains(DemoAspect.color) && activeColor != oldWidget.activeColor) return true;';
+  }
+
+  void _openAiCopilot(BuildContext context, bool isArabic) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: isArabic ? 'مختبر InheritedModel وإدارة الحالة المعمارية' : 'InheritedModel & Architectural State Lab',
+      topicCode: _getInheritedCode(),
+      levelTitle: isArabic ? 'إدارة الحالة المتقدمة وهندسة شجرة الـ Elements' : 'Advanced State Management & Element Tree',
+      isArabic: isArabic,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = AppLocaleScope.of(context);
@@ -70,13 +92,29 @@ class _StateInheritedScreenState extends State<StateInheritedScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر InheritedModel وإدارة الحالة' : 'InheritedModel & State Lab'),
+          actions: [
+            IconButton(
+              tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
+              icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+              onPressed: () => _openAiCopilot(context, isArabic),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _openAiCopilot(context, isArabic),
+          icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+          label: Text(
+            isArabic ? 'اسأل المساعد الذكي عن هذا الكود' : 'Ask AI About This Code',
+            style: const TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: const Color(0xFF14B8A6),
         ),
         body: AppConfigModel(
           counter: _counter,
           activeColor: _color,
           themeName: _themeName,
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
             children: [
               _buildIntroCard(isArabic),
               16.heightBox,
@@ -102,6 +140,10 @@ class _StateInheritedScreenState extends State<StateInheritedScreen> {
 
               // ويدجت مهتمة بجميع التغييرات (InheritedWidget تقليدي)
               const AllChangesConsumerCard(),
+              16.heightBox,
+
+              // كود الـ InheritedModel الحي
+              _buildCodeSection(isArabic),
               24.heightBox,
             ],
           ),
@@ -205,6 +247,31 @@ class _StateInheritedScreenState extends State<StateInheritedScreen> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeSection(bool isArabic) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101828),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF24324A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            isArabic ? '💻 كود الاشتراك الحبيبي في InheritedModel (يتغير مع العداد واللون):' : '💻 Live InheritedModel Code:',
+            style: const TextStyle(color: Color(0xFF5EEAD4), fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          10.heightBox,
+          CopyableCodeBlock(
+            code: _getInheritedCode(),
+            copiedMessage: isArabic ? 'تم نسخ كود InheritedModel' : 'InheritedModel code copied',
           ),
         ],
       ),

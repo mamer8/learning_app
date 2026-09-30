@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// شاشة مختبر تحسين الذاكرة وتفادي تسريبات RAM
 class MemoryPerfScreen extends StatefulWidget {
@@ -19,6 +20,47 @@ class _MemoryPerfScreenState extends State<MemoryPerfScreen> {
 
   // صورة مع أو بدون Downsampling
   bool _useDownsampling = true;
+
+  void _openAiAssistant(bool isArabic) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: isArabic ? 'مختبر تسريبات الذاكرة والأداء' : 'Memory Leaks & Profiling Lab',
+      topicCode: _buildDynamicMemoryCode(isArabic),
+      levelTitle: 'مستوى خبير (Senior Performance & Memory Profiling)',
+      isArabic: isArabic,
+    );
+  }
+
+  String _buildDynamicMemoryCode(bool isArabic) {
+    return '// === 1. Proper Disposal & Memory Leak Prevention ===\n'
+        'class SafeStatefulWidgetState extends State<SafeStatefulWidget> {\n'
+        '  // عدد الـ Controllers النشطة الآن: ${_leakedControllers.length} (استهلاك RAM: ${_simulatedRamMb.toStringAsFixed(1)} MB)\n'
+        '  late final StreamController<int> _controller;\n'
+        '  late final TextEditingController _textController;\n\n'
+        '  @override\n'
+        '  void initState() {\n'
+        '    super.initState();\n'
+        '    _controller = StreamController<int>.broadcast();\n'
+        '    _textController = TextEditingController();\n'
+        '  }\n\n'
+        '  @override\n'
+        '  void dispose() {\n'
+        '    // تنظيف جميع الكائنات المستهلكة للذاكرة لمنع التسريب\n'
+        '    _controller.close();\n'
+        '    _textController.dispose();\n'
+        '    super.dispose();\n'
+        '  }\n'
+        '}\n\n'
+        '// === 2. Image Downsampling (ResizeImage) ===\n'
+        '// وضع Downsampling الحالي: ${_useDownsampling ? "مفعل (40 KB في GPU)" : "معطل (24 MB خطر تسريب OOM!)"}\n'
+        'Widget buildOptimizedImage() {\n'
+        '  return Image(\n'
+        '${_useDownsampling ? "    image: ResizeImage(\n      NetworkImage('https://example.com/large_4k.png'),\n      width: 100,\n      height: 100,\n      allowUpscaling: false,\n    )," : "    image: NetworkImage('https://example.com/large_4k.png'), // فك تشفير 4K كامل!"}\n'
+        '    width: 50,\n'
+        '    height: 50,\n'
+        '  );\n'
+        '}';
+  }
 
   void _createMemoryLeak() {
     setState(() {
@@ -62,9 +104,26 @@ class _MemoryPerfScreenState extends State<MemoryPerfScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر تسريبات الذاكرة والأداء' : 'Memory Leaks & Profiling Lab'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.auto_awesome, color: Color(0xFFF87171)),
+              tooltip: isArabic ? 'اسأل الذكاء الاصطناعي عن إدارة الذاكرة' : 'Ask AI Copilot',
+              onPressed: () => _openAiAssistant(isArabic),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: const Color(0xFFDC2626),
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.auto_awesome),
+          label: Text(
+            isArabic ? 'اسأل الـ AI عن الذاكرة' : 'Ask Memory AI',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          onPressed: () => _openAiAssistant(isArabic),
         ),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           children: [
             _buildIntroCard(isArabic),
             16.heightBox,
@@ -79,6 +138,10 @@ class _MemoryPerfScreenState extends State<MemoryPerfScreen> {
 
             // فحص الصور وتحجيم الذاكرة (Image Downsampling)
             _buildImageOptimizationSection(isArabic),
+            16.heightBox,
+
+            // الكود الجاهز للنسخ والتفاعل
+            _buildCodeSnippetCard(isArabic),
             24.heightBox,
           ],
         ),
@@ -285,6 +348,47 @@ class _MemoryPerfScreenState extends State<MemoryPerfScreen> {
             ),
             value: _useDownsampling,
             onChanged: (val) => setState(() => _useDownsampling = val),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCodeSnippetCard(bool isArabic) {
+    final code = _buildDynamicMemoryCode(isArabic);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF101828),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF24324A)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isArabic ? '💻 كود إدارة الذاكرة وتفادي التسريبات الحي:' : '💻 Dynamic Memory & Disposal Code:',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text('Dynamic Live Code', style: TextStyle(color: Color(0xFFF87171), fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          10.heightBox,
+          CopyableCodeBlock(
+            code: code,
+            copiedMessage: isArabic ? 'تم نسخ كود الذاكرة المحدث' : 'Memory code copied',
+            copyTooltip: isArabic ? 'نسخ الكود' : 'Copy Code',
           ),
         ],
       ),

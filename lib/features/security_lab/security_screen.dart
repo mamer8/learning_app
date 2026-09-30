@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🔒 مختبر الأمان وتجديد الـ JWT Token والتشفير
 /// يوضح كيفية عمل الـ QueuedInterceptor وتشفير البيانات الحساسة برمجياً
@@ -112,6 +113,49 @@ class _SecurityScreenState extends State<SecurityScreen> {
     }
   }
 
+  void _openAiAssistant() {
+    final isTokenValid = _secondsRemaining > 0;
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الأمان والـ Token Interceptors والتشفير',
+      topicCode: _buildDynamicSecurityCode(isTokenValid),
+      levelTitle: 'مستوى متقدم (Senior Security & Network)',
+      isArabic: true,
+    );
+  }
+
+  String _buildDynamicSecurityCode(bool isTokenValid) {
+    final plainText = _plainTextController.text;
+    return '// === 1. QueuedInterceptor & Auto-Refresh Token ===\n'
+        'class AuthInterceptor extends QueuedInterceptor {\n'
+        '  final Dio dio;\n'
+        '  // الحالة الحالية للتوكن: ${isTokenValid ? "نشط ($_secondsRemaining ثوان متبقية)" : "منتهي الصلاحية 401"}\n'
+        '  AuthInterceptor({required this.dio});\n\n'
+        '  @override\n'
+        '  void onError(DioException err, ErrorInterceptorHandler handler) async {\n'
+        '    if (err.response?.statusCode == 401) {\n'
+        '      // تعليق الطلبات وتجديد التوكن في الخلفية\n'
+        '      final newToken = await refreshJwtToken(); // ${_isRefreshingToken ? "جاري التجديد الآن..." : "جاهز"}\n'
+        '      if (newToken != null) {\n'
+        '        final retry = await dio.request(\n'
+        '          err.requestOptions.path,\n'
+        '          options: Options(headers: {"Authorization": "Bearer \$newToken"}),\n'
+        '        );\n'
+        '        return handler.resolve(retry);\n'
+        '      }\n'
+        '    }\n'
+        '    handler.next(err);\n'
+        '  }\n'
+        '}\n\n'
+        '// === 2. AES-256 Encryption / Decryption ===\n'
+        '// النص الأصلي المدخل: "$plainText"\n'
+        'final encrypter = Encrypter(AES(Key.fromUtf8("32_Byte_Secret_Key_For_AES256!")));\n'
+        'final iv = IV.fromSecureRandom(16);\n'
+        'final encrypted = encrypter.encrypt("$plainText", iv: iv);\n'
+        '// المشفر الناتج: "$_encryptedText"\n'
+        'final decrypted = encrypter.decrypt(encrypted, iv: iv); // "$plainText"';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isTokenValid = _secondsRemaining > 0;
@@ -121,9 +165,23 @@ class _SecurityScreenState extends State<SecurityScreen> {
       appBar: AppBar(
         title: const Text('مختبر الأمان والـ Token Interceptors'),
         backgroundColor: const Color(0xFF1E293B),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: Color(0xFFEC4899)),
+            tooltip: 'اسأل الذكاء الاصطناعي عن الأمان و JWT',
+            onPressed: _openAiAssistant,
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFFEC4899),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.auto_awesome),
+        label: const Text('اسأل الـ AI عن الأمان', style: TextStyle(fontWeight: FontWeight.bold)),
+        onPressed: _openAiAssistant,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -140,7 +198,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
             16.heightBox,
 
             // الكود الجاهز للنسخ
-            _buildCodeSnippetCard(),
+            _buildCodeSnippetCard(isTokenValid),
           ],
         ),
       ),
@@ -313,27 +371,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
     );
   }
 
-  Widget _buildCodeSnippetCard() {
-    const code =
-        'class AuthInterceptor extends QueuedInterceptor {\n'
-        '  final Dio dio;\n'
-        '  AuthInterceptor({required this.dio});\n\n'
-        '  @override\n'
-        '  void onError(DioException err, ErrorInterceptorHandler handler) async {\n'
-        '    if (err.response?.statusCode == 401) {\n'
-        '      final newToken = await refreshJwtToken();\n'
-        '      if (newToken != null) {\n'
-        '        // إعادة إرسال الطلب الأصلي بتوكن جديد\n'
-        '        final retry = await dio.request(\n'
-        '          err.requestOptions.path,\n'
-        '          options: Options(headers: {"Authorization": "Bearer \$newToken"}),\n'
-        '        );\n'
-        '        return handler.resolve(retry);\n'
-        '      }\n'
-        '    }\n'
-        '    handler.next(err);\n'
-        '  }\n'
-        '}';
+  Widget _buildCodeSnippetCard(bool isTokenValid) {
+    final code = _buildDynamicSecurityCode(isTokenValid);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -345,14 +384,27 @@ class _SecurityScreenState extends State<SecurityScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '💻 كود الـ QueuedInterceptor لتجديد التوكن التلقائي:',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '💻 كود الأمان وتجديد التوكن التفاعلي الحي:',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEC4899).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text('Dynamic Live Code', style: TextStyle(color: Color(0xFFEC4899), fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+            ],
           ),
           10.heightBox,
-          const CopyableCodeBlock(
+          CopyableCodeBlock(
             code: code,
-            copiedMessage: 'تم نسخ كود AuthInterceptor',
+            copiedMessage: 'تم نسخ كود الأمان المحدث',
             copyTooltip: 'نسخ الكود',
           ),
         ],

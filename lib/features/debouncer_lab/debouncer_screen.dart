@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
+import '../ai_chat/widgets/contextual_ai_sheet.dart';
 
 /// 🔍 مختبر الـ Debouncer والـ Throttler
 /// شاشة تفاعلية تشرح كيفية ترشيد استهلاك الشبكة وحماية أزرار التطبيق
@@ -158,6 +159,38 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
     });
   }
 
+  String _getDebouncerCode() {
+    return '// كود الـ Debouncer (يتغير تلقائياً مع السلايدر الحالي: $_debounceDurationMs ms)\n'
+        'final debouncer = Debouncer(delay: const Duration(milliseconds: $_debounceDurationMs));\n\n'
+        'void onSearchChanged(String query) {\n'
+        '  debouncer.run(() {\n'
+        '    // يُستدعى فقط بعد توقف المستخدم عن الكتابة لـ $_debounceDurationMs ms\n'
+        '    fetchSearchResults(query);\n'
+        '  });\n'
+        '}';
+  }
+
+  String _getThrottlerCode() {
+    return '// كود الـ Throttler لحماية أزرار الدفع والنقر المتكرر\n'
+        'final throttler = Throttler(interval: const Duration(seconds: 1));\n\n'
+        'void onPayButtonClicked() {\n'
+        '  throttler.run(() {\n'
+        '    // يُنفذ فوراً عند أول نقرة، ثم يتجاهل أي نقرات مكررة لمدة 1 ثانية\n'
+        '    processPayment();\n'
+        '  });\n'
+        '}';
+  }
+
+  void _openAiCopilot(BuildContext context) {
+    ContextualAiSheet.show(
+      context,
+      topicTitle: 'مختبر الـ Debouncer & Throttler',
+      topicCode: '${_getDebouncerCode()}\n\n${_getThrottlerCode()}',
+      levelTitle: 'الأداء وهندسة استهلاك الشبكة (Rate Limiting)',
+      isArabic: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final savingsPercent = _rawKeystrokeCount > 0
@@ -171,14 +204,28 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
         backgroundColor: const Color(0xFF1E293B),
         actions: [
           IconButton(
+            tooltip: 'اسأل المساعد الذكي',
+            icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+            onPressed: () => _openAiCopilot(context),
+          ),
+          IconButton(
             tooltip: 'إعادة تصفير العدادات',
             onPressed: _resetCounters,
             icon: const Icon(Icons.refresh_rounded),
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openAiCopilot(context),
+        icon: const Icon(Icons.psychology_rounded, color: Color(0xFF04111C)),
+        label: const Text(
+          'اسأل المساعد الذكي عن هذا الكود',
+          style: TextStyle(color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF14B8A6),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -597,7 +644,7 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '💻 الأكواد التطبيقية الجاهزة للنسخ:',
+            '💻 الأكواد التطبيقية الجاهزة للنسخ (تتحدث ديناميكياً مع المدخلات):',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -606,20 +653,13 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
           ),
           12.heightBox,
           const Text(
-            '1. كود استخدام الـ Debouncer في البحث الفوري:',
+            '1. كود استخدام الـ Debouncer في البحث الفوري (يتغير مع وقت التأخير):',
             style: TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold),
           ),
           8.heightBox,
-          const CopyableCodeBlock(
-            code:
-                'final debouncer = Debouncer(delay: const Duration(milliseconds: 500));\n\n'
-                'void onSearchChanged(String query) {\n'
-                '  debouncer.run(() {\n'
-                '    // يُستدعى فقط بعد توقف المستخدم عن الكتابة لـ 500ms\n'
-                '    fetchSearchResults(query);\n'
-                '  });\n'
-                '}',
-            copiedMessage: 'تم نسخ كود Debouncer',
+          CopyableCodeBlock(
+            code: _getDebouncerCode(),
+            copiedMessage: 'تم نسخ كود Debouncer الحي',
             copyTooltip: 'نسخ الكود',
           ),
           16.heightBox,
@@ -628,15 +668,8 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
             style: TextStyle(color: Colors.purpleAccent, fontSize: 12, fontWeight: FontWeight.bold),
           ),
           8.heightBox,
-          const CopyableCodeBlock(
-            code:
-                'final throttler = Throttler(interval: const Duration(seconds: 1));\n\n'
-                'void onPayButtonClicked() {\n'
-                '  throttler.run(() {\n'
-                '    // يُنفذ فوراً ثم يتجاهل أي نقرات إضافية لمدة 1 ثانية\n'
-                '    processPayment();\n'
-                '  });\n'
-                '}',
+          CopyableCodeBlock(
+            code: _getThrottlerCode(),
             copiedMessage: 'تم نسخ كود Throttler',
             copyTooltip: 'نسخ الكود',
           ),

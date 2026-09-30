@@ -350,27 +350,41 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
             ),
 
             // حقل كتابة سؤال مخصص
-            Container(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF101828),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFF24324A)),
-                      ),
+            SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
                       child: TextField(
                         controller: _promptController,
-                        style: const TextStyle(color: Colors.white, fontSize: 12.5),
-                        decoration: const InputDecoration(
-                          hintText: 'اسأل عن أي تفصيل في هذا الموضوع...',
-                          hintStyle: TextStyle(color: Color(0xFF64748B), fontSize: 11.5),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        maxLines: 3,
+                        minLines: 1,
+                        textInputAction: TextInputAction.send,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: const Color(0xFF101828),
+                          hintText: widget.isArabic
+                              ? 'اسأل عن أي تفصيل في هذا الموضوع...'
+                              : 'Ask anything about this topic...',
+                          hintStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: const BorderSide(color: Color(0xFF24324A)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: const BorderSide(color: Color(0xFF24324A)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: const BorderSide(color: Color(0xFF14B8A6), width: 1.5),
+                          ),
                         ),
                         onSubmitted: (val) {
                           if (val.trim().isNotEmpty) {
@@ -380,29 +394,48 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
                         },
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
+                    const SizedBox(width: 8),
+                    Material(
+                      color: Colors.transparent,
+                      child: Ink(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(22),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x3314B8A6),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(22),
+                          onTap: () {
+                            final text = _promptController.text.trim();
+                            if (text.isNotEmpty) {
+                              _askAssistant(text);
+                              _promptController.clear();
+                            }
+                          },
+                          child: const Center(
+                            child: Icon(
+                              Icons.arrow_upward_rounded,
+                              color: Color(0xFF04111C),
+                              size: 20,
+                            ),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: IconButton(
-                      icon: const Icon(Icons.send_rounded, color: Color(0xFF04111C), size: 17),
-                      onPressed: () {
-                        final text = _promptController.text.trim();
-                        if (text.isNotEmpty) {
-                          _askAssistant(text);
-                          _promptController.clear();
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
