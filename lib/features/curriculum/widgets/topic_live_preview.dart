@@ -57,11 +57,16 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   bool _isExpanded = false;
   Curve _selectedCurve = Curves.easeOutBack;
 
-  // --- Gestures State (Level 2 Topic 7) ---
+  // --- Gestures & Buttons State (Level 2 Topic 7) ---
+  int _gestureTab = 0;
+  String _lastClickedButton = '';
   int _tapCount = 0;
   int _doubleTapCount = 0;
   int _longPressCount = 0;
+  Offset _lastPanOffset = Offset.zero;
   bool _isBadgeDropped = false;
+  List<String> _dismissibleTasks = ['مهمة 1: إتقان Flutter Widgets 🚀', 'مهمة 2: اسحبني لليسار للحذف 🗑️'];
+  String _selectedSegment = 'خيار 1';
 
   // --- Async Future State (Level 2 Topic 10) ---
   Future<String>? _apiSimulationFuture;
@@ -797,7 +802,218 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
   // ===========================================================================
   // 7. Gestures & Drag/Drop Sandbox
   // ===========================================================================
+  // ===========================================================================
+  // 7. All Buttons, Gestures, InkWell, Draggable, Dismissible & Zoom Sandbox
+  // ===========================================================================
   Widget _buildGesturesSandbox(bool isAr) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Tab Selector
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFF24324A)),
+          ),
+          child: Row(
+            children: [
+              _buildGestureTabItem(0, isAr ? '🔘 معرض الأزرار (Buttons)' : 'Buttons Suite', Icons.smart_button_rounded),
+              _buildGestureTabItem(1, isAr ? '👆 الإيماءات (Gestures & Ink)' : 'Gestures & Ink', Icons.touch_app_rounded),
+              _buildGestureTabItem(2, isAr ? '🎯 السحب والتكبير (Drag/Zoom)' : 'Drag & Zoom', Icons.drag_indicator_rounded),
+            ],
+          ),
+        ),
+        12.heightBox,
+
+        if (_gestureTab == 0) ...[
+          _buildAllButtonsTab(isAr),
+        ] else if (_gestureTab == 1) ...[
+          _buildGesturesAndInkWellTab(isAr),
+        ] else ...[
+          _buildDragDismissZoomTab(isAr),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildGestureTabItem(int index, String label, IconData icon) {
+    final isSelected = _gestureTab == index;
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _gestureTab = index),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF14B8A6) : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 14, color: isSelected ? const Color(0xFF04111C) : const Color(0xFF94A3B8)),
+              4.widthBox,
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isSelected ? const Color(0xFF04111C) : const Color(0xFF94A3B8),
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // TAB 1: ALL MATERIAL 3 BUTTONS
+  Widget _buildAllButtonsTab(bool isAr) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Status indicator
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E293B),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFF334155)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.info_outline_rounded, color: Color(0xFF38BDF8), size: 16),
+              8.widthBox,
+              Expanded(
+                child: Text(
+                  _lastClickedButton.isEmpty
+                      ? (isAr ? 'انقر على أي زر لتجربة الاستجابة والمظهر الحقيقي:' : 'Click any button to test live reaction & style:')
+                      : (isAr ? '⚡ تم النقر على: $_lastClickedButton' : '⚡ Tapped: $_lastClickedButton'),
+                  style: const TextStyle(color: Color(0xFFE2E8F0), fontSize: 11.5, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+        12.heightBox,
+
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            // 1. FilledButton
+            FilledButton.icon(
+              onPressed: () => setState(() => _lastClickedButton = 'FilledButton (الزر الرئيسي الممتلئ)'),
+              icon: const Icon(Icons.check_circle_rounded, size: 16),
+              label: const Text('FilledButton'),
+              style: FilledButton.styleFrom(backgroundColor: const Color(0xFF14B8A6), foregroundColor: const Color(0xFF04111C)),
+            ),
+
+            // 2. ElevatedButton
+            ElevatedButton.icon(
+              onPressed: () => setState(() => _lastClickedButton = 'ElevatedButton (زر بارز بظل)'),
+              icon: const Icon(Icons.arrow_upward_rounded, size: 16),
+              label: const Text('ElevatedButton'),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E293B), foregroundColor: Colors.white),
+            ),
+
+            // 3. OutlinedButton
+            OutlinedButton.icon(
+              onPressed: () => setState(() => _lastClickedButton = 'OutlinedButton (زر بإطار مفرغ)'),
+              icon: const Icon(Icons.border_all_rounded, size: 16),
+              label: const Text('OutlinedButton'),
+              style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF38BDF8), side: const BorderSide(color: Color(0xFF38BDF8))),
+            ),
+
+            // 4. TextButton
+            TextButton.icon(
+              onPressed: () => setState(() => _lastClickedButton = 'TextButton (زر نصي شفاف)'),
+              icon: const Icon(Icons.text_fields_rounded, size: 16),
+              label: const Text('TextButton'),
+              style: TextButton.styleFrom(foregroundColor: const Color(0xFFA78BFA)),
+            ),
+
+            // 5. IconButton
+            IconButton.filledTonal(
+              onPressed: () => setState(() => _lastClickedButton = 'IconButton.filledTonal (أيقونة بإضاءة)'),
+              icon: const Icon(Icons.favorite_rounded, color: Color(0xFFEC4899), size: 18),
+              tooltip: 'IconButton',
+            ),
+
+            // 6. FloatingActionButton
+            FloatingActionButton.small(
+              onPressed: () => setState(() => _lastClickedButton = 'FloatingActionButton (FAB العائم)'),
+              backgroundColor: const Color(0xFFF59E0B),
+              foregroundColor: Colors.black,
+              child: const Icon(Icons.add, size: 20),
+            ),
+
+            // 7. PopupMenuButton
+            PopupMenuButton<String>(
+              color: const Color(0xFF1E293B),
+              icon: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF334155),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Popup Menu', style: TextStyle(color: Colors.white, fontSize: 11.5)),
+                    SizedBox(width: 4),
+                    Icon(Icons.arrow_drop_down, color: Colors.white70, size: 16),
+                  ],
+                ),
+              ),
+              onSelected: (val) => setState(() => _lastClickedButton = 'PopupMenu: $val'),
+              itemBuilder: (ctx) => [
+                const PopupMenuItem(value: 'تعديل (Edit)', child: Text('✏️ تعديل (Edit)', style: TextStyle(color: Colors.white))),
+                const PopupMenuItem(value: 'حذف (Delete)', child: Text('🗑️ حذف (Delete)', style: TextStyle(color: Color(0xFFEF4444)))),
+              ],
+            ),
+          ],
+        ),
+        10.heightBox,
+
+        // 8. SegmentedButton
+        Center(
+          child: SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(value: 'خيار 1', label: Text('خيار 1 (Single)'), icon: Icon(Icons.person, size: 14)),
+              ButtonSegment(value: 'خيار 2', label: Text('خيار 2 (Team)'), icon: Icon(Icons.groups, size: 14)),
+            ],
+            selected: {_selectedSegment},
+            onSelectionChanged: (set) {
+              setState(() {
+                _selectedSegment = set.first;
+                _lastClickedButton = 'SegmentedButton: $_selectedSegment';
+              });
+            },
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.selected) ? const Color(0xFF14B8A6) : const Color(0xFF1E293B),
+              ),
+              foregroundColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.selected) ? const Color(0xFF04111C) : Colors.white70,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // TAB 2: GESTURES & INKWELL
+  Widget _buildGesturesAndInkWellTab(bool isAr) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -806,8 +1022,9 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
           onTap: () => setState(() => _tapCount++),
           onDoubleTap: () => setState(() => _doubleTapCount++),
           onLongPress: () => setState(() => _longPressCount++),
+          onPanUpdate: (details) => setState(() => _lastPanOffset = details.localPosition),
           child: Container(
-            height: 90,
+            height: 110,
             decoration: BoxDecoration(
               color: const Color(0xFF1E293B),
               borderRadius: BorderRadius.circular(12),
@@ -818,18 +1035,19 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    isAr ? 'منطقة رصد الإيماءات (انقر، انقر مرتين، أو اضغط مطولاً)' : 'Gesture Touch Pad (Tap, Double Tap, or Long Press)',
-                    style: const TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.bold, fontSize: 12),
+                    isAr ? 'منطقة رصد GestureDetector (انقر، انقر مرتين، اضغط مطولاً، أو اسحب)' : 'GestureDetector Sandbox (Tap, DoubleTap, LongPress, or Pan)',
+                    style: const TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.bold, fontSize: 11),
                   ),
-                  6.heightBox,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  8.heightBox,
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    alignment: WrapAlignment.center,
                     children: [
                       _badgeCount('Tap: $_tapCount', Colors.cyan),
-                      8.widthBox,
                       _badgeCount('Double: $_doubleTapCount', Colors.amber),
-                      8.widthBox,
                       _badgeCount('Long: $_longPressCount', Colors.pinkAccent),
+                      _badgeCount('Pan (X:${_lastPanOffset.dx.toInt()}, Y:${_lastPanOffset.dy.toInt()})', const Color(0xFF34D399)),
                     ],
                   ),
                 ],
@@ -837,9 +1055,52 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
             ),
           ),
         ),
-        12.heightBox,
+        10.heightBox,
 
-        // Draggable & DragTarget Box
+        // Material InkWell Ripple Container
+        Material(
+          color: const Color(0xFF0F766E),
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            onTap: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('🌊 تم إطلاق تموجات الماء المادية (InkWell Material Ripple)!'),
+                  duration: Duration(milliseconds: 900),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(10),
+            splashColor: const Color(0xFF5EEAD4).withValues(alpha: 0.5),
+            highlightColor: const Color(0xFF14B8A6).withValues(alpha: 0.2),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.waves_rounded, color: Color(0xFF5EEAD4), size: 18),
+                  8.widthBox,
+                  Text(
+                    isAr ? 'اضغط هنا لتجربة تموجات الماء المادية (InkWell Splash) 🌊' : 'Tap here to trigger Material InkWell Ripple 🌊',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // TAB 3: DRAGGABLE, DISMISSIBLE & INTERACTIVE VIEWER
+  Widget _buildDragDismissZoomTab(bool isAr) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 1. Draggable & DragTarget Box
         Row(
           children: [
             Expanded(
@@ -847,11 +1108,14 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 data: 'PRO_VIP',
                 feedback: Material(
                   color: Colors.transparent,
-                  child: Chip(backgroundColor: Colors.amber, label: Text(isAr ? 'وسام PRO 🌟' : 'PRO Badge 🌟')),
+                  child: Chip(
+                    backgroundColor: Colors.amber,
+                    label: Text(isAr ? '🌟 وسام PRO (أثناء السحب)' : '🌟 PRO Badge (Dragging)'),
+                  ),
                 ),
                 childWhenDragging: Opacity(
                   opacity: 0.3,
-                  child: Chip(label: Text(isAr ? 'اسحبني للهدف ⬅️' : 'Drag to target ➡️')),
+                  child: Chip(label: Text(isAr ? 'مكان العنصر المسحوب ⬅️' : 'Dragging... ➡️')),
                 ),
                 child: Chip(
                   backgroundColor: const Color(0xFFF59E0B),
@@ -867,7 +1131,7 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                 },
                 builder: (context, candidateData, rejectedData) {
                   return Container(
-                    height: 50,
+                    height: 48,
                     decoration: BoxDecoration(
                       color: candidateData.isNotEmpty ? const Color(0xFF059669) : const Color(0xFF0F172A),
                       borderRadius: BorderRadius.circular(10),
@@ -877,7 +1141,7 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
                       child: Text(
                         _isBadgeDropped
                             ? (isAr ? '✅ تم الإسقاط بنجاح!' : '✅ Dropped!')
-                            : (isAr ? 'مستقبل السحب (Drop Here)' : 'Drop Target Here'),
+                            : (isAr ? 'مستقبل السحب (Drop Target) 📥' : 'Drop Target Here 📥'),
                         style: TextStyle(
                           color: _isBadgeDropped ? const Color(0xFF34D399) : Colors.white70,
                           fontSize: 11,
@@ -890,6 +1154,125 @@ class _TopicLivePreviewState extends State<TopicLivePreview> {
               ),
             ),
           ],
+        ),
+        10.heightBox,
+
+        // 2. Dismissible Swipe to delete
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E293B),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFF334155)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isAr ? '🗑️ تجربة Dismissible (اسحب العنصر لليسار لحذفه):' : '🗑️ Dismissible (Swipe left to delete):',
+                    style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                  if (_dismissibleTasks.length < 2)
+                    TextButton(
+                      onPressed: () => setState(() {
+                        _dismissibleTasks = ['مهمة 1: إتقان Flutter Widgets 🚀', 'مهمة 2: اسحبني لليسار للحذف 🗑️'];
+                      }),
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 20)),
+                      child: const Text('استعادة العناصر 🔄', style: TextStyle(fontSize: 10.5, color: Color(0xFF38BDF8))),
+                    ),
+                ],
+              ),
+              6.heightBox,
+              for (final task in _dismissibleTasks)
+                Dismissible(
+                  key: ValueKey(task),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.delete_forever_rounded, color: Colors.white, size: 20),
+                  ),
+                  onDismissed: (_) {
+                    setState(() => _dismissibleTasks.remove(task));
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF101828),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFF24324A)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.drag_indicator_rounded, color: Color(0xFF64748B), size: 16),
+                        8.widthBox,
+                        Expanded(child: Text(task, style: const TextStyle(color: Colors.white, fontSize: 11.5))),
+                        const Icon(Icons.swipe_left_rounded, color: Color(0xFF94A3B8), size: 14),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        10.heightBox,
+
+        // 3. InteractiveViewer Pinch to zoom
+        Container(
+          height: 120,
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFF334155)),
+          ),
+          child: Stack(
+            children: [
+              InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Center(
+                  child: Container(
+                    width: 140,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0284C7), Color(0xFF14B8A6)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.flutter_dash_rounded, color: Colors.white, size: 30),
+                        SizedBox(height: 4),
+                        Text('InteractiveViewer\nكبرني بإصبعين 🔍', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 6,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text('Pinch-to-zoom (0.5x - 4x)', style: TextStyle(color: Colors.white70, fontSize: 9)),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

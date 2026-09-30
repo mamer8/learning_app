@@ -1960,62 +1960,249 @@ const curriculumLevels = [
       // 7. Buttons, Gestures & InteractiveViewer
       CurriculumTopic(
         title: LocalText(
-          ar: '7. ويدجتس الأزرار والإيماءات والتقريب (Buttons, GestureDetector & InteractiveViewer)',
-          en: '7. Buttons, Gestures, Zooming & Drag-and-Drop (InkWell, GestureDetector & InteractiveViewer)',
+          ar: '7. ويدجتس الأزرار والإيماءات والتقريب (All Buttons, GestureDetector, InkWell, Draggable & InteractiveViewer)',
+          en: '7. Buttons, Gestures, Zooming & Drag-and-Drop (Buttons, GestureDetector, InkWell, Draggable & InteractiveViewer)',
         ),
         summary: LocalText(
-          ar: 'التقاط النقرات، السحب والإفلات، التكبير باللمس بـ InteractiveViewer، وأحدث أزرار Material 3.',
-          en: 'Handle multi-touch gestures, drag-and-drop mechanics, pinch-to-zoom views, and Material 3 action buttons.',
+          ar: 'دليل شامل لكل أنواع الأزرار (Elevated, Filled, Outlined, Text, FAB, Segmented, Popup)، ورصد الإيماءات بـ GestureDetector و InkWell، والسحب والإفلات بـ Draggable، والحذف بـ Dismissible، والتكبير بـ InteractiveViewer.',
+          en: 'Complete guide to all Material 3 buttons, touch gestures with GestureDetector and InkWell, drag-and-drop mechanics, dismissible swipes, and pinch-to-zoom views.',
         ),
         explain: LocalText(
-          ar: 'يوفر `GestureDetector` رصد دقيق لجميع حركات الأصابع (Tap, DoubleTap, LongPress, Pan/Drag, Scale). بينما يضيف `InkWell` تأثير تموجات الماء المادية (Ripple Effect). كما يمنحك `InteractiveViewer` تجربة تكبير وتقريب وتحريك الصور والخرائط (Pinch-to-zoom & Pan) بسطرين فقط.',
-          en: '`GestureDetector` intercepts raw touch gestures (taps, drags, scale events). `InkWell` adds tactile Material ripple feedback. `InteractiveViewer` equips canvases and images with automatic two-finger pinch, zoom, and viewport panning out of the box.',
+          ar: 'توفر Flutter منظومة تفاعلية متكاملة:\n'
+              '1️⃣ **عائلة الأزرار (Buttons Suite)**:\n'
+              '• `ElevatedButton`: زر بارز مرتفع بظل خفيف للإجراءات الواضحة.\n'
+              '• `FilledButton` / `FilledButton.tonal`: أزرار Material 3 الحديثة للمهام الأساسية والثانوية بلون ممتلئ مريح.\n'
+              '• `OutlinedButton`: زر بإطار شفاف للعمليات الثانوية وتأكيد الإلغاء.\n'
+              '• `TextButton`: زر نصي شفاف بدون حدود للروابط والأفعال داخل الحوارات.\n'
+              '• `IconButton`: زر أيقونة مدمج في أشرطة العناوين والقوائم السريعة.\n'
+              '• `FloatingActionButton` (FAB): الزر العائم الرئيسي في أسفل الشاشة للإجراء الأهم.\n'
+              '• `SegmentedButton`: أزرار الاختيار والتبديل المتعدد والمفرد (Material 3 Segmented Control).\n'
+              '• `PopupMenuButton`: زر يفتح قائمة منسدلة بخيارات متعددة عند النقر.\n\n'
+              '2️⃣ **رصد الإيماءات واللمس (Gestures & Touch)**:\n'
+              '• `GestureDetector`: يرصد بدقة نقرات الأصابع، النقر المزدوج (DoubleTap)، الضغط المطول (LongPress)، السحب والتحريك (Pan/Drag)، وتكبير المنظور (Scale).\n'
+              '• `InkWell` / `InkResponse`: يمنح أي ويدجت تموجات مائية مادية (Material Ripple Effect) عند الضغط، بشرط وجود `Material` في الشجرة.\n'
+              '• `Listener`: للاستماع الخام المباشر لإحداثيات البوينتر (PointerDown, PointerMove, PointerUp).\n\n'
+              '3️⃣ **السحب والإفلات والتكبير والحذف (Drag, Zoom & Dismiss)**:\n'
+              '• `Draggable<T>` و `DragTarget<T>`: سحب العناصر ونقل كائنات البيانات بين أجزاء الشاشة مع ردود بصرية فورية (feedback و childWhenDragging).\n'
+              '• `Dismissible`: سحب البطاقة يميناً أو يساراً للحذف أو الأرشفة مع خلفيات مخصصة وتأكيد.\n'
+              '• `InteractiveViewer`: تحريك وتكبير وتصغير المحتوى والصور والخرائط بإصبعين (Pinch-to-zoom & Pan) بدون أي Controller.',
+          en: 'Flutter provides a complete interaction suite:\n'
+              '1. **Button Family**: `ElevatedButton`, `FilledButton`, `OutlinedButton`, `TextButton`, `IconButton`, `FloatingActionButton`, `SegmentedButton`, and `PopupMenuButton`.\n'
+              '2. **Gestures**: `GestureDetector` (Tap, DoubleTap, LongPress, Pan, Scale), `InkWell` (Material Ripple), and raw `Listener`.\n'
+              '3. **Drag, Zoom & Dismiss**: `Draggable<T>` with `DragTarget<T>`, `Dismissible` swipe-to-delete, and `InteractiveViewer` pinch-to-zoom.',
         ),
         whenToUse: [
           LocalText(
-            ar: 'معارض الصور والخرائط التي تحتاج للتكبير والتحريك بـ `InteractiveViewer`.',
-            en: 'Image galleries, blueprints, and document viewers requiring smooth pinch-zoom.',
+            ar: 'استخدام `FilledButton` للإجراء الرئيسي و `OutlinedButton` للإجراء الثانوي لمنح الواجهة تسلسلاً بصرياً متناسقاً.',
+            en: 'Use `FilledButton` for primary CTAs and `OutlinedButton` for secondary cancel actions.',
           ),
           LocalText(
-            ar: 'ألعاب البطاقات وسحب العناصر من مكان لآخر بـ `Draggable` و `DragTarget`.',
-            en: 'Drag-and-drop card games and kanban task boards.',
+            ar: 'استخدام `GestureDetector` للتعامل مع السحب والرسم والتكبير، و `InkWell` للأزرار والقوائم التي تحتاج تموج مادي.',
+            en: 'Use `GestureDetector` for complex gestures (pan, scale) and `InkWell` for Material ripple feedback on cards.',
+          ),
+          LocalText(
+            ar: 'استخدام `InteractiveViewer` لمعارض الصور والمخططات والخرائط التي تحتاج إلى تكبير وتمرير سلس.',
+            en: 'Wrap blueprints, photo galleries, and documents in `InteractiveViewer` for pinch-to-zoom.',
+          ),
+          LocalText(
+            ar: 'استخدام `Draggable` و `DragTarget` في قوائم المهام (Kanban Boards) وألعاب السحب وإعادة الترتيب.',
+            en: 'Use `Draggable` and `DragTarget` in drag-and-drop boards, card games, and shopping carts.',
+          ),
+          LocalText(
+            ar: 'استخدام `Dismissible` في قوائم الرسائل والتنبيهات للسحب السريع للحذف أو الأرشفة.',
+            en: 'Use `Dismissible` in inbox lists for intuitive swipe-to-delete and swipe-to-archive.',
           ),
         ],
         steps: [
           LocalText(
-            ar: 'غلف الصور داخل `InteractiveViewer(minScale: 0.8, maxScale: 4.0, child: ...)` لتفعيل التكبير التلقائي.',
-            en: 'Wrap image widgets in `InteractiveViewer` with configured min/max scale boundaries.',
+            ar: 'اختر نوع الزر المناسب من عائلة Buttons (`FilledButton`, `ElevatedButton`, `OutlinedButton`, `TextButton`, `IconButton`).',
+            en: 'Choose the appropriate button type matching the visual hierarchy.',
           ),
           LocalText(
-            ar: 'استخدم `InkWell` مع `Material` شفاف للحصول على موجات الضغط دون تشويه التصميم.',
-            en: 'Use `InkWell` with an ancestor `Material` widget to render ripple animations correctly.',
+            ar: 'لإضافة تموجات تفاعلية لأي كارد مخصص، غلفه بـ `Material(color: Colors.transparent, child: InkWell(onTap: ..., child: ...))`',
+            en: 'Add tactile ripples to cards with `Material(color: Colors.transparent, child: InkWell(onTap: ...))`.',
+          ),
+          LocalText(
+            ar: 'لتفعيل التكبير باللمس، غلف الويدجت بـ `InteractiveViewer(minScale: 0.8, maxScale: 4.0, child: ...)`',
+            en: 'Wrap zoomable widgets in `InteractiveViewer` specifying min and max scale bounds.',
+          ),
+          LocalText(
+            ar: 'لتنفيذ السحب والإفلات، عرّف `Draggable<T>(data: item, feedback: ..., child: ...)` واستقبله بـ `DragTarget<T>(onAcceptWithDetails: ...)`',
+            en: 'Set up `Draggable<T>` with data payload and receive it in `DragTarget<T>`.',
+          ),
+          LocalText(
+            ar: 'لحذف العناصر بالسحب، غلف العنصر بـ `Dismissible(key: Key(item.id), onDismissed: ..., background: ...)`',
+            en: 'Wrap swipeable list items with `Dismissible` providing unique Keys and delete callbacks.',
           ),
         ],
         code:
-            '// 1. عارض صور تفاعلي يدعم التكبير باللمس (Pinch & Zoom)\n'
-            'Widget buildZoomableImage(String imageUrl) {\n'
-            '  return Center(\n'
-            '    child: InteractiveViewer(\n'
-            '      clipBehavior: Clip.none,\n'
-            '      minScale: 0.8,\n'
-            '      maxScale: 4.5,\n'
-            '      child: ClipRRect(\n'
-            '        borderRadius: BorderRadius.circular(16),\n'
-            '        child: Image.network(imageUrl, fit: BoxFit.cover),\n'
+            '// =========================================================================\n'
+            '// 1. عائلة أزرار فلاتر الحديثة (Flutter Buttons Suite - Material 3)\n'
+            '// =========================================================================\n'
+            'Widget buildAllButtonsExample(BuildContext context) {\n'
+            '  return Wrap(\n'
+            '    spacing: 12,\n'
+            '    runSpacing: 12,\n'
+            '    crossAxisAlignment: WrapCrossAlignment.center,\n'
+            '    children: [\n'
+            '      // أ. زر Material 3 ممتلئ (FilledButton) - الأهم للإجراء الرئيسي\n'
+            '      FilledButton.icon(\n'
+            '        onPressed: () => print("Filled Clicked!"),\n'
+            '        icon: const Icon(Icons.check_circle_outline),\n'
+            '        label: const Text("FilledButton (رئيسي)"),\n'
+            '      ),\n\n'
+            '      // ب. زر بارز بظل خفيف (ElevatedButton)\n'
+            '      ElevatedButton.icon(\n'
+            '        onPressed: () => print("Elevated Clicked!"),\n'
+            '        icon: const Icon(Icons.touch_app),\n'
+            '        label: const Text("ElevatedButton"),\n'
+            '      ),\n\n'
+            '      // ج. زر بإطار شفاف (OutlinedButton) - للإجراءات الثانوية\n'
+            '      OutlinedButton.icon(\n'
+            '        onPressed: () => print("Outlined Clicked!"),\n'
+            '        icon: const Icon(Icons.close),\n'
+            '        label: const Text("OutlinedButton"),\n'
+            '      ),\n\n'
+            '      // د. زر نصي شفاف (TextButton) - للحوارات والروابط\n'
+            '      TextButton(\n'
+            '        onPressed: () => print("Text Clicked!"),\n'
+            '        child: const Text("TextButton"),\n'
+            '      ),\n\n'
+            '      // هـ. زر أيقونة مستقل (IconButton)\n'
+            '      IconButton.filledTonal(\n'
+            '        onPressed: () => print("Icon Clicked!"),\n'
+            '        icon: const Icon(Icons.favorite_rounded),\n'
+            '        tooltip: "إضافة للمفضلة",\n'
+            '      ),\n\n'
+            '      // و. زر عائم صغير (FloatingActionButton Small)\n'
+            '      FloatingActionButton.small(\n'
+            '        onPressed: () => print("FAB Clicked!"),\n'
+            '        child: const Icon(Icons.add),\n'
+            '      ),\n\n'
+            '      // ز. قائمة خيارات منسدلة (PopupMenuButton)\n'
+            '      PopupMenuButton<String>(\n'
+            '        icon: const Icon(Icons.more_vert),\n'
+            '        onSelected: (val) => print("Selected: \$val"),\n'
+            '        itemBuilder: (context) => [\n'
+            '          const PopupMenuItem(value: "edit", child: Text("✏️ تعديل")),\n'
+            '          const PopupMenuItem(value: "delete", child: Text("🗑️ حذف")),\n'
+            '        ],\n'
             '      ),\n'
+            '    ],\n'
+            '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 2. التقاط الإيماءات بـ GestureDetector و تموجات InkWell\n'
+            '// =========================================================================\n'
+            'Widget buildGesturesAndInkWellExample() {\n'
+            '  return Column(\n'
+            '    children: [\n'
+            '      // أ. كاشف الإيماءات متعدد الحركات (GestureDetector)\n'
+            '      GestureDetector(\n'
+            '        onTap: () => print("نقرة واحدة (Single Tap)"),\n'
+            '        onDoubleTap: () => print("نقرة مزدوجة (Double Tap)"),\n'
+            '        onLongPress: () => print("ضغط مطول (Long Press)"),\n'
+            '        onPanUpdate: (details) => print("تحريك وسحب بالإصبع: \${details.delta}"),\n'
+            '        child: Container(\n'
+            '          padding: const EdgeInsets.all(16),\n'
+            '          decoration: BoxDecoration(\n'
+            '            color: Colors.indigo.shade900,\n'
+            '            borderRadius: BorderRadius.circular(12),\n'
+            '          ),\n'
+            '          child: const Center(child: Text("المس، انقر مرتين، أو اضغط مطولاً هنا 👆")),\n'
+            '        ),\n'
+            '      ),\n'
+            '      const SizedBox(height: 12),\n\n'
+            '      // ب. تموجات مادية حقيقية (Material InkWell Ripple)\n'
+            '      Material(\n'
+            '        color: Colors.teal.shade800,\n'
+            '        borderRadius: BorderRadius.circular(12),\n'
+            '        child: InkWell(\n'
+            '          onTap: () => print("InkWell Ripple Triggered!"),\n'
+            '          borderRadius: BorderRadius.circular(12),\n'
+            '          splashColor: Colors.tealAccent.withOpacity(0.4),\n'
+            '          child: const Padding(\n'
+            '            padding: EdgeInsets.all(16),\n'
+            '            child: Center(child: Text("اضغط هنا لتجربة تموجات الماء المادية (InkWell) 🌊")),\n'
+            '          ),\n'
+            '        ),\n'
+            '      ),\n'
+            '    ],\n'
+            '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 3. التكبير والتصغير باللمس عبر InteractiveViewer\n'
+            '// =========================================================================\n'
+            'Widget buildZoomablePhoto(String imageUrl) {\n'
+            '  return InteractiveViewer(\n'
+            '    boundaryMargin: const EdgeInsets.all(20),\n'
+            '    minScale: 0.5,\n'
+            '    maxScale: 4.0,\n'
+            '    child: ClipRRect(\n'
+            '      borderRadius: BorderRadius.circular(16),\n'
+            '      child: Image.network(imageUrl, fit: BoxFit.cover),\n'
             '    ),\n'
             '  );\n'
             '}\n\n'
-            '// 2. سحب وإفلات العناصر التفاعلية Draggable & DragTarget\n'
-            'Widget buildDraggableBadge() {\n'
-            '  return Draggable<String>(\n'
-            '    data: "PRO_BADGE",\n'
-            '    feedback: Material(\n'
-            '      color: Colors.transparent,\n'
-            '      child: Chip(backgroundColor: Colors.amber, label: const Text("PRO 🌟")),\n'
+            '// =========================================================================\n'
+            '// 4. السحب والإفلات Draggable & DragTarget\n'
+            '// =========================================================================\n'
+            'Widget buildDragAndDropSystem() {\n'
+            '  return Row(\n'
+            '    mainAxisAlignment: MainAxisAlignment.spaceEvenly,\n'
+            '    children: [\n'
+            '      // العنصر القابل للسحب (Draggable)\n'
+            '      Draggable<String>(\n'
+            '        data: "PRO_BADGE",\n'
+            '        feedback: Material(\n'
+            '          color: Colors.transparent,\n'
+            '          child: Chip(backgroundColor: Colors.amber, label: const Text("🌟 PRO Badge (أثناء السحب)")),\n'
+            '        ),\n'
+            '        childWhenDragging: const Opacity(\n'
+            '          opacity: 0.3,\n'
+            '          child: Chip(label: Text("مكان العنصر المسحوب")),\n'
+            '        ),\n'
+            '        child: const Chip(backgroundColor: Colors.amber, label: Text("اسحبني إلى الهدف ⬅️")),\n'
+            '      ),\n\n'
+            '      // منطقة استقبال السحب (DragTarget)\n'
+            '      DragTarget<String>(\n'
+            '        onWillAcceptWithDetails: (details) => details.data == "PRO_BADGE",\n'
+            '        onAcceptWithDetails: (details) => print("تم قبول واستلام: \${details.data}"),\n'
+            '        builder: (context, candidateData, rejectedData) {\n'
+            '          return Container(\n'
+            '            width: 140,\n'
+            '            height: 60,\n'
+            '            decoration: BoxDecoration(\n'
+            '              color: candidateData.isNotEmpty ? Colors.green.shade800 : Colors.grey.shade900,\n'
+            '              borderRadius: BorderRadius.circular(10),\n'
+            '              border: Border.all(color: Colors.greenAccent),\n'
+            '            ),\n'
+            '            child: const Center(child: Text("أفلت هنا (Drop Target) 📥")),\n'
+            '          );\n'
+            '        },\n'
+            '      ),\n'
+            '    ],\n'
+            '  );\n'
+            '}\n\n'
+            '// =========================================================================\n'
+            '// 5. السحب للحذف بـ Dismissible\n'
+            '// =========================================================================\n'
+            'Widget buildSwipeToDeleteItem(String itemId, String title, VoidCallback onDelete) {\n'
+            '  return Dismissible(\n'
+            '    key: Key(itemId),\n'
+            '    direction: DismissDirection.endToStart,\n'
+            '    background: Container(\n'
+            '      alignment: Alignment.centerRight,\n'
+            '      padding: const EdgeInsets.symmetric(horizontal: 20),\n'
+            '      color: Colors.red,\n'
+            '      child: const Icon(Icons.delete_forever, color: Colors.white),\n'
             '    ),\n'
-            '    childWhenDragging: const Opacity(opacity: 0.4, child: Chip(label: Text("PRO 🌟"))),\n'
-            '    child: const Chip(backgroundColor: Colors.amberAccent, label: Text("اسحبني PRO 🌟")),\n'
+            '    onDismissed: (direction) => onDelete(),\n'
+            '    child: ListTile(\n'
+            '      title: Text(title),\n'
+            '      subtitle: const Text("اسحب العنصر لليسار لحذفه"),\n'
+            '      leading: const Icon(Icons.drag_indicator),\n'
+            '    ),\n'
             '  );\n'
             '}',
         commonMistakes: [
@@ -2024,8 +2211,16 @@ const curriculumLevels = [
             en: 'Expecting Material ripple animations from `GestureDetector` instead of `InkWell`.',
           ),
           LocalText(
-            ar: 'نسيان تحديد `hitTestBehavior: HitTestBehavior.opaque` عند استخدام GestureDetector مع مساحات شفافة.',
-            en: 'Leaving default hit test behavior on empty transparent gesture detector areas.',
+            ar: 'نسيان تحديد `hitTestBehavior: HitTestBehavior.opaque` عند استخدام GestureDetector مع مساحات فارغة أو شفافة، مما يمنع استجابتها للنقر.',
+            en: 'Leaving default hit test behavior on transparent gesture detector areas, missing clicks.',
+          ),
+          LocalText(
+            ar: 'نسيان إعطاء `Key` فريد وثابت لكل عنصر `Dismissible` مما يؤدي لأخطاء أثناء حذف العناصر من القوائم.',
+            en: 'Not providing unique immutable Keys to `Dismissible` widgets in dynamic lists.',
+          ),
+          LocalText(
+            ar: 'الإفراط في استخدام `ElevatedButton` لكل الأزرار في نفس الصفحة بدلاً من توزيع الأهمية بين `FilledButton` للأساسي و `OutlinedButton` و `TextButton` للثانوي.',
+            en: 'Overcrowding multiple primary ElevatedButtons instead of creating visual hierarchy with Text/Outlined variants.',
           ),
         ],
       ),
