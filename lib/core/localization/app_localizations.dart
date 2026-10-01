@@ -84,6 +84,47 @@ const Map<String, _LocalizedValue> _values = {
   'lessons': _LocalizedValue(ar: 'دروس', en: 'Lessons'),
   'labs': _LocalizedValue(ar: 'تجارب', en: 'Labs'),
   'code': _LocalizedValue(ar: 'كود', en: 'Code'),
+  'playgroundTry': _LocalizedValue(ar: 'جرب بنفسك', en: 'Try it yourself'),
+  'playgroundTitle': _LocalizedValue(
+    ar: 'محرر التجربة',
+    en: 'Interactive editor',
+  ),
+  'playgroundInstructions': _LocalizedValue(
+    ar: 'عدّل الكود هنا واضغط الزر لفتح DartPad داخل التطبيق؛ الكود هيظهر تلقائيًا في المحرر. اضغط Run للتجربة. بعض الأمثلة قد تحتاج إلى استكمال.',
+    en: 'Edit the code here and open DartPad inside the app; your code will appear in the editor automatically. Select Run to try it. Some examples may need completion.',
+  ),
+  'playgroundOpenDartPad': _LocalizedValue(
+    ar: 'افتح الكود في DartPad وجربه',
+    en: 'Open code in DartPad and try it',
+  ),
+  'playgroundDartPadTitle': _LocalizedValue(
+    ar: 'DartPad داخل التطبيق',
+    en: 'DartPad in the app',
+  ),
+  'playgroundCopyCode': _LocalizedValue(
+    ar: 'نسخ الكود المعدّل',
+    en: 'Copy edited code',
+  ),
+  'playgroundCodeCopied': _LocalizedValue(
+    ar: 'تم نسخ الكود المعدّل.',
+    en: 'Edited code copied.',
+  ),
+  'playgroundPasteInDartPad': _LocalizedValue(
+    ar: 'تم نسخ الكود.',
+    en: 'Code copied.',
+  ),
+  'playgroundDartPadInstructions': _LocalizedValue(
+    ar: 'الكود بيتحمّل تلقائيًا في محرر DartPad. اضغط Run لعرض النتيجة.',
+    en: 'Your code loads automatically in the DartPad editor. Select Run to see the result.',
+  ),
+  'playgroundLoadFailed': _LocalizedValue(
+    ar: 'تعذر تحميل DartPad. تحقق من الاتصال بالإنترنت وحاول مرة أخرى.',
+    en: 'DartPad did not finish loading. Check your internet connection and try again.',
+  ),
+  'playgroundUnsupportedPlatform': _LocalizedValue(
+    ar: 'تشغيل DartPad داخل التطبيق متاح على Android و iOS و macOS فقط.',
+    en: 'Embedded DartPad is supported on Android, iOS, and macOS only.',
+  ),
   'startLearning': _LocalizedValue(ar: 'ابدأ التجربة', en: 'Start learning'),
   'continueLab': _LocalizedValue(ar: 'افتح التجربة', en: 'Open lab'),
   'trackTitle': _LocalizedValue(ar: 'مسار الدروس', en: 'Level Path'),

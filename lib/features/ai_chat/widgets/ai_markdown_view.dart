@@ -146,6 +146,7 @@ class _CodeElementBuilder extends MarkdownElementBuilder {
     return CopyableCodeBlock(
       code: code,
       language: language.isEmpty ? 'Dart' : language,
+      showPlaygroundAction: false,
     );
   }
 }

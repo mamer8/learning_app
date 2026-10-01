@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:learning/core/localization/app_localizations.dart';
 import 'package:learning/core/services/lab_progress_service.dart';
+import 'package:learning/core/widgets/copyable_code_block.dart';
 import 'package:learning/features/quiz/lab_quiz_data.dart';
 import 'package:learning/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +18,29 @@ void main() {
 
     expect(find.text('أكاديمية ومختبرات Flutter'), findsOneWidget);
     expect(find.text('أكملت 0 من 18 مختبر'), findsOneWidget);
+  });
+
+  testWidgets('lab code opens the interactive editor with its snippet', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      AppLocaleScope(
+        locale: const Locale('ar', 'EG'),
+        onToggleLanguage: () {},
+        child: MaterialApp(
+          home: const Scaffold(
+            body: CopyableCodeBlock(code: 'final answer = 42;'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('جرب بنفسك'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('محرر التجربة'), findsOneWidget);
+    final editor = tester.widget<TextField>(find.byType(TextField));
+    expect(editor.controller?.text, 'final answer = 42;');
   });
 
   testWidgets('opening a lab completes it automatically', (

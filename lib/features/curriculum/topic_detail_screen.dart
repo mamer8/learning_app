@@ -352,6 +352,7 @@ class _CodeBlock extends StatelessWidget {
       code: code,
       copiedMessage: isArabic ? 'تم نسخ الكود' : 'Code copied',
       copyTooltip: isArabic ? 'نسخ الكود' : 'Copy code',
+      showPlaygroundAction: false,
     );
   }
 }

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../localization/app_localizations.dart';
+import '../../features/playground/interactive_editor_screen.dart';
+
 /// كود بلوك احترافي بتصميم شبيه بمحررات الأكواد الحديثة
 class CopyableCodeBlock extends StatefulWidget {
   const CopyableCodeBlock({
@@ -10,6 +13,7 @@ class CopyableCodeBlock extends StatefulWidget {
     this.copiedMessage = 'تم نسخ الكود بنجاح!',
     this.copyTooltip = 'نسخ الكود',
     this.showLineNumbers = true,
+    this.showPlaygroundAction = true,
     super.key,
   });
 
@@ -18,6 +22,7 @@ class CopyableCodeBlock extends StatefulWidget {
   final String copiedMessage;
   final String copyTooltip;
   final bool showLineNumbers;
+  final bool showPlaygroundAction;
 
   @override
   State<CopyableCodeBlock> createState() => _CopyableCodeBlockState();
@@ -36,9 +41,16 @@ class _CopyableCodeBlockState extends State<CopyableCodeBlock> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Color(0xFF34D399), size: 18),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Color(0xFF34D399),
+              size: 18,
+            ),
             const SizedBox(width: 8),
-            Text(widget.copiedMessage, style: const TextStyle(color: Colors.white, fontSize: 12.5)),
+            Text(
+              widget.copiedMessage,
+              style: const TextStyle(color: Colors.white, fontSize: 12.5),
+            ),
           ],
         ),
         backgroundColor: const Color(0xFF0F172A),
@@ -92,17 +104,41 @@ class _CopyableCodeBlockState extends State<CopyableCodeBlock> {
                   // نقاط Mac الثلاث
                   Row(
                     children: [
-                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle)),
+                      Container(
+                        width: 9,
+                        height: 9,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEF4444),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 5),
-                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFFF59E0B), shape: BoxShape.circle)),
+                      Container(
+                        width: 9,
+                        height: 9,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF59E0B),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 5),
-                      Container(width: 9, height: 9, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
+                      Container(
+                        width: 9,
+                        height: 9,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF10B981),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(width: 12),
                   // لغة البرمجة
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1E293B),
                       borderRadius: BorderRadius.circular(6),
@@ -118,33 +154,74 @@ class _CopyableCodeBlockState extends State<CopyableCodeBlock> {
                     ),
                   ),
                   const Spacer(),
+                  if (widget.showPlaygroundAction) ...[
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => InteractiveEditorScreen(
+                              initialCode: widget.code,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.play_circle_outline_rounded,
+                        size: 15,
+                      ),
+                      label: Text(
+                        AppLocaleScope.of(context).strings.t('playgroundTry'),
+                        style: const TextStyle(fontSize: 10.5),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF5EEAD4),
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        minimumSize: const Size(0, 30),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                   // زر النسخ السريع
                   InkWell(
                     onTap: _handleCopy,
                     borderRadius: BorderRadius.circular(6),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: _isCopied ? const Color(0xFF064E3B) : const Color(0xFF1E293B),
+                        color: _isCopied
+                            ? const Color(0xFF064E3B)
+                            : const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: _isCopied ? const Color(0xFF10B981) : Colors.transparent,
+                          color: _isCopied
+                              ? const Color(0xFF10B981)
+                              : Colors.transparent,
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            _isCopied ? Icons.check_rounded : Icons.copy_rounded,
+                            _isCopied
+                                ? Icons.check_rounded
+                                : Icons.copy_rounded,
                             size: 13,
-                            color: _isCopied ? const Color(0xFF34D399) : const Color(0xFF94A3B8),
+                            color: _isCopied
+                                ? const Color(0xFF34D399)
+                                : const Color(0xFF94A3B8),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             _isCopied ? 'Copied' : 'Copy',
                             style: TextStyle(
-                              color: _isCopied ? const Color(0xFF34D399) : const Color(0xFF94A3B8),
+                              color: _isCopied
+                                  ? const Color(0xFF34D399)
+                                  : const Color(0xFF94A3B8),
                               fontSize: 10.5,
                               fontWeight: FontWeight.w600,
                             ),
