@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 🔍 مختبر الـ Debouncer والـ Throttler
 /// شاشة تفاعلية تشرح كيفية ترشيد استهلاك الشبكة وحماية أزرار التطبيق
@@ -203,6 +204,7 @@ class _DebouncerScreenState extends State<DebouncerScreen> {
         title: const Text('مختبر Debouncer & Throttler'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'debouncer'),
           IconButton(
             tooltip: 'اسأل المساعد الذكي',
             icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

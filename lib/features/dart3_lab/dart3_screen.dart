@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// نماذج حالات Dart 3 Sealed Classes
 sealed class AuthState {
@@ -140,6 +141,7 @@ class _Dart3ScreenState extends State<Dart3Screen> {
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر ميزات Dart 3 الحديثة' : 'Dart 3 Modern Features Lab'),
           actions: [
+          const LabQuizAction(labId: 'dart3'),
             IconButton(
               tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
               icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

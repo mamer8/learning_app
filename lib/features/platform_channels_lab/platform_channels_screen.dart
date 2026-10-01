@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// شاشة مختبر Platform Channels و Native Bridge
 class PlatformChannelsScreen extends StatefulWidget {
@@ -95,6 +96,7 @@ class _PlatformChannelsScreenState extends State<PlatformChannelsScreen> {
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر جسر المنصات (Platform Channels)' : 'Platform Channels & FFI Lab'),
           actions: [
+          const LabQuizAction(labId: 'platform-channels'),
             IconButton(
               icon: const Icon(Icons.auto_awesome, color: Color(0xFF22D3EE)),
               tooltip: isArabic ? 'اسأل الذكاء الاصطناعي عن Platform Channels' : 'Ask AI Copilot',

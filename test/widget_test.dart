@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:learning/main.dart';
 import 'package:learning/core/services/lab_progress_service.dart';
+import 'package:learning/features/quiz/lab_quiz_data.dart';
+import 'package:learning/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -31,6 +32,92 @@ void main() {
 
     final progress = await LabProgressService().load();
     expect(progress.isCompleted('isolates'), isTrue);
+  });
+
+  testWidgets('lab details open their interactive quiz', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const FlutterLearningLabApp());
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('quiz-isolates')), findsNothing);
+
+    await tester.tap(find.text('1. العمليات في الخلفية (Isolates)'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(
+      find.byKey(const ValueKey('lab-quiz-action-isolates')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('lab-quiz-action-isolates')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('ما الفائدة الأساسية من Isolate.run() في تطبيق Flutter؟'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('quiz-option-0')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('check-quiz-answer')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('إجابة صحيحة'), findsOneWidget);
+
+    final answerButton = find.byKey(const ValueKey('check-quiz-answer'));
+    await tester.ensureVisible(answerButton);
+    await tester.pumpAndSettle();
+    await tester.tap(answerButton);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('quiz-option-0')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quiz-option-0')));
+    await tester.pump();
+    await tester.ensureVisible(answerButton);
+    await tester.pumpAndSettle();
+    await tester.tap(answerButton);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(answerButton);
+    await tester.pumpAndSettle();
+    await tester.tap(answerButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('نتيجتك 1 من 2 (50٪)'), findsOneWidget);
+  });
+
+  test('every lab has two valid quiz questions', () {
+    expect(
+      labQuizzes.keys,
+      unorderedEquals([
+        'isolates',
+        'repaint-boundary',
+        'animations',
+        'memory-performance',
+        'slivers',
+        'physics-painter',
+        'debouncer',
+        'streams-rx',
+        'error-handling',
+        'offline-sync',
+        'dart3',
+        'state-inherited',
+        'clean-architecture',
+        'platform-channels',
+        'keys',
+        'security',
+        'deployment',
+        'extensions',
+      ]),
+    );
+    expect(labQuizTitles.keys, unorderedEquals(labQuizzes.keys));
+    for (final questions in labQuizzes.values) {
+      expect(questions, hasLength(2));
+      for (final question in questions) {
+        expect(question.options, hasLength(4));
+        expect(question.correctIndex, inInclusiveRange(0, 3));
+      }
+    }
   });
 
   test('opening a lab marks it complete and retains progress', () async {

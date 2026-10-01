@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 enum DemoAspect { counter, color, theme }
 
@@ -93,6 +94,7 @@ class _StateInheritedScreenState extends State<StateInheritedScreen> {
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر InheritedModel وإدارة الحالة' : 'InheritedModel & State Lab'),
           actions: [
+          const LabQuizAction(labId: 'state-inherited'),
             IconButton(
               tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
               icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

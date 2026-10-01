@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 🔑 نموذج عنصر البيانات في القائمة
 class LabItem {
@@ -106,6 +107,7 @@ class _KeysScreenState extends State<KeysScreen> {
         title: const Text('مختبر الـ 3 Trees والـ Keys'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'keys'),
           IconButton(
             tooltip: 'اسأل المساعد الذكي',
             icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

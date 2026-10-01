@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 🧪 مختبر الـ Isolates والـ Concurrency
 /// يوضح الفرق الجوهري بين تشغيل العمليات الثقيلة على الـ Main Thread (UI Thread)
@@ -154,6 +155,7 @@ class _IsolatesScreenState extends State<IsolatesScreen>
         backgroundColor: const Color(0xFF1E293B),
         elevation: 0,
         actions: [
+          const LabQuizAction(labId: 'isolates'),
           IconButton(
             tooltip: 'اسأل المساعد الذكي',
             icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

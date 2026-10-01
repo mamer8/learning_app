@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// شاشة مختبر تحسين الذاكرة وتفادي تسريبات RAM
 class MemoryPerfScreen extends StatefulWidget {
@@ -105,6 +106,7 @@ class _MemoryPerfScreenState extends State<MemoryPerfScreen> {
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر تسريبات الذاكرة والأداء' : 'Memory Leaks & Profiling Lab'),
           actions: [
+          const LabQuizAction(labId: 'memory-performance'),
             IconButton(
               icon: const Icon(Icons.auto_awesome, color: Color(0xFFF87171)),
               tooltip: isArabic ? 'اسأل الذكاء الاصطناعي عن إدارة الذاكرة' : 'Ask AI Copilot',

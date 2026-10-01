@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// حدث في خط تتبع الـ Stream (Stream Event)
 class StreamLogItem {
@@ -130,6 +131,7 @@ class _StreamsRxScreenState extends State<StreamsRxScreen> {
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر Streams والبرمجة التفاعلية' : 'Streams & Reactive Lab'),
           actions: [
+          const LabQuizAction(labId: 'streams-rx'),
             IconButton(
               tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
               icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

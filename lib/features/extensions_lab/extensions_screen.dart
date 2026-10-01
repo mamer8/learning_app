@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// ⚡ مختبر امتدادات الـ Core (Extensions Playground)
 /// شاشة تفاعلية لتجربة جميع الـ Extensions المنشأة مع فحص حي لخصائص الشاشة والتحقق من النصوص
@@ -53,6 +54,7 @@ class _ExtensionsScreenState extends State<ExtensionsScreen> {
         title: const Text('مختبر Extensions & Utilities'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'extensions'),
           IconButton(
             tooltip: 'اسأل المساعد الذكي',
             icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

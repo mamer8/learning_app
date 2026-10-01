@@ -70,6 +70,8 @@ const Map<String, _LocalizedValue> _values = {
   'of': _LocalizedValue(ar: 'من', en: 'of'),
   'labsCount': _LocalizedValue(ar: 'مختبر', en: 'labs'),
   'openLab': _LocalizedValue(ar: 'افتح المختبر', en: 'Open lab'),
+  'takeQuiz': _LocalizedValue(ar: 'اختبر نفسك', en: 'Take the quiz'),
+  'checkAnswer': _LocalizedValue(ar: 'تحقق من الإجابة', en: 'Check answer'),
   'progressLoadError': _LocalizedValue(
     ar: 'تعذر تحميل تقدم المختبرات.',
     en: 'Could not load lab progress.',

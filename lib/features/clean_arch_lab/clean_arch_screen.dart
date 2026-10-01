@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 1. Domain Layer: Entity
 class ArticleEntity {
@@ -144,6 +145,7 @@ class _CleanArchScreenState extends State<CleanArchScreen> {
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر المعمارية النظيفة (Clean Architecture)' : 'Clean Architecture & SOLID Lab'),
           actions: [
+          const LabQuizAction(labId: 'clean-architecture'),
             IconButton(
               tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
               icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

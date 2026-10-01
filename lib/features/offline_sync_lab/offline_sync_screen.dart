@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 class _OfflineTask {
   final String id;
@@ -135,6 +136,7 @@ class _OfflineSyncScreenState extends State<OfflineSyncScreen> {
         title: const Text('مختبر Offline-First والتزامن'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'offline-sync'),
           IconButton(
             icon: const Icon(Icons.auto_awesome, color: Color(0xFF38BDF8)),
             tooltip: 'اسأل الذكاء الاصطناعي عن Offline-First',

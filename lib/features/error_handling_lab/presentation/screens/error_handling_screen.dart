@@ -7,6 +7,7 @@ import '../../domain/repositories/user_repository.dart';
 import '../cubit/user_cubit.dart';
 import '../cubit/user_state.dart';
 import '../../../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../../../quiz/lab_quiz_action.dart';
 
 /// 🏛️ مختبر الـ Functional Error Handling مع `Either<Failure, Success>` و Cubit
 class ErrorHandlingScreen extends StatelessWidget {
@@ -65,6 +66,7 @@ class _ErrorHandlingView extends StatelessWidget {
         title: const Text('مختبر Either & معالجة الأخطاء'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'error-handling'),
           IconButton(
             tooltip: 'اسأل المساعد الذكي',
             icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

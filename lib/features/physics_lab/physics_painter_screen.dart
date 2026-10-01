@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// ⚡ مختبر الـ CustomPainter ومحاكي الجسيمات الفيزيائية
 /// يوضح قوة الـ Canvas والـ Direct GPU Drawing في معالجة آلاف العناصر بحسابات رياضية سلسة بمعدل 60/120 FPS
@@ -161,6 +162,7 @@ class _PhysicsPainterScreenState extends State<PhysicsPainterScreen>
         title: const Text('مختبر CustomPainter & الفيزياء'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'physics-painter'),
           IconButton(
             tooltip: 'اسأل المساعد الذكي',
             icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

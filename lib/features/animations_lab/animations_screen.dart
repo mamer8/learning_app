@@ -3,6 +3,7 @@ import 'package:flutter/physics.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// شاشة مختبر الحركات المتقدمة (Advanced Animations & Physics)
 class AnimationsScreen extends StatefulWidget {
@@ -148,6 +149,7 @@ class _AnimationsScreenState extends State<AnimationsScreen> with TickerProvider
         appBar: AppBar(
           title: Text(isArabic ? 'مختبر الحركات والفيزياء (Animations)' : 'Advanced Animations Lab'),
           actions: [
+          const LabQuizAction(labId: 'animations'),
             IconButton(
               tooltip: isArabic ? 'اسأل المساعد الذكي' : 'Ask AI Copilot',
               icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

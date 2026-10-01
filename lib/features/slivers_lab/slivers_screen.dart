@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 🌊 مختبر الـ Slivers وهندسة التمرير المتقدمة ومفتش الـ Geometry
 class SliversScreen extends StatefulWidget {
@@ -87,6 +88,7 @@ class _SliversScreenState extends State<SliversScreen> {
                   floating: _isFloating,
                   backgroundColor: const Color(0xFF1E293B),
                   actions: [
+          const LabQuizAction(labId: 'slivers'),
                     IconButton(
                       tooltip: 'اسأل المساعد الذكي',
                       icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

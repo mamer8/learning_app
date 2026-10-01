@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 🎨 مختبر الـ RepaintBoundary وتحسين أداء الرسوميات
 /// يوضح كيف يعزل Flutter عمليات الرسم (Painting) لمنع إعادة رسم العناصر الثابتة المجاورة
@@ -81,6 +82,7 @@ class _RepaintBoundaryScreenState extends State<RepaintBoundaryScreen>
         title: const Text('مختبر RepaintBoundary والأداء'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'repaint-boundary'),
           IconButton(
             tooltip: 'اسأل المساعد الذكي',
             icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),

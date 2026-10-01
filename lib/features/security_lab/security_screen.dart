@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 🔒 مختبر الأمان وتجديد الـ JWT Token والتشفير
 /// يوضح كيفية عمل الـ QueuedInterceptor وتشفير البيانات الحساسة برمجياً
@@ -166,6 +167,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
         title: const Text('مختبر الأمان والـ Token Interceptors'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'security'),
           IconButton(
             icon: const Icon(Icons.auto_awesome, color: Color(0xFFEC4899)),
             tooltip: 'اسأل الذكاء الاصطناعي عن الأمان و JWT',

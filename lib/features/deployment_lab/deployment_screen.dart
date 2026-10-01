@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../ai_chat/widgets/contextual_ai_sheet.dart';
+import '../quiz/lab_quiz_action.dart';
 
 /// 🚀 مختبر النشر على المتاجر وهندسة الإصدارات (App Stores & CI/CD)
 class DeploymentScreen extends StatefulWidget {
@@ -123,6 +124,7 @@ class _DeploymentScreenState extends State<DeploymentScreen> {
         title: const Text('مختبر النشر على المتاجر و CI/CD'),
         backgroundColor: const Color(0xFF1E293B),
         actions: [
+          const LabQuizAction(labId: 'deployment'),
           IconButton(
             icon: const Icon(Icons.auto_awesome, color: Color(0xFFF59E0B)),
             tooltip: 'اسأل الذكاء الاصطناعي عن CI/CD والنشر',
