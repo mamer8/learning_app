@@ -5,6 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'core/localization/app_localizations.dart';
 import 'core/services/ai_assistant_service.dart';
+import 'core/services/daily_streak_service.dart';
+import 'core/services/notification_service.dart';
+import 'core/utils/app_environment.dart';
 import 'features/home/home_screen.dart';
 
 Future<void> main() async {
@@ -17,8 +20,11 @@ Future<void> main() async {
     // .env might not exist in production or during test environments
   }
 
-  // Initialize AI assistant preferences
+  // Initialize environment and services
+  AppEnvironment.instance.init();
   await AiAssistantService.instance.init();
+  await DailyStreakService.instance.init();
+  await NotificationService.instance.init();
 
   runApp(const FlutterLearningLabApp());
 }
@@ -32,12 +38,19 @@ class FlutterLearningLabApp extends StatefulWidget {
 
 class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
   Locale _locale = const Locale('ar', 'EG');
+  bool _isDarkMode = true;
 
   void _toggleLanguage() {
     setState(() {
       _locale = _locale.languageCode == 'ar'
           ? const Locale('en', 'US')
           : const Locale('ar', 'EG');
+    });
+  }
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
     });
   }
 
@@ -48,6 +61,8 @@ class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
     return AppLocaleScope(
       locale: _locale,
       onToggleLanguage: _toggleLanguage,
+      isDarkMode: _isDarkMode,
+      onToggleTheme: _toggleTheme,
       child: MaterialApp(
         title: strings.t('appTitle'),
         debugShowCheckedModeBanner: false,
@@ -58,7 +73,7 @@ class _FlutterLearningLabAppState extends State<FlutterLearningLabApp> {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        themeMode: ThemeMode.dark,
+        themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
         theme: _buildTheme(Brightness.light),
         darkTheme: _buildTheme(Brightness.dark),
         home: const HomeScreen(),

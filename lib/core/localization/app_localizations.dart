@@ -4,12 +4,16 @@ class AppLocaleScope extends InheritedWidget {
   const AppLocaleScope({
     required this.locale,
     required this.onToggleLanguage,
+    this.isDarkMode = true,
+    this.onToggleTheme,
     required super.child,
     super.key,
   });
 
   final Locale locale;
   final VoidCallback onToggleLanguage;
+  final bool isDarkMode;
+  final VoidCallback? onToggleTheme;
 
   bool get isArabic => locale.languageCode == 'ar';
 
@@ -26,7 +30,8 @@ class AppLocaleScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AppLocaleScope oldWidget) {
-    return locale != oldWidget.locale;
+    return locale != oldWidget.locale ||
+        isDarkMode != oldWidget.isDarkMode;
   }
 }
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/daily_streak_service.dart';
 import '../../core/services/lab_progress_service.dart';
+import '../../core/services/notification_service.dart';
 import '../ai_chat/ai_chat_screen.dart';
 import '../animations_lab/animations_screen.dart';
 import '../clean_arch_lab/clean_arch_screen.dart';
@@ -50,6 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
       0; // 0: المعامل التفاعلية (Labs), 1: المسار التعليمي (Roadmap)
   String _labCategoryFilter = 'all'; // all, performance, network, architecture
   final _labProgressService = LabProgressService();
+  final _streakService = DailyStreakService.instance;
+  final _notificationService = NotificationService.instance;
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
   LabProgress _labProgress = LabProgress.empty();
   bool _isProgressLoading = true;
   String? _progressError;
@@ -61,6 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _progressReady = _loadProgress();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadProgress() async {
     setState(() {
       _isProgressLoading = true;
@@ -68,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     try {
       final progress = await _labProgressService.load();
+      await _streakService.recordDailyActivity();
       if (!mounted) return;
       setState(() {
         _labProgress = progress;
@@ -165,8 +178,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           child: SafeArea(
-            child: CustomScrollView(
-              slivers: [
+            child: RefreshIndicator(
+              onRefresh: _loadProgress,
+              color: const Color(0xFF14B8A6),
+              backgroundColor: const Color(0xFF0F172A),
+              child: CustomScrollView(
+                slivers: [
                 // 1. شريط العنوان واللغة
                 SliverAppBar(
                   pinned: true,
@@ -176,6 +193,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         : 'Flutter Master Academy',
                   ),
                   actions: [
+                    if (locale.onToggleTheme != null)
+                      IconButton(
+                        tooltip: locale.isDarkMode
+                            ? (isArabic ? 'الوضع الفاتح' : 'Light Mode')
+                            : (isArabic ? 'الوضع الداكن' : 'Dark Mode'),
+                        icon: Icon(
+                          locale.isDarkMode
+                              ? Icons.light_mode_rounded
+                              : Icons.dark_mode_rounded,
+                          color: locale.isDarkMode
+                              ? const Color(0xFFFDE68A)
+                              : const Color(0xFF38BDF8),
+                          size: 20,
+                        ),
+                        onPressed: locale.onToggleTheme,
+                      ),
                     IconButton(
                       tooltip: isArabic
                           ? 'مساعد Flutter الذكي'
@@ -216,12 +249,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildProgressCard(locale, labs.length),
                         14.heightBox,
 
+                        // بنر سلسلة الإنجاز والتحفيز اليومي (Streak & Daily Motivation)
+                        _buildStreakAndNotificationBanner(isArabic),
+                        14.heightBox,
+
                         // أزرار التبديل الرئيسية (Segmented Tab Bar)
                         _buildMainSegmentedSwitch(isArabic),
                         16.heightBox,
 
                         // عرض المحتوى بحسب التبويب المختار
                         if (_selectedTabIndex == 0) ...[
+                          _buildSearchBar(isArabic),
+                          12.heightBox,
                           _buildLabCategoryChips(isArabic),
                           14.heightBox,
                           _buildLabsGrid(isArabic, labs),
@@ -237,8 +276,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildProgressCard(AppLocaleScope locale, int totalLabs) {
     final strings = locale.strings;
@@ -352,6 +392,158 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildStreakAndNotificationBanner(bool isArabic) {
+    return ListenableBuilder(
+      listenable: _streakService,
+      builder: (context, _) {
+        final streak = _streakService.data;
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF1E1B4B), Color(0xFF172554), Color(0xFF101828)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF6366F1).withValues(alpha: 0.35),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text('🔥', style: TextStyle(fontSize: 20)),
+              ),
+              10.widthBox,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          isArabic
+                              ? '${streak.currentStreak} ${streak.currentStreak == 1 ? "يوم متواصل" : "أيام متتالية"}'
+                              : '${streak.currentStreak} Days Streak',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        6.widthBox,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6366F1).withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isArabic
+                                ? 'أعلى رقم: ${streak.maxStreak}'
+                                : 'Best: ${streak.maxStreak}d',
+                            style: const TextStyle(
+                                color: Color(0xFFA5B4FC),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    2.heightBox,
+                    Text(
+                      isArabic
+                          ? 'واصل استكشاف المختبرات يومياً للحفاظ على سلسلتك وفتح الشارات!'
+                          : 'Explore labs daily to maintain streak & unlock badges!',
+                      style: const TextStyle(color: Colors.white60, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+              8.widthBox,
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6366F1),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                ),
+                onPressed: () {
+                  _notificationService
+                      .triggerSimulatedDailyNotification(context);
+                },
+                icon: const Icon(Icons.notifications_active_rounded,
+                    color: Colors.white, size: 14),
+                label: Text(
+                  isArabic ? 'تحدي اليوم' : 'Daily Tip',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchBar(bool isArabic) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _searchQuery.isNotEmpty
+              ? const Color(0xFF14B8A6)
+              : const Color(0xFF1E293B),
+        ),
+      ),
+      child: TextField(
+        controller: _searchController,
+        style: const TextStyle(color: Colors.white, fontSize: 13),
+        onChanged: (val) {
+          setState(() {
+            _searchQuery = val;
+          });
+        },
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: isArabic
+              ? '🔍 ابحث بين المختبرات (بالاسم، المفهوم، أو التقنية)...'
+              : '🔍 Search labs (by name, keyword, or concept)...',
+          hintStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+          prefixIcon: const Icon(Icons.search_rounded,
+              color: Color(0xFF14B8A6), size: 20),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear_rounded,
+                      color: Colors.white54, size: 18),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        ),
       ),
     );
   }
@@ -876,9 +1068,60 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLabsGrid(bool isArabic, List<_Lab> allLabs) {
     final filteredLabs = allLabs.where((lab) {
-      if (_labCategoryFilter == 'all') return true;
-      return lab.category == _labCategoryFilter;
+      final matchesCategory =
+          _labCategoryFilter == 'all' || lab.category == _labCategoryFilter;
+      if (!matchesCategory) return false;
+      if (_searchQuery.trim().isEmpty) return true;
+      final q = _searchQuery.trim().toLowerCase();
+      return lab.title.toLowerCase().contains(q) ||
+          lab.subtitle.toLowerCase().contains(q) ||
+          lab.id.toLowerCase().contains(q);
     }).toList();
+
+    if (filteredLabs.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(28),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color(0xFF101828),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF1E293B)),
+        ),
+        child: Column(
+          children: [
+            const Icon(Icons.search_off_rounded,
+                color: Color(0xFF64748B), size: 40),
+            8.heightBox,
+            Text(
+              isArabic
+                  ? 'لم يتم العثور على مختبرات مطابقة لـ "$_searchQuery"'
+                  : 'No labs matching "$_searchQuery"',
+              style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold),
+            ),
+            12.heightBox,
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF14B8A6)),
+              onPressed: () {
+                _searchController.clear();
+                setState(() {
+                  _searchQuery = '';
+                  _labCategoryFilter = 'all';
+                });
+              },
+              child: Text(
+                isArabic ? 'إعادة ضبط البحث' : 'Clear Search',
+                style: const TextStyle(
+                    color: Color(0xFF04111C), fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return AdaptiveGrid(
       mobileColumns: 1,
