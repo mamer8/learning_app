@@ -24,6 +24,7 @@ import '../slivers_lab/slivers_screen.dart';
 import '../state_comparison_lab/state_comparison_screen.dart';
 import '../state_inherited_lab/state_inherited_screen.dart';
 import '../streams_rx_lab/streams_rx_screen.dart';
+import '../testing_lab/testing_screen.dart';
 
 typedef _Lab = ({
   String id,
@@ -831,11 +832,24 @@ class _HomeScreenState extends State<HomeScreen> {
         page: const DeploymentScreen(),
       ),
       (
+        id: 'testing',
+        category: 'architecture',
+        title: isArabic
+            ? '19. اختبارات الوحدة والواجهة (Testing Lab)'
+            : '19. Unit, Widget & Bloc Testing',
+        subtitle: isArabic
+            ? 'اختبار دوال المنطق وحركات الـ Widgets وتدفق حالات Cubit و Mocktail مع CI/CD.'
+            : 'Automated testing with flutter_test, mocktail, bloc_test and GitHub Actions.',
+        icon: Icons.fact_check_rounded,
+        color: const Color(0xFF10B981),
+        page: const TestingScreen(),
+      ),
+      (
         id: 'extensions',
         category: 'architecture',
         title: isArabic
-            ? '19. اختصارات الكود الذكية (Extensions)'
-            : '19. Core Extensions Playground',
+            ? '20. اختصارات الكود الذكية (Extensions)'
+            : '20. Core Extensions Playground',
         subtitle: isArabic
             ? 'اختصارات سهلة لفحص الإيميل ورقم الموبايل وتحديد مسافات الشاشة بسرعة.'
             : 'Live context dimensions, floating snackbars and validators.',

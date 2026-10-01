@@ -64,6 +64,10 @@ const Map<String, QuizText> labQuizTitles = {
   'keys': QuizText(ar: 'مختبر المفاتيح', en: 'Keys Lab'),
   'security': QuizText(ar: 'مختبر الأمان', en: 'Security Lab'),
   'deployment': QuizText(ar: 'مختبر النشر', en: 'Deployment Lab'),
+  'testing': QuizText(
+    ar: 'مختبر اختبارات الوحدة والواجهة (Testing Lab)',
+    en: 'Unit & Widget Testing Lab',
+  ),
   'extensions': QuizText(ar: 'مختبر Extensions', en: 'Extensions Lab'),
 };
 
@@ -1117,6 +1121,66 @@ const Map<String, List<LabQuizQuestion>> labQuizzes = {
       explanation: QuizText(
         ar: 'يوفر ValueNotifier مع ValueListenableBuilder أسلوباً بسيطاً ومدمجاً في Flutter Framework لتحديث جزئيات محددة بدون إضافة أي حزم خارجية.',
         en: 'ValueNotifier with ValueListenableBuilder offers a clean, zero-dependency reactive approach for scoped micro-state.',
+      ),
+    ),
+  ],
+  'testing': [
+    LabQuizQuestion(
+      question: QuizText(
+        ar: 'ما هو الترتيب الصحيح لنمط AAA في اختبارات البرمجيات؟',
+        en: 'What is the correct order of the AAA pattern in software testing?',
+      ),
+      options: [
+        QuizText(
+          ar: 'Arrange (التجهيز) ثم Act (التنفيذ) ثم Assert (التحقق)',
+          en: 'Arrange, Act, then Assert',
+        ),
+        QuizText(
+          ar: 'Assert ثم Arrange ثم Act',
+          en: 'Assert, Arrange, then Act',
+        ),
+        QuizText(
+          ar: 'Act ثم Assert ثم Arrange',
+          en: 'Act, Assert, then Arrange',
+        ),
+        QuizText(
+          ar: 'Analyze ثم Adapt ثم Apply',
+          en: 'Analyze, Adapt, then Apply',
+        ),
+      ],
+      correctIndex: 0,
+      explanation: QuizText(
+        ar: 'نمط Arrange-Act-Assert هو المعيار الذهبي لتنظيم الاختبارات: تهيئة البيانات والـ Mocks، ثم استدعاء الدالة المراد اختبارها، ثم التحقق من النتائج.',
+        en: 'The Arrange-Act-Assert pattern organizes tests by preparing inputs and mocks, executing the target method, and asserting outcomes.',
+      ),
+    ),
+    LabQuizQuestion(
+      question: QuizText(
+        ar: 'ما الفائدة من استخدام tester.pumpAndSettle() في Widget Tests؟',
+        en: 'What is the purpose of tester.pumpAndSettle() in Widget Tests?',
+      ),
+      options: [
+        QuizText(
+          ar: 'الانتظار حتى انتهاء جميع الرسوم المتحركة وعمليات الـ Future واستقرار الشاشة',
+          en: 'Repeatedly pump frames until all animations and microtasks settle',
+        ),
+        QuizText(
+          ar: 'إغلاق شاشات التطبيق وحذف البيانات',
+          en: 'Close all screens and clear data',
+        ),
+        QuizText(
+          ar: 'إرسال تقرير الاختبار إلى السيرفر',
+          en: 'Upload test report to backend server',
+        ),
+        QuizText(
+          ar: 'تخطي فحص الأخطاء',
+          en: 'Bypass test error validations',
+        ),
+      ],
+      correctIndex: 0,
+      explanation: QuizText(
+        ar: 'دالة pumpAndSettle تكرر رسم الإطارات حتى تنتهي كل التحريكات والمؤقتات المجدولة، مما يضمن أن الشاشة وصلت لحالتها النهائية المستقرة قبل الفحص.',
+        en: 'pumpAndSettle pumps frames repeatedly until there are no more scheduled frames or animations, ensuring the UI is completely settled.',
       ),
     ),
   ],

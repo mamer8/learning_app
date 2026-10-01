@@ -17,7 +17,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('أكاديمية ومختبرات Flutter'), findsOneWidget);
-    expect(find.text('أكملت 0 من 18 مختبر'), findsOneWidget);
+    expect(find.text('أكملت 0 من 20 مختبر'), findsOneWidget);
   });
 
   testWidgets('lab code opens the interactive editor with its snippet', (
@@ -127,11 +127,13 @@ void main() {
         'offline-sync',
         'dart3',
         'state-inherited',
+        'state-comparison',
         'clean-architecture',
         'platform-channels',
         'keys',
         'security',
         'deployment',
+        'testing',
         'extensions',
       ]),
     );
