@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../core/core.dart';
 import '../../core/services/ai_assistant_service.dart';
+import '../../core/services/text_to_speech_service.dart';
 import 'widgets/ai_markdown_view.dart';
 import 'widgets/ai_typing_indicator.dart';
 
@@ -31,11 +32,30 @@ class _AiChatScreenState extends State<AiChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final AiAssistantService _aiService = AiAssistantService.instance;
+  final TextToSpeechService _tts = TextToSpeechService.instance;
 
   final List<ChatMessage> _messages = [];
   bool _isLoading = false;
 
   final List<({String title, String prompt, IconData icon, Color color})> _suggestedTopics = [
+    (
+      title: '⚡ توليد كود لـ Isolates',
+      prompt: 'أريد كود كامل ومحسّن لمعالجة قائمة ضخمة من بيانات JSON في الخلفية باستخدام Isolate.run() مع معالجة الأخطاء.',
+      icon: Icons.bolt_rounded,
+      color: const Color(0xFF0284C7),
+    ),
+    (
+      title: '⚡ توليد كود لـ Cubit & State',
+      prompt: 'اكتب لي مثال كود كامل يوضح إدارة الحالة بـ Cubit مع BlocSelector لعزل الـ Rebuilds بدقة.',
+      icon: Icons.compare_arrows_rounded,
+      color: const Color(0xFF10B981),
+    ),
+    (
+      title: '⚡ توليد كود لـ Drift & SQLite',
+      prompt: 'أعطني كود جدول Drift مع DAO واستعلامات Streams وترقية Schema Migration من v1 إلى v2.',
+      icon: Icons.storage_rounded,
+      color: const Color(0xFF38BDF8),
+    ),
     (
       title: 'بنية Clean Architecture',
       prompt: 'كيف أصمم بنية Clean Architecture مع BLoC وإدارة الحالات في مشروع إنتاجي كبير؟',
@@ -690,28 +710,32 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     style: const TextStyle(color: Color(0xFF64748B), fontSize: 9.5),
                   ),
                   const Spacer(),
-                  // زر نسخ الإجابة بالكامل
+                  // زر نسخ الكود فقط
                   InkWell(
                     onTap: () {
-                      Clipboard.setData(ClipboardData(text: message.text));
+                      final codeOnly =
+                          TextToSpeechService.extractOnlyCode(message.text);
+                      Clipboard.setData(ClipboardData(text: codeOnly));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Row(
+                        const SnackBar(
+                          content: Row(
                             children: [
-                              Icon(Icons.check_circle_rounded, color: Color(0xFF34D399), size: 16),
+                              Icon(Icons.check_circle_rounded,
+                                  color: Color(0xFF38BDF8), size: 16),
                               SizedBox(width: 8),
-                              Text('تم نسخ الإجابة بالكامل إلى الحافظة!'),
+                              Text('تم نسخ الأكواد البرمجية فقط إلى الحافظة!'),
                             ],
                           ),
                           behavior: SnackBarBehavior.floating,
-                          backgroundColor: const Color(0xFF0F172A),
-                          duration: const Duration(seconds: 1),
+                          backgroundColor: Color(0xFF0F172A),
+                          duration: Duration(seconds: 1),
                         ),
                       );
                     },
                     borderRadius: BorderRadius.circular(6),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(6),
@@ -719,12 +743,115 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.copy_rounded, size: 12, color: Color(0xFF94A3B8)),
+                          Icon(Icons.code_rounded,
+                              size: 12, color: Color(0xFF38BDF8)),
                           SizedBox(width: 4),
-                          Text('نسخ الرد', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9.5)),
+                          Text('نسخ الكود فقط',
+                              style: TextStyle(
+                                  color: Color(0xFF38BDF8),
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
+                  ),
+                  const SizedBox(width: 6),
+                  // زر نسخ الإجابة بالكامل
+                  InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: message.text));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.check_circle_rounded,
+                                  color: Color(0xFF34D399), size: 16),
+                              SizedBox(width: 8),
+                              Text('تم نسخ الإجابة بالكامل إلى الحافظة!'),
+                            ],
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Color(0xFF0F172A),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E293B),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.copy_rounded,
+                              size: 12, color: Color(0xFF94A3B8)),
+                          SizedBox(width: 4),
+                          Text('نسخ الرد',
+                              style: TextStyle(
+                                  color: Color(0xFF94A3B8), fontSize: 9.5)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  // زر القراءة الصوتية
+                  ListenableBuilder(
+                    listenable: _tts,
+                    builder: (context, _) {
+                      final isSpeakingThis = _tts.isSpeaking &&
+                          _tts.currentSpeakingText ==
+                              TextToSpeechService.cleanMarkdownForSpeech(
+                                  message.text);
+                      return InkWell(
+                        onTap: () {
+                          _tts.toggleSpeak(message.text, isArabic: true);
+                        },
+                        borderRadius: BorderRadius.circular(6),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isSpeakingThis
+                                ? const Color(0x3310B981)
+                                : const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(6),
+                            border: isSpeakingThis
+                                ? Border.all(
+                                    color: const Color(0xFF10B981), width: 0.8)
+                                : null,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isSpeakingThis
+                                    ? Icons.volume_up_rounded
+                                    : Icons.volume_up_outlined,
+                                size: 12,
+                                color: isSpeakingThis
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF14B8A6),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                isSpeakingThis ? 'إيقاف' : 'صوت',
+                                style: TextStyle(
+                                  color: isSpeakingThis
+                                      ? const Color(0xFF34D399)
+                                      : const Color(0xFF14B8A6),
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

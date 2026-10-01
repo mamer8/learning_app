@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/services/ai_assistant_service.dart';
+import '../../../core/services/text_to_speech_service.dart';
 import 'ai_markdown_view.dart';
 import 'ai_typing_indicator.dart';
 
@@ -50,11 +52,13 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
   final TextEditingController _promptController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final AiAssistantService _aiService = AiAssistantService.instance;
+  final TextToSpeechService _tts = TextToSpeechService.instance;
 
   bool _isLoading = false;
   String _aiResponse = '';
 
   final List<String> _quickPrompts = [
+    '⚡ توليد كود محسّن للمختبر للإنتاج',
     'اشرح لي هذا الكود بمثال وسيناريو عملي',
     'كيف أكتب Unit Tests لاختبار هذا المفهوم؟',
     'ما هي البدائل الشائعة ومقارنة الأداء؟',
@@ -329,23 +333,147 @@ class _ContextualAiSheetState extends State<ContextualAiSheet> {
             // مساحة عرض إجابة المساعد الذكي
             Expanded(
               child: Container(
-                margin: const EdgeInsets.all(14),
-                padding: const EdgeInsets.all(14),
+                margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0D1527),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: const Color(0xFF1E293B)),
                 ),
-                child: _isLoading
-                    ? const Center(
-                        child: AiTypingIndicator(
-                          statusText: 'المساعد الذكي يحلل الكود والموضوع في بيئة الإنتاج...',
+                child: Column(
+                  children: [
+                    if (!_isLoading && _aiResponse.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF0F172A),
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(13)),
+                          border: Border(
+                            bottom: BorderSide(color: Color(0xFF1E293B)),
+                          ),
                         ),
-                      )
-                    : SingleChildScrollView(
-                        controller: _scrollController,
-                        child: AiMarkdownView(data: _aiResponse),
+                        child: Row(
+                          children: [
+                            const Text(
+                              'إجراءات الرد:',
+                              style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const Spacer(),
+                            // زر نسخ الكود فقط
+                            TextButton.icon(
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                              ),
+                              onPressed: () {
+                                final codeOnly =
+                                    TextToSpeechService.extractOnlyCode(
+                                        _aiResponse);
+                                Clipboard.setData(
+                                    ClipboardData(text: codeOnly));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    backgroundColor: Color(0xFF065F46),
+                                    content: Text(
+                                        '✅ تم استخراج ونسخ الأكواد البرمجية فقط إلى الحافظة!'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.code_rounded,
+                                  color: Color(0xFF38BDF8), size: 14),
+                              label: const Text(
+                                'نسخ الكود فقط',
+                                style: TextStyle(
+                                    color: Color(0xFF38BDF8),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            4.widthBox,
+                            // زر نسخ الرد كاملاً
+                            IconButton(
+                              tooltip: 'نسخ الرد كاملاً',
+                              iconSize: 16,
+                              visualDensity: VisualDensity.compact,
+                              icon: const Icon(Icons.copy_rounded,
+                                  color: Colors.white60),
+                              onPressed: () {
+                                Clipboard.setData(
+                                    ClipboardData(text: _aiResponse));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    backgroundColor: Color(0xFF1E293B),
+                                    content: Text('تم نسخ الرد بالكامل!'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                            ),
+                            // زر القراءة الصوتية
+                            ListenableBuilder(
+                              listenable: _tts,
+                              builder: (context, _) {
+                                final isSpeaking = _tts.isSpeaking;
+                                return TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    visualDensity: VisualDensity.compact,
+                                    backgroundColor: isSpeaking
+                                        ? const Color(0x3310B981)
+                                        : Colors.transparent,
+                                  ),
+                                  onPressed: () {
+                                    _tts.toggleSpeak(_aiResponse,
+                                        isArabic: widget.isArabic);
+                                  },
+                                  icon: Icon(
+                                    isSpeaking
+                                        ? Icons.volume_up_rounded
+                                        : Icons.volume_up_outlined,
+                                    color: isSpeaking
+                                        ? const Color(0xFF34D399)
+                                        : const Color(0xFF14B8A6),
+                                    size: 15,
+                                  ),
+                                  label: Text(
+                                    isSpeaking ? 'إيقاف الصوت' : 'قراءة صوتية',
+                                    style: TextStyle(
+                                      color: isSpeaking
+                                          ? const Color(0xFF34D399)
+                                          : const Color(0xFF14B8A6),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: _isLoading
+                            ? const Center(
+                                child: AiTypingIndicator(
+                                  statusText:
+                                      'المساعد الذكي يحلل الكود ويولد النسخة المحسنة...',
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                controller: _scrollController,
+                                child: AiMarkdownView(data: _aiResponse),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
