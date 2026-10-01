@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/core.dart';
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/lab_progress_service.dart';
 import '../ai_chat/ai_chat_screen.dart';
 import '../animations_lab/animations_screen.dart';
 import '../clean_arch_lab/clean_arch_screen.dart';
@@ -23,6 +24,16 @@ import '../slivers_lab/slivers_screen.dart';
 import '../state_inherited_lab/state_inherited_screen.dart';
 import '../streams_rx_lab/streams_rx_screen.dart';
 
+typedef _Lab = ({
+  String id,
+  String category,
+  String title,
+  String subtitle,
+  IconData icon,
+  Color color,
+  Widget page,
+});
+
 /// الشاشة الرئيسية المطورة لأكاديمية ومختبرات Flutter
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,13 +43,71 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedTabIndex = 0; // 0: المعامل التفاعلية (Labs), 1: المسار التعليمي (Roadmap)
+  int _selectedTabIndex =
+      0; // 0: المعامل التفاعلية (Labs), 1: المسار التعليمي (Roadmap)
   String _labCategoryFilter = 'all'; // all, performance, network, architecture
+  final _labProgressService = LabProgressService();
+  LabProgress _labProgress = LabProgress.empty();
+  bool _isProgressLoading = true;
+  String? _progressError;
+  late Future<void> _progressReady;
+
+  @override
+  void initState() {
+    super.initState();
+    _progressReady = _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    setState(() {
+      _isProgressLoading = true;
+      _progressError = null;
+    });
+    try {
+      final progress = await _labProgressService.load();
+      if (!mounted) return;
+      setState(() {
+        _labProgress = progress;
+        _isProgressLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _progressError = error.toString();
+        _isProgressLoading = false;
+      });
+    }
+  }
+
+  Future<void> _openLab(_Lab lab) async {
+    await _progressReady;
+    try {
+      final progress = await _labProgressService.markOpened(lab.id);
+      if (mounted) {
+        setState(() {
+          _labProgress = progress;
+          _progressError = null;
+        });
+      }
+    } catch (_) {
+      _showProgressError();
+    }
+    if (mounted) context.push(lab.page);
+  }
+
+  void _showProgressError() {
+    if (!mounted) return;
+    final strings = AppLocaleScope.of(context).strings;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(strings.t('progressSaveError'))));
+  }
 
   @override
   Widget build(BuildContext context) {
     final locale = AppLocaleScope.of(context);
     final isArabic = locale.isArabic;
+    final labs = _buildLabs(isArabic);
 
     return Directionality(
       textDirection: locale.textDirection,
@@ -69,10 +138,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => const AiChatScreen()),
               );
             },
-            icon: const Icon(Icons.psychology_rounded, color: Colors.white, size: 22),
+            icon: const Icon(
+              Icons.psychology_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
             label: Text(
               isArabic ? 'مساعد Flutter الذكي' : 'Flutter AI Copilot',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+              ),
             ),
           ),
         ),
@@ -90,15 +167,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 // 1. شريط العنوان واللغة
                 SliverAppBar(
                   pinned: true,
-                  title: Text(isArabic ? 'أكاديمية ومختبرات Flutter' : 'Flutter Master Academy'),
+                  title: Text(
+                    isArabic
+                        ? 'أكاديمية ومختبرات Flutter'
+                        : 'Flutter Master Academy',
+                  ),
                   actions: [
                     IconButton(
-                      tooltip: isArabic ? 'مساعد Flutter الذكي' : 'Flutter AI Copilot',
-                      icon: const Icon(Icons.psychology_rounded, color: Color(0xFF14B8A6)),
+                      tooltip: isArabic
+                          ? 'مساعد Flutter الذكي'
+                          : 'Flutter AI Copilot',
+                      icon: const Icon(
+                        Icons.psychology_rounded,
+                        color: Color(0xFF14B8A6),
+                      ),
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const AiChatScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const AiChatScreen(),
+                          ),
                         );
                       },
                     ),
@@ -122,6 +210,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         // بنر الترحيب المصغر الأنيق
                         _buildHeaderBanner(isArabic),
                         14.heightBox,
+                        _buildProgressCard(locale, labs.length),
+                        14.heightBox,
 
                         // أزرار التبديل الرئيسية (Segmented Tab Bar)
                         _buildMainSegmentedSwitch(isArabic),
@@ -131,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (_selectedTabIndex == 0) ...[
                           _buildLabCategoryChips(isArabic),
                           14.heightBox,
-                          _buildLabsGrid(isArabic),
+                          _buildLabsGrid(isArabic, labs),
                         ] else ...[
                           _buildRoadmapSection(isArabic),
                         ],
@@ -147,6 +237,122 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildProgressCard(AppLocaleScope locale, int totalLabs) {
+    final strings = locale.strings;
+    final completedCount = _labProgress.completedLabIds.length;
+    final progress = totalLabs == 0 ? 0.0 : completedCount / totalLabs;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF122B35), Color(0xFF101828)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: const Color(0xFF14B8A6).withValues(alpha: 0.22),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF14B8A6).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: const Icon(
+                  Icons.trending_up_rounded,
+                  color: Color(0xFF5EEAD4),
+                  size: 23,
+                ),
+              ),
+              12.widthBox,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      strings.t('progressTitle'),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                    4.heightBox,
+                    Text(
+                      '${strings.t('completed')} $completedCount '
+                      '${strings.t('of')} $totalLabs ${strings.t('labsCount')}',
+                      style: const TextStyle(
+                        color: Color(0xFFCBD5E1),
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              12.widthBox,
+              if (_isProgressLoading)
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Text(
+                  '${(progress * 100).round()}%',
+                  style: const TextStyle(
+                    color: Color(0xFF5EEAD4),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                  ),
+                ),
+            ],
+          ),
+          12.heightBox,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 5,
+              backgroundColor: const Color(0xFF24324A),
+              valueColor: const AlwaysStoppedAnimation(Color(0xFF14B8A6)),
+            ),
+          ),
+          if (_progressError != null) ...[
+            8.heightBox,
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    strings.t('progressLoadError'),
+                    style: const TextStyle(
+                      color: Color(0xFFFCA5A5),
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _progressReady = _loadProgress();
+                  },
+                  child: Text(strings.t('retry')),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeaderBanner(bool isArabic) {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -157,9 +363,15 @@ class _HomeScreenState extends State<HomeScreen> {
           colors: [Color(0xFF133E47), Color(0xFF101828), Color(0xFF19253B)],
         ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFF14B8A6).withValues(alpha: 0.3),
+        ),
         boxShadow: const [
-          BoxShadow(color: Color(0x33000000), blurRadius: 16, offset: Offset(0, 8)),
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
         ],
       ),
       child: Column(
@@ -173,12 +385,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: const Color(0xFF14B8A6).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.touch_app_rounded, color: Color(0xFF5EEAD4), size: 24),
+                child: const Icon(
+                  Icons.touch_app_rounded,
+                  color: Color(0xFF5EEAD4),
+                  size: 24,
+                ),
               ),
               10.widthBox,
               Expanded(
                 child: Text(
-                  isArabic ? 'تجارب تفاعلية بسيطة لتطوير Flutter' : 'Interactive Flutter Master Reference',
+                  isArabic
+                      ? 'تجارب تفاعلية بسيطة لتطوير Flutter'
+                      : 'Interactive Flutter Master Reference',
                   style: const TextStyle(
                     color: Color(0xFF5EEAD4),
                     fontWeight: FontWeight.w800,
@@ -193,7 +411,11 @@ class _HomeScreenState extends State<HomeScreen> {
             isArabic
                 ? 'جرّب كل ميزة بإيدك: غيّر القيم وشوف الحركة وسرعة التطبيق والكود بيتعدل قدامك لحظة بلحظة.'
                 : 'Live interactive labs for performance, concurrency, clean architecture, security, and store releases.',
-            style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 12, height: 1.45),
+            style: const TextStyle(
+              color: Color(0xFFCBD5E1),
+              fontSize: 12,
+              height: 1.45,
+            ),
           ),
           12.heightBox,
           InkWell(
@@ -209,21 +431,35 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: const Color(0xFF0F172A).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.5)),
+                border: Border.all(
+                  color: const Color(0xFF14B8A6).withValues(alpha: 0.5),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.auto_awesome_rounded, color: Color(0xFF5EEAD4), size: 16),
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Color(0xFF5EEAD4),
+                    size: 16,
+                  ),
                   8.widthBox,
                   Expanded(
                     child: Text(
                       isArabic
                           ? 'اسأل المساعد الذكي (AI) بالعامية عن أي كود أو شرح...'
                           : 'Ask AI Copilot for architecture advice & code review...',
-                      style: const TextStyle(color: Color(0xFF5EEAD4), fontSize: 11.5, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Color(0xFF5EEAD4),
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_rounded, color: Color(0xFF5EEAD4), size: 16),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Color(0xFF5EEAD4),
+                    size: 16,
+                  ),
                 ],
               ),
             ),
@@ -247,14 +483,18 @@ class _HomeScreenState extends State<HomeScreen> {
             child: _buildSegmentButton(
               index: 0,
               icon: Icons.touch_app_rounded,
-              label: isArabic ? 'التجارب العملية (18 فكرة)' : 'Interactive Labs (18 Labs)',
+              label: isArabic
+                  ? 'التجارب العملية (18 فكرة)'
+                  : 'Interactive Labs (18 Labs)',
             ),
           ),
           Expanded(
             child: _buildSegmentButton(
               index: 1,
               icon: Icons.menu_book_rounded,
-              label: isArabic ? 'خطة المنهج (6 مستويات)' : 'Curriculum Path (6 Levels)',
+              label: isArabic
+                  ? 'خطة المنهج (6 مستويات)'
+                  : 'Curriculum Path (6 Levels)',
             ),
           ),
         ],
@@ -262,7 +502,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSegmentButton({required int index, required IconData icon, required String label}) {
+  Widget _buildSegmentButton({
+    required int index,
+    required IconData icon,
+    required String label,
+  }) {
     final isSelected = _selectedTabIndex == index;
     return InkWell(
       onTap: () => setState(() => _selectedTabIndex = index),
@@ -277,7 +521,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 16, color: isSelected ? const Color(0xFF04111C) : Colors.white60),
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? const Color(0xFF04111C) : Colors.white60,
+            ),
             6.widthBox,
             Text(
               label,
@@ -296,9 +544,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildLabCategoryChips(bool isArabic) {
     final categories = [
       (id: 'all', label: isArabic ? 'كل التجارب (18)' : 'All (18)'),
-      (id: 'performance', label: isArabic ? '⚡ السرعة والحركات' : '⚡ Performance & Motion'),
-      (id: 'network', label: isArabic ? '🌐 النت والبيانات' : '🌐 Network & Streams'),
-      (id: 'architecture', label: isArabic ? '🔒 تنظيم الكود' : '🔒 Architecture & Dart 3'),
+      (
+        id: 'performance',
+        label: isArabic ? '⚡ السرعة والحركات' : '⚡ Performance & Motion',
+      ),
+      (
+        id: 'network',
+        label: isArabic ? '🌐 النت والبيانات' : '🌐 Network & Streams',
+      ),
+      (
+        id: 'architecture',
+        label: isArabic ? '🔒 تنظيم الكود' : '🔒 Architecture & Dart 3',
+      ),
     ];
 
     return SingleChildScrollView(
@@ -314,7 +571,9 @@ class _HomeScreenState extends State<HomeScreen> {
               selectedColor: const Color(0xFF14B8A6).withValues(alpha: 0.25),
               backgroundColor: const Color(0xFF101828),
               side: BorderSide(
-                color: isSelected ? const Color(0xFF14B8A6) : const Color(0xFF24324A),
+                color: isSelected
+                    ? const Color(0xFF14B8A6)
+                    : const Color(0xFF24324A),
               ),
               labelStyle: TextStyle(
                 color: isSelected ? const Color(0xFF5EEAD4) : Colors.white70,
@@ -329,53 +588,83 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildLabsGrid(bool isArabic) {
-    final allLabs = [
+  List<_Lab> _buildLabs(bool isArabic) {
+    return [
       // 1. Performance & Motion Category
       (
+        id: 'isolates',
         category: 'performance',
-        title: isArabic ? '1. العمليات في الخلفية (Isolates)' : '1. Isolates & Concurrency',
-        subtitle: isArabic ? 'شغل الحسابات الثقيلة في الخلفية عشان الشاشة ما تهنجش وتفضل سريعة.' : 'Main Thread freeze vs Isolate.run() smoothness.',
+        title: isArabic
+            ? '1. العمليات في الخلفية (Isolates)'
+            : '1. Isolates & Concurrency',
+        subtitle: isArabic
+            ? 'شغل الحسابات الثقيلة في الخلفية عشان الشاشة ما تهنجش وتفضل سريعة.'
+            : 'Main Thread freeze vs Isolate.run() smoothness.',
         icon: Icons.bolt_rounded,
         color: const Color(0xFF0284C7),
         page: const IsolatesScreen(),
       ),
       (
+        id: 'repaint-boundary',
         category: 'performance',
-        title: isArabic ? '2. تسريع الرسم (Repaint Boundary)' : '2. RepaintBoundary & GPU',
-        subtitle: isArabic ? 'اعزل الأجزاء اللي بتتحرك عشان كارت الشاشة ما يرسمش باقي الشاشة عالفاضي.' : 'Isolate render layers to prevent full repaint jank.',
+        title: isArabic
+            ? '2. تسريع الرسم (Repaint Boundary)'
+            : '2. RepaintBoundary & GPU',
+        subtitle: isArabic
+            ? 'اعزل الأجزاء اللي بتتحرك عشان كارت الشاشة ما يرسمش باقي الشاشة عالفاضي.'
+            : 'Isolate render layers to prevent full repaint jank.',
         icon: Icons.layers_rounded,
         color: const Color(0xFF0D9488),
         page: const RepaintBoundaryScreen(),
       ),
       (
+        id: 'animations',
         category: 'performance',
-        title: isArabic ? '3. حركات وفيزياء ناعمة (Animations)' : '3. Staggered & Physics Animations',
-        subtitle: isArabic ? 'حركات تتابع خطوة بخطوة ومحاكاة السوستة الطبيعية بتغير الصلابة والتخميد.' : 'Chained Interval timelines and physics spring simulation.',
+        title: isArabic
+            ? '3. حركات وفيزياء ناعمة (Animations)'
+            : '3. Staggered & Physics Animations',
+        subtitle: isArabic
+            ? 'حركات تتابع خطوة بخطوة ومحاكاة السوستة الطبيعية بتغير الصلابة والتخميد.'
+            : 'Chained Interval timelines and physics spring simulation.',
         icon: Icons.animation_rounded,
         color: const Color(0xFF8B5CF6),
         page: const AnimationsScreen(),
       ),
       (
+        id: 'memory-performance',
         category: 'performance',
-        title: isArabic ? '4. تنظيف الرام والصور (Memory & Images)' : '4. Memory Profiling & Image Resize',
-        subtitle: isArabic ? 'اكتشف تسريب الذاكرة واقفل المؤقتات وصغر حجم الصور الكبيرة قبل عرضها.' : 'Memory leaks detector and GPU bitmap downsampling.',
+        title: isArabic
+            ? '4. تنظيف الرام والصور (Memory & Images)'
+            : '4. Memory Profiling & Image Resize',
+        subtitle: isArabic
+            ? 'اكتشف تسريب الذاكرة واقفل المؤقتات وصغر حجم الصور الكبيرة قبل عرضها.'
+            : 'Memory leaks detector and GPU bitmap downsampling.',
         icon: Icons.memory_rounded,
         color: const Color(0xFFEF4444),
         page: const MemoryPerfScreen(),
       ),
       (
+        id: 'slivers',
         category: 'performance',
-        title: isArabic ? '5. القوائم المنزلقة المرنة (Slivers)' : '5. Slivers & Scroll Geometry',
-        subtitle: isArabic ? 'تحكم في حركة التمرير وتثبيت الهيدر في أعلى الشاشة بمرونة.' : 'Live scroll offset & viewport geometry inspector.',
+        title: isArabic
+            ? '5. القوائم المنزلقة المرنة (Slivers)'
+            : '5. Slivers & Scroll Geometry',
+        subtitle: isArabic
+            ? 'تحكم في حركة التمرير وتثبيت الهيدر في أعلى الشاشة بمرونة.'
+            : 'Live scroll offset & viewport geometry inspector.',
         icon: Icons.view_quilt_rounded,
         color: const Color(0xFF06B6D4),
         page: const SliversScreen(),
       ),
       (
+        id: 'physics-painter',
         category: 'performance',
-        title: isArabic ? '6. الرسم الحر والفيزياء (Canvas Painter)' : '6. CustomPainter & Physics',
-        subtitle: isArabic ? 'ارسم نقاط وجزيئات حرة بتتحرك وتتفاعل مع الجاذبية ولمساتك مباشرة.' : 'Particle physics engine and direct GPU canvas draw.',
+        title: isArabic
+            ? '6. الرسم الحر والفيزياء (Canvas Painter)'
+            : '6. CustomPainter & Physics',
+        subtitle: isArabic
+            ? 'ارسم نقاط وجزيئات حرة بتتحرك وتتفاعل مع الجاذبية ولمساتك مباشرة.'
+            : 'Particle physics engine and direct GPU canvas draw.',
         icon: Icons.auto_awesome_motion_rounded,
         color: const Color(0xFF14B8A6),
         page: const PhysicsPainterScreen(),
@@ -383,33 +672,53 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // 2. Network & Async Category
       (
+        id: 'debouncer',
         category: 'network',
-        title: isArabic ? '7. مؤقت البحث والضغطات (Debounce)' : '7. Debouncer & Throttler',
-        subtitle: isArabic ? 'استنى لما المستخدم يخلص كتابة قبل ما تبحث وامنع تكرار الضغط ع الأزرار.' : 'Search keystrokes optimizer and anti-spam protection.',
+        title: isArabic
+            ? '7. مؤقت البحث والضغطات (Debounce)'
+            : '7. Debouncer & Throttler',
+        subtitle: isArabic
+            ? 'استنى لما المستخدم يخلص كتابة قبل ما تبحث وامنع تكرار الضغط ع الأزرار.'
+            : 'Search keystrokes optimizer and anti-spam protection.',
         icon: Icons.filter_alt_rounded,
         color: const Color(0xFF6366F1),
         page: const DebouncerScreen(),
       ),
       (
+        id: 'streams-rx',
         category: 'network',
-        title: isArabic ? '8. تدفق البيانات والرسائل (Streams)' : '8. Reactive Streams & Pipelines',
-        subtitle: isArabic ? 'استقبل التحديثات اللحظية وفلتر الأرقام الزوجية والمكررة خطوة بخطوة.' : 'Reactive streams event emitter and pipeline operators.',
+        title: isArabic
+            ? '8. تدفق البيانات والرسائل (Streams)'
+            : '8. Reactive Streams & Pipelines',
+        subtitle: isArabic
+            ? 'استقبل التحديثات اللحظية وفلتر الأرقام الزوجية والمكررة خطوة بخطوة.'
+            : 'Reactive streams event emitter and pipeline operators.',
         icon: Icons.water_drop_rounded,
         color: const Color(0xFF10B981),
         page: const StreamsRxScreen(),
       ),
       (
+        id: 'error-handling',
         category: 'network',
-        title: isArabic ? '9. معالجة الأخطاء الذكية (Either)' : '9. Functional Error Handling',
-        subtitle: isArabic ? 'اتعامل مع أخطاء السيرفر والإنترنت بأمان وطلع رسايل واضحة بدون كراش.' : 'Safe functional error handling with Either and Cubit.',
+        title: isArabic
+            ? '9. معالجة الأخطاء الذكية (Either)'
+            : '9. Functional Error Handling',
+        subtitle: isArabic
+            ? 'اتعامل مع أخطاء السيرفر والإنترنت بأمان وطلع رسايل واضحة بدون كراش.'
+            : 'Safe functional error handling with Either and Cubit.',
         icon: Icons.shield_rounded,
         color: const Color(0xFF34D399),
         page: const ErrorHandlingScreen(),
       ),
       (
+        id: 'offline-sync',
         category: 'network',
-        title: isArabic ? '10. العمل بدون إنترنت (Offline First)' : '10. Offline-First & Sync Engine',
-        subtitle: isArabic ? 'ضيف بياناتك حتى والنت فاصل والتطبيق هيرفعها للسيرفر لوحده أول ما يتصل.' : 'Optimistic UI updates and offline cache sync queue.',
+        title: isArabic
+            ? '10. العمل بدون إنترنت (Offline First)'
+            : '10. Offline-First & Sync Engine',
+        subtitle: isArabic
+            ? 'ضيف بياناتك حتى والنت فاصل والتطبيق هيرفعها للسيرفر لوحده أول ما يتصل.'
+            : 'Optimistic UI updates and offline cache sync queue.',
         icon: Icons.cloud_sync_rounded,
         color: const Color(0xFF38BDF8),
         page: const OfflineSyncScreen(),
@@ -417,71 +726,113 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // 3. Architecture, Language & Native Category
       (
+        id: 'dart3',
         category: 'architecture',
-        title: isArabic ? '11. أسرار لغة Dart 3 الجديدة' : '11. Dart 3: Sealed Classes & Records',
-        subtitle: isArabic ? 'قسم الحالات واجمع أكتر من قيمة في متغير واحد بكود مختصر وسهل.' : 'Records, exhaustive switch patterns and guard clauses.',
+        title: isArabic
+            ? '11. أسرار لغة Dart 3 الجديدة'
+            : '11. Dart 3: Sealed Classes & Records',
+        subtitle: isArabic
+            ? 'قسم الحالات واجمع أكتر من قيمة في متغير واحد بكود مختصر وسهل.'
+            : 'Records, exhaustive switch patterns and guard clauses.',
         icon: Icons.code_rounded,
         color: const Color(0xFF0284C7),
         page: const Dart3Screen(),
       ),
       (
+        id: 'state-inherited',
         category: 'architecture',
-        title: isArabic ? '12. مشاركة البيانات السريعة (State)' : '12. InheritedModel & O(1) Rebuilds',
-        subtitle: isArabic ? 'شارك الداتا بين الشاشات وحدّث الجزء اللي اتغير بس بدون إعادة بناء الشاشة.' : 'O(1) tree lookup and granular aspect-filtered rebuilds.',
+        title: isArabic
+            ? '12. مشاركة البيانات السريعة (State)'
+            : '12. InheritedModel & O(1) Rebuilds',
+        subtitle: isArabic
+            ? 'شارك الداتا بين الشاشات وحدّث الجزء اللي اتغير بس بدون إعادة بناء الشاشة.'
+            : 'O(1) tree lookup and granular aspect-filtered rebuilds.',
         icon: Icons.hub_rounded,
         color: const Color(0xFF14B8A6),
         page: const StateInheritedScreen(),
       ),
       (
+        id: 'clean-architecture',
         category: 'architecture',
-        title: isArabic ? '13. تنظيم وهندسة الكود (Clean Arch)' : '13. Clean Architecture & SOLID',
-        subtitle: isArabic ? 'افصل كود التصميم عن منطق البيانات عشان التطبيق يبقى سهل في الصيانة.' : 'Layer separation and live Dependency Inversion switcher.',
+        title: isArabic
+            ? '13. تنظيم وهندسة الكود (Clean Arch)'
+            : '13. Clean Architecture & SOLID',
+        subtitle: isArabic
+            ? 'افصل كود التصميم عن منطق البيانات عشان التطبيق يبقى سهل في الصيانة.'
+            : 'Layer separation and live Dependency Inversion switcher.',
         icon: Icons.architecture_rounded,
         color: const Color(0xFFF59E0B),
         page: const CleanArchScreen(),
       ),
       (
+        id: 'platform-channels',
         category: 'architecture',
-        title: isArabic ? '14. ربط الموبايل ونظام التشغيل (Native)' : '14. Platform Channels & Native Bridge',
-        subtitle: isArabic ? 'اطلب نسبة البطارية ومعلومات الجهاز وحساسات الموبايل من أندرويد و iOS.' : 'BinaryMessenger bridge, method calls and sensor streams.',
+        title: isArabic
+            ? '14. ربط الموبايل ونظام التشغيل (Native)'
+            : '14. Platform Channels & Native Bridge',
+        subtitle: isArabic
+            ? 'اطلب نسبة البطارية ومعلومات الجهاز وحساسات الموبايل من أندرويد و iOS.'
+            : 'BinaryMessenger bridge, method calls and sensor streams.',
         icon: Icons.settings_input_component_rounded,
         color: const Color(0xFF06B6D4),
         page: const PlatformChannelsScreen(),
       ),
       (
+        id: 'keys',
         category: 'architecture',
-        title: isArabic ? '15. ترتيب عناصر القوائم (Keys)' : '15. 3 Trees & Widget Keys',
-        subtitle: isArabic ? 'افهم سبب لخبطة الألوان والقيم في القائمة وإزاي تثبت كل عنصر بمفتاح Key.' : 'Widget vs Element matching and state identity.',
+        title: isArabic
+            ? '15. ترتيب عناصر القوائم (Keys)'
+            : '15. 3 Trees & Widget Keys',
+        subtitle: isArabic
+            ? 'افهم سبب لخبطة الألوان والقيم في القائمة وإزاي تثبت كل عنصر بمفتاح Key.'
+            : 'Widget vs Element matching and state identity.',
         icon: Icons.account_tree_rounded,
         color: const Color(0xFFD97706),
         page: const KeysScreen(),
       ),
       (
+        id: 'security',
         category: 'architecture',
-        title: isArabic ? '16. الأمان وتجديد تسجيل الدخول (JWT)' : '16. Security & Token Interceptors',
-        subtitle: isArabic ? 'شفر كلمات السر وجدد جلسة الدخول في الخلفية بدون ما تخرج المستخدم.' : 'AES-256 encryption and auto JWT refresh queue.',
+        title: isArabic
+            ? '16. الأمان وتجديد تسجيل الدخول (JWT)'
+            : '16. Security & Token Interceptors',
+        subtitle: isArabic
+            ? 'شفر كلمات السر وجدد جلسة الدخول في الخلفية بدون ما تخرج المستخدم.'
+            : 'AES-256 encryption and auto JWT refresh queue.',
         icon: Icons.lock_person_rounded,
         color: const Color(0xFFEC4899),
         page: const SecurityScreen(),
       ),
       (
+        id: 'deployment',
         category: 'architecture',
-        title: isArabic ? '17. تجهيز التطبيق للمتاجر (CI/CD)' : '17. App Stores & CI/CD Release',
-        subtitle: isArabic ? 'قائمة الفحص قبل رفع التطبيق وأوامر البناء المشفرة لـ Google Play و iOS.' : 'Keystore generator, store checklist & CI/CD pipeline.',
+        title: isArabic
+            ? '17. تجهيز التطبيق للمتاجر (CI/CD)'
+            : '17. App Stores & CI/CD Release',
+        subtitle: isArabic
+            ? 'قائمة الفحص قبل رفع التطبيق وأوامر البناء المشفرة لـ Google Play و iOS.'
+            : 'Keystore generator, store checklist & CI/CD pipeline.',
         icon: Icons.rocket_launch_rounded,
         color: const Color(0xFFF59E0B),
         page: const DeploymentScreen(),
       ),
       (
+        id: 'extensions',
         category: 'architecture',
-        title: isArabic ? '18. اختصارات الكود الذكية (Extensions)' : '18. Core Extensions Playground',
-        subtitle: isArabic ? 'اختصارات سهلة لفحص الإيميل ورقم الموبايل وتحديد مسافات الشاشة بسرعة.' : 'Live context dimensions, floating snackbars and validators.',
+        title: isArabic
+            ? '18. اختصارات الكود الذكية (Extensions)'
+            : '18. Core Extensions Playground',
+        subtitle: isArabic
+            ? 'اختصارات سهلة لفحص الإيميل ورقم الموبايل وتحديد مسافات الشاشة بسرعة.'
+            : 'Live context dimensions, floating snackbars and validators.',
         icon: Icons.auto_awesome_rounded,
         color: const Color(0xFFE11D48),
         page: const ExtensionsScreen(),
       ),
     ];
+  }
 
+  Widget _buildLabsGrid(bool isArabic, List<_Lab> allLabs) {
     final filteredLabs = allLabs.where((lab) {
       if (_labCategoryFilter == 'all') return true;
       return lab.category == _labCategoryFilter;
@@ -494,8 +845,9 @@ class _HomeScreenState extends State<HomeScreen> {
       spacing: 12,
       runSpacing: 12,
       children: filteredLabs.map((lab) {
+        final isCompleted = _labProgress.isCompleted(lab.id);
         return InkWell(
-          onTap: () => context.push(lab.page),
+          onTap: () => _openLab(lab),
           borderRadius: BorderRadius.circular(10),
           child: Ink(
             padding: const EdgeInsets.all(14),
@@ -512,7 +864,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: BoxDecoration(
                     color: lab.color.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: lab.color.withValues(alpha: 0.35)),
+                    border: Border.all(
+                      color: lab.color.withValues(alpha: 0.35),
+                    ),
                   ),
                   child: Icon(lab.icon, color: lab.color, size: 22),
                 ),
@@ -544,8 +898,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                8.widthBox,
-                const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF64748B), size: 14),
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: AppLocaleScope.of(
+                    context,
+                  ).strings.t(isCompleted ? 'completed' : 'openLab'),
+                  child: Icon(
+                    isCompleted
+                        ? Icons.check_circle_rounded
+                        : Icons.arrow_forward_ios_rounded,
+                    color: isCompleted
+                        ? const Color(0xFF5EEAD4)
+                        : const Color(0xFF64748B),
+                    size: isCompleted ? 20 : 14,
+                  ),
+                ),
               ],
             ),
           ),
@@ -581,7 +948,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                       color: level.color.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: level.color.withValues(alpha: 0.35)),
+                      border: Border.all(
+                        color: level.color.withValues(alpha: 0.35),
+                      ),
                     ),
                     child: Center(
                       child: Text(
@@ -623,7 +992,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   8.widthBox,
-                  const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF64748B), size: 14),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Color(0xFF64748B),
+                    size: 14,
+                  ),
                 ],
               ),
             ),

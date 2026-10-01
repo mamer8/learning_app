@@ -62,6 +62,23 @@ const Map<String, _LocalizedValue> _values = {
   'dashboard': _LocalizedValue(ar: 'لوحة التجارب', en: 'Learning Dashboard'),
   'level': _LocalizedValue(ar: 'المستوى', en: 'Level'),
   'progress': _LocalizedValue(ar: 'نسبة إنجازك', en: 'Progress'),
+  'progressTitle': _LocalizedValue(
+    ar: 'تقدمك في المختبرات',
+    en: 'Your lab progress',
+  ),
+  'completed': _LocalizedValue(ar: 'أكملت', en: 'Completed'),
+  'of': _LocalizedValue(ar: 'من', en: 'of'),
+  'labsCount': _LocalizedValue(ar: 'مختبر', en: 'labs'),
+  'openLab': _LocalizedValue(ar: 'افتح المختبر', en: 'Open lab'),
+  'progressLoadError': _LocalizedValue(
+    ar: 'تعذر تحميل تقدم المختبرات.',
+    en: 'Could not load lab progress.',
+  ),
+  'progressSaveError': _LocalizedValue(
+    ar: 'تعذر حفظ تقدم المختبر.',
+    en: 'Could not save lab progress.',
+  ),
+  'retry': _LocalizedValue(ar: 'إعادة المحاولة', en: 'Retry'),
   'lessons': _LocalizedValue(ar: 'دروس', en: 'Lessons'),
   'labs': _LocalizedValue(ar: 'تجارب', en: 'Labs'),
   'code': _LocalizedValue(ar: 'كود', en: 'Code'),
@@ -128,7 +145,10 @@ const Map<String, _LocalizedValue> _values = {
     ar: 'امنع لخبطة العناصر في القوائم وحافظ على مكان وقيمة كل عنصر صح.',
     en: 'Understand Widget, Element, RenderObject, and state identity.',
   ),
-  'errorsTitle': _LocalizedValue(ar: 'معالجة الأخطاء الذكية', en: 'Error Handling'),
+  'errorsTitle': _LocalizedValue(
+    ar: 'معالجة الأخطاء الذكية',
+    en: 'Error Handling',
+  ),
   'errorsBody': _LocalizedValue(
     ar: 'اتعامل مع مشاكل النت والسيرفر بهدوء بدون ما التطبيق يقفل فجأة.',
     en: 'Use Either and Cubit to build predictable error flows.',
