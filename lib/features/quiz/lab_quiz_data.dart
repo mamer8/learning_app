@@ -68,6 +68,10 @@ const Map<String, QuizText> labQuizTitles = {
     ar: 'مختبر اختبارات الوحدة والواجهة (Testing Lab)',
     en: 'Unit & Widget Testing Lab',
   ),
+  'local-database': QuizText(
+    ar: 'مختبر قواعد البيانات والتخزين المحلي (Local DB)',
+    en: 'Local Database Lab (Drift, SQFlite, Hive)',
+  ),
   'extensions': QuizText(ar: 'مختبر Extensions', en: 'Extensions Lab'),
 };
 
@@ -1181,6 +1185,66 @@ const Map<String, List<LabQuizQuestion>> labQuizzes = {
       explanation: QuizText(
         ar: 'دالة pumpAndSettle تكرر رسم الإطارات حتى تنتهي كل التحريكات والمؤقتات المجدولة، مما يضمن أن الشاشة وصلت لحالتها النهائية المستقرة قبل الفحص.',
         en: 'pumpAndSettle pumps frames repeatedly until there are no more scheduled frames or animations, ensuring the UI is completely settled.',
+      ),
+    ),
+  ],
+  'local-database': [
+    LabQuizQuestion(
+      question: QuizText(
+        ar: 'ما هي الخاصية الأساسية التي تضمنها معاملات ACID في SQLite عند حدوث خطأ مفاجئ أثناء التعديل؟',
+        en: 'What core property does ACID provide in SQLite when an unexpected error occurs during mutation?',
+      ),
+      options: [
+        QuizText(
+          ar: 'الذرية (Atomicity) والتراجع التلقائي (Rollback) لمنع تلف البيانات الجزئية',
+          en: 'Atomicity and automatic Rollback to prevent corrupted partial state',
+        ),
+        QuizText(
+          ar: 'زيادة سرعة الإنترنت في الجهاز',
+          en: 'Boost device internet bandwidth',
+        ),
+        QuizText(
+          ar: 'حذف جميع الجداول القديمة',
+          en: 'Drop all existing tables',
+        ),
+        QuizText(
+          ar: 'تحويل قاعدة البيانات إلى JSON',
+          en: 'Convert the database to raw JSON',
+        ),
+      ],
+      correctIndex: 0,
+      explanation: QuizText(
+        ar: 'خاصية الذرية (Atomicity) تعني إما أن تنجح كافة خطوات المعاملة (Transaction) بالكامل أو يتم التراجع عن كل التغييرات (Rollback)، فلا تترك قاعدة البيانات في حالة مشوهة جزئياً.',
+        en: 'Atomicity ensures that all operations within a transaction succeed completely, or everything is rolled back, preventing partial corrupted state.',
+      ),
+    ),
+    LabQuizQuestion(
+      question: QuizText(
+        ar: 'متى يُفضل استخدام Hive / Isar بدلاً من SQLite / Drift في تطبيق Flutter؟',
+        en: 'When is Hive / Isar preferred over SQLite / Drift in a Flutter app?',
+      ),
+      options: [
+        QuizText(
+          ar: 'عند الرغبة في تخزين كائنات NoSQL / Key-Value خفيفة وسريعة جداً للقراءة مثل Cache وإعدادات المستخدم',
+          en: 'For lightweight, ultra-fast O(1) Key-Value document caching and app settings',
+        ),
+        QuizText(
+          ar: 'عند بناء نظام محاسبة بنكي معقد يحتوي على Foreign Keys واستعلامات JOIN كثيرة',
+          en: 'When building complex relational banking ledgers with multiple JOIN queries',
+        ),
+        QuizText(
+          ar: 'عند تشغيل التطبيق في السيرفر فقط',
+          en: 'Only when running Flutter on server backend',
+        ),
+        QuizText(
+          ar: 'لإرسال إشعارات Push',
+          en: 'To dispatch push notifications',
+        ),
+      ],
+      correctIndex: 0,
+      explanation: QuizText(
+        ar: 'تتميز صناديق Hive بالسرعة الخارقة في الوصول المباشر للمفاتيح دون تعقيدات SQL أو جداول علائقية، مما يجعلها مثالية للـ Caching والإعدادات.',
+        en: 'Hive boxes excel at blazing-fast O(1) key lookups without SQL relational overhead, making them ideal for caching and session state.',
       ),
     ),
   ],

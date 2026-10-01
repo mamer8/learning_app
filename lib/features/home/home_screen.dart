@@ -14,6 +14,7 @@ import '../error_handling_lab/presentation/screens/error_handling_screen.dart';
 import '../extensions_lab/extensions_screen.dart';
 import '../isolates_lab/isolates_screen.dart';
 import '../keys_lab/keys_screen.dart';
+import '../local_database_lab/local_database_screen.dart';
 import '../memory_perf_lab/memory_perf_screen.dart';
 import '../offline_sync_lab/offline_sync_screen.dart';
 import '../physics_lab/physics_painter_screen.dart';
@@ -725,14 +726,27 @@ class _HomeScreenState extends State<HomeScreen> {
         color: const Color(0xFF38BDF8),
         page: const OfflineSyncScreen(),
       ),
+      (
+        id: 'local-database',
+        category: 'network',
+        title: isArabic
+            ? '11. قواعد البيانات والتخزين المحلي (Local DB)'
+            : '11. Local Database & Cache (Drift, SQFlite, Hive)',
+        subtitle: isArabic
+            ? 'احفظ البيانات بـ SQLite و Hive ونفذ عمليات الـ ACID والـ Migrations وطابور الـ Outbox.'
+            : 'ACID transactions, SQLite migrations, Hive NoSQL boxes and outbox sync engine.',
+        icon: Icons.storage_rounded,
+        color: const Color(0xFF0284C7),
+        page: const LocalDatabaseScreen(),
+      ),
 
       // 3. Architecture, Language & Native Category
       (
         id: 'dart3',
         category: 'architecture',
         title: isArabic
-            ? '11. أسرار لغة Dart 3 الجديدة'
-            : '11. Dart 3: Sealed Classes & Records',
+            ? '12. أسرار لغة Dart 3 الجديدة'
+            : '12. Dart 3: Sealed Classes & Records',
         subtitle: isArabic
             ? 'قسم الحالات واجمع أكتر من قيمة في متغير واحد بكود مختصر وسهل.'
             : 'Records, exhaustive switch patterns and guard clauses.',
@@ -744,8 +758,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'state-inherited',
         category: 'architecture',
         title: isArabic
-            ? '12. مشاركة البيانات السريعة (State)'
-            : '12. InheritedModel & O(1) Rebuilds',
+            ? '13. مشاركة البيانات السريعة (State)'
+            : '13. InheritedModel & O(1) Rebuilds',
         subtitle: isArabic
             ? 'شارك الداتا بين الشاشات وحدّث الجزء اللي اتغير بس بدون إعادة بناء الشاشة.'
             : 'O(1) tree lookup and granular aspect-filtered rebuilds.',
@@ -757,8 +771,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'state-comparison',
         category: 'architecture',
         title: isArabic
-            ? '13. مقارنة وتقويم إدارة الحالة (Cubit)'
-            : '13. State Management & Cubit Benchmark',
+            ? '14. مقارنة وتقويم إدارة الحالة (Cubit)'
+            : '14. State Management & Cubit Benchmark',
         subtitle: isArabic
             ? 'قارن بين setState و Cubit و ValueNotifier مع رسوم بيانية حية لعدد الـ Rebuilds.'
             : 'Live rebuild telemetry & benchmark: setState vs Cubit vs ValueNotifier.',
@@ -770,8 +784,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'clean-architecture',
         category: 'architecture',
         title: isArabic
-            ? '14. تنظيم وهندسة الكود (Clean Arch)'
-            : '14. Clean Architecture & SOLID',
+            ? '15. تنظيم وهندسة الكود (Clean Arch)'
+            : '15. Clean Architecture & SOLID',
         subtitle: isArabic
             ? 'افصل كود التصميم عن منطق البيانات عشان التطبيق يبقى سهل في الصيانة.'
             : 'Layer separation and live Dependency Inversion switcher.',
@@ -783,8 +797,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'platform-channels',
         category: 'architecture',
         title: isArabic
-            ? '15. ربط الموبايل ونظام التشغيل (Native)'
-            : '15. Platform Channels & Native Bridge',
+            ? '16. ربط الموبايل ونظام التشغيل (Native)'
+            : '16. Platform Channels & Native Bridge',
         subtitle: isArabic
             ? 'اطلب نسبة البطارية ومعلومات الجهاز وحساسات الموبايل من أندرويد و iOS.'
             : 'BinaryMessenger bridge, method calls and sensor streams.',
@@ -796,8 +810,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'keys',
         category: 'architecture',
         title: isArabic
-            ? '16. ترتيب عناصر القوائم (Keys)'
-            : '16. 3 Trees & Widget Keys',
+            ? '17. ترتيب عناصر القوائم (Keys)'
+            : '17. 3 Trees & Widget Keys',
         subtitle: isArabic
             ? 'افهم سبب لخبطة الألوان والقيم في القائمة وإزاي تثبت كل عنصر بمفتاح Key.'
             : 'Widget vs Element matching and state identity.',
@@ -809,8 +823,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'security',
         category: 'architecture',
         title: isArabic
-            ? '17. الأمان وتجديد تسجيل الدخول (JWT)'
-            : '17. Security & Token Interceptors',
+            ? '18. الأمان وتجديد تسجيل الدخول (JWT)'
+            : '18. Security & Token Interceptors',
         subtitle: isArabic
             ? 'شفر كلمات السر وجدد جلسة الدخول في الخلفية بدون ما تخرج المستخدم.'
             : 'AES-256 encryption and auto JWT refresh queue.',
@@ -822,8 +836,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'deployment',
         category: 'architecture',
         title: isArabic
-            ? '18. تجهيز التطبيق للمتاجر (CI/CD)'
-            : '18. App Stores & CI/CD Release',
+            ? '19. تجهيز التطبيق للمتاجر (CI/CD)'
+            : '19. App Stores & CI/CD Release',
         subtitle: isArabic
             ? 'قائمة الفحص قبل رفع التطبيق وأوامر البناء المشفرة لـ Google Play و iOS.'
             : 'Keystore generator, store checklist & CI/CD pipeline.',
@@ -835,8 +849,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'testing',
         category: 'architecture',
         title: isArabic
-            ? '19. اختبارات الوحدة والواجهة (Testing Lab)'
-            : '19. Unit, Widget & Bloc Testing',
+            ? '20. اختبارات الوحدة والواجهة (Testing Lab)'
+            : '20. Unit, Widget & Bloc Testing',
         subtitle: isArabic
             ? 'اختبار دوال المنطق وحركات الـ Widgets وتدفق حالات Cubit و Mocktail مع CI/CD.'
             : 'Automated testing with flutter_test, mocktail, bloc_test and GitHub Actions.',
@@ -848,8 +862,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'extensions',
         category: 'architecture',
         title: isArabic
-            ? '20. اختصارات الكود الذكية (Extensions)'
-            : '20. Core Extensions Playground',
+            ? '21. اختصارات الكود الذكية (Extensions)'
+            : '21. Core Extensions Playground',
         subtitle: isArabic
             ? 'اختصارات سهلة لفحص الإيميل ورقم الموبايل وتحديد مسافات الشاشة بسرعة.'
             : 'Live context dimensions, floating snackbars and validators.',
