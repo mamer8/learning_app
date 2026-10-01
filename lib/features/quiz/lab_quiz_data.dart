@@ -49,6 +49,10 @@ const Map<String, QuizText> labQuizTitles = {
     ar: 'مختبر إدارة الحالة',
     en: 'State Management Lab',
   ),
+  'state-comparison': QuizText(
+    ar: 'مختبر مقارنة إدارة الحالة (Cubit vs setState)',
+    en: 'State Comparison Lab (Cubit vs setState)',
+  ),
   'clean-architecture': QuizText(
     ar: 'مختبر المعمارية النظيفة',
     en: 'Clean Architecture Lab',
@@ -1024,6 +1028,95 @@ const Map<String, List<LabQuizQuestion>> labQuizzes = {
       explanation: QuizText(
         ar: 'الدوال والامتدادات البسيطة مناسبة لإعادة استخدام منطق صغير مستقل دون إدخال تعقيد الواجهة.',
         en: 'Simple functions and extensions reuse small independent logic without introducing UI complexity.',
+      ),
+    ),
+  ],
+  'state-comparison': [
+    LabQuizQuestion(
+      question: QuizText(
+        ar: 'لماذا يُفضل استخدام BlocSelector بدل BlocBuilder عند التعامل مع حالات تحتوي على حقول متعددة؟',
+        en: 'Why is BlocSelector preferred over BlocBuilder when dealing with multi-field states?',
+      ),
+      options: [
+        QuizText(
+          ar: 'لأنه يعزل إعادة البناء ليحدث فقط عندما يتغير الحقل المحدد (Selected value)',
+          en: 'Because it isolates widget rebuilds to trigger only when the selected value changes',
+        ),
+        QuizText(
+          ar: 'لأنه يمنع إنشاء Cubit جديد',
+          en: 'Because it prevents creating a new Cubit',
+        ),
+        QuizText(
+          ar: 'لأنه يحذف الـ State من الذاكرة تلقائياً',
+          en: 'Because it automatically clears state from memory',
+        ),
+        QuizText(
+          ar: 'لأنه يعمل بدون BuildContext',
+          en: 'Because it works without BuildContext',
+        ),
+      ],
+      correctIndex: 0,
+      explanation: QuizText(
+        ar: 'يقوم BlocSelector بفلترة التحديثات بحيث لا يعيد بناء الويدجت إلا إذا تغيرت القيمة الناتجة عن دالة الـ selector فقط، مما يوفر أداءً فائقاً ويمنع إعادة البناء غير الضرورية.',
+        en: 'BlocSelector filters updates so the widget only rebuilds when the selected slice of state actually changes, preventing unnecessary rebuilds.',
+      ),
+    ),
+    LabQuizQuestion(
+      question: QuizText(
+        ar: 'ما العيب الأساسي في الاعتماد الحصري على setState في التطبيقات الكبيرة؟',
+        en: 'What is the main drawback of relying exclusively on setState in large-scale apps?',
+      ),
+      options: [
+        QuizText(
+          ar: 'إعادة بناء شجرة الويدجت بالكامل وصعوبة فصل منطق الأعمال عن الواجهة وصعوبة كتابة Unit Tests',
+          en: 'Full subtree rebuilds, tight UI coupling, and difficulty writing unit tests',
+        ),
+        QuizText(
+          ar: 'عدم توافق setState مع لغة Dart 3',
+          en: 'setState is incompatible with Dart 3',
+        ),
+        QuizText(
+          ar: 'عدم إمكانية تغيير الألوان عبر setState',
+          en: 'Inability to mutate colors using setState',
+        ),
+        QuizText(
+          ar: 'استهلاك الإنترنت بشكل متكرر',
+          en: 'Excessive network bandwidth consumption',
+        ),
+      ],
+      correctIndex: 0,
+      explanation: QuizText(
+        ar: 'استدعاء setState يعيد بناء كامل الـ State الحالية ومكوناتها التابعة، ويدمج منطق البيانات داخل كود الواجهة مما يعقد الاختبارات المعمارية.',
+        en: 'setState triggers a full rebuild of the StatefulWidget subtree and tightly couples business logic with UI rendering.',
+      ),
+    ),
+    LabQuizQuestion(
+      question: QuizText(
+        ar: 'متى يعتبر ValueNotifier خياراً مثالياً؟',
+        en: 'When is ValueNotifier an ideal state management choice?',
+      ),
+      options: [
+        QuizText(
+          ar: 'عند الحاجة لتحديث تفاعلي محدد وخفيف لقيمة واحدة دون الحاجة لحزم إضافية',
+          en: 'When needing lightweight reactive updates for single values without external packages',
+        ),
+        QuizText(
+          ar: 'عند بناء نظام دفع بنكي كامل ومعقد',
+          en: 'When building a full complex banking transaction flow',
+        ),
+        QuizText(
+          ar: 'عند الرغبة في إيقاف رسم الإطارات بالكامل',
+          en: 'When wanting to halt frame rendering completely',
+        ),
+        QuizText(
+          ar: 'فقط داخل الـ Isolates',
+          en: 'Only inside background Isolates',
+        ),
+      ],
+      correctIndex: 0,
+      explanation: QuizText(
+        ar: 'يوفر ValueNotifier مع ValueListenableBuilder أسلوباً بسيطاً ومدمجاً في Flutter Framework لتحديث جزئيات محددة بدون إضافة أي حزم خارجية.',
+        en: 'ValueNotifier with ValueListenableBuilder offers a clean, zero-dependency reactive approach for scoped micro-state.',
       ),
     ),
   ],

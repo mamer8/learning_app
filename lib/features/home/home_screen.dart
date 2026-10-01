@@ -21,6 +21,7 @@ import '../platform_channels_lab/platform_channels_screen.dart';
 import '../repaint_boundary_lab/repaint_boundary_screen.dart';
 import '../security_lab/security_screen.dart';
 import '../slivers_lab/slivers_screen.dart';
+import '../state_comparison_lab/state_comparison_screen.dart';
 import '../state_inherited_lab/state_inherited_screen.dart';
 import '../streams_rx_lab/streams_rx_screen.dart';
 
@@ -752,11 +753,24 @@ class _HomeScreenState extends State<HomeScreen> {
         page: const StateInheritedScreen(),
       ),
       (
+        id: 'state-comparison',
+        category: 'architecture',
+        title: isArabic
+            ? '13. مقارنة وتقويم إدارة الحالة (Cubit)'
+            : '13. State Management & Cubit Benchmark',
+        subtitle: isArabic
+            ? 'قارن بين setState و Cubit و ValueNotifier مع رسوم بيانية حية لعدد الـ Rebuilds.'
+            : 'Live rebuild telemetry & benchmark: setState vs Cubit vs ValueNotifier.',
+        icon: Icons.compare_arrows_rounded,
+        color: const Color(0xFF10B981),
+        page: const StateComparisonScreen(),
+      ),
+      (
         id: 'clean-architecture',
         category: 'architecture',
         title: isArabic
-            ? '13. تنظيم وهندسة الكود (Clean Arch)'
-            : '13. Clean Architecture & SOLID',
+            ? '14. تنظيم وهندسة الكود (Clean Arch)'
+            : '14. Clean Architecture & SOLID',
         subtitle: isArabic
             ? 'افصل كود التصميم عن منطق البيانات عشان التطبيق يبقى سهل في الصيانة.'
             : 'Layer separation and live Dependency Inversion switcher.',
@@ -768,8 +782,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'platform-channels',
         category: 'architecture',
         title: isArabic
-            ? '14. ربط الموبايل ونظام التشغيل (Native)'
-            : '14. Platform Channels & Native Bridge',
+            ? '15. ربط الموبايل ونظام التشغيل (Native)'
+            : '15. Platform Channels & Native Bridge',
         subtitle: isArabic
             ? 'اطلب نسبة البطارية ومعلومات الجهاز وحساسات الموبايل من أندرويد و iOS.'
             : 'BinaryMessenger bridge, method calls and sensor streams.',
@@ -781,8 +795,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'keys',
         category: 'architecture',
         title: isArabic
-            ? '15. ترتيب عناصر القوائم (Keys)'
-            : '15. 3 Trees & Widget Keys',
+            ? '16. ترتيب عناصر القوائم (Keys)'
+            : '16. 3 Trees & Widget Keys',
         subtitle: isArabic
             ? 'افهم سبب لخبطة الألوان والقيم في القائمة وإزاي تثبت كل عنصر بمفتاح Key.'
             : 'Widget vs Element matching and state identity.',
@@ -794,8 +808,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'security',
         category: 'architecture',
         title: isArabic
-            ? '16. الأمان وتجديد تسجيل الدخول (JWT)'
-            : '16. Security & Token Interceptors',
+            ? '17. الأمان وتجديد تسجيل الدخول (JWT)'
+            : '17. Security & Token Interceptors',
         subtitle: isArabic
             ? 'شفر كلمات السر وجدد جلسة الدخول في الخلفية بدون ما تخرج المستخدم.'
             : 'AES-256 encryption and auto JWT refresh queue.',
@@ -807,8 +821,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'deployment',
         category: 'architecture',
         title: isArabic
-            ? '17. تجهيز التطبيق للمتاجر (CI/CD)'
-            : '17. App Stores & CI/CD Release',
+            ? '18. تجهيز التطبيق للمتاجر (CI/CD)'
+            : '18. App Stores & CI/CD Release',
         subtitle: isArabic
             ? 'قائمة الفحص قبل رفع التطبيق وأوامر البناء المشفرة لـ Google Play و iOS.'
             : 'Keystore generator, store checklist & CI/CD pipeline.',
@@ -820,8 +834,8 @@ class _HomeScreenState extends State<HomeScreen> {
         id: 'extensions',
         category: 'architecture',
         title: isArabic
-            ? '18. اختصارات الكود الذكية (Extensions)'
-            : '18. Core Extensions Playground',
+            ? '19. اختصارات الكود الذكية (Extensions)'
+            : '19. Core Extensions Playground',
         subtitle: isArabic
             ? 'اختصارات سهلة لفحص الإيميل ورقم الموبايل وتحديد مسافات الشاشة بسرعة.'
             : 'Live context dimensions, floating snackbars and validators.',
